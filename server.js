@@ -48,8 +48,7 @@ passport.deserializeUser((user, done) => {
 });
 
 // In-memory storage for demo (use database in production)
-let stands = {};
-let serviceRequests = [];
+let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map() } }
 let connectedUsers = new Map();
 
 // Serve frontend build
@@ -81,23 +80,40 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("✅ User connected:", socket.id);
 
-  // Send current stands data
-  socket.emit("standUpdate", stands);
-
   socket.on("userMode", (data) => {
     connectedUsers.set(socket.id, data);
+    
+    // Initialize airport data if not exists
+    if (data.airport && !airportData[data.airport]) {
+      airportData[data.airport] = {
+        stands: {},
+        requests: [],
+        users: new Map()
+      };
+    }
+    
+    // Send airport-specific data
+    if (data.airport) {
+      socket.emit("standUpdate", airportData[data.airport].stands);
+      socket.emit("serviceUpdate", airportData[data.airport].requests);
+    }
   });
 
   socket.on("claimStand", (data) => {
-    const { stand, flightNumber, aircraft, pilot, userId } = data;
+    const { stand, flightNumber, aircraft, pilot, userId, airport } = data;
+    
+    if (!airport || !airportData[airport]) {
+      socket.emit("error", { message: "Invalid airport selected" });
+      return;
+    }
     
     // Check if stand is available
-    if (stands[stand] && stands[stand].occupied) {
+    if (airportData[airport].stands[stand] && airportData[airport].stands[stand].occupied) {
       socket.emit("error", { message: "Stand already occupied" });
       return;
     }
 
-    stands[stand] = {
+    airportData[airport].stands[stand] = {
       flight: flightNumber,
       aircraft: aircraft,
       pilot: pilot,
@@ -106,13 +122,15 @@ io.on("connection", (socket) => {
       claimedAt: new Date().toLocaleTimeString()
     };
 
-    io.emit("standUpdate", stands);
+    // Emit to users at the same airport
+    io.emit("standUpdate", airportData[airport].stands);
     
-    // Notify ground crew
+    // Notify users at the same airport
     io.emit("chatUpdate", {
-      text: `${pilot} has claimed ${stand} with flight ${flightNumber} (${aircraft})`,
+      text: `${pilot} has claimed ${stand} with flight ${flightNumber} (${aircraft}) at ${airport}`,
       sender: "SYSTEM",
       stand: stand,
+      airport: airport,
       timestamp: new Date().toLocaleTimeString(),
       mode: "system"
     });
@@ -124,21 +142,27 @@ io.on("connection", (socket) => {
   });
 
   socket.on("serviceRequest", (req) => {
-    const requestId = serviceRequests.length;
+    if (!req.airport || !airportData[req.airport]) {
+      socket.emit("error", { message: "Invalid airport selected" });
+      return;
+    }
+    
+    const requestId = airportData[req.airport].requests.length;
     const serviceRequest = {
       ...req,
       id: requestId,
       requestedBy: socket.id
     };
     
-    serviceRequests.push(serviceRequest);
-    io.emit("serviceUpdate", serviceRequests);
+    airportData[req.airport].requests.push(serviceRequest);
+    io.emit("serviceUpdate", airportData[req.airport].requests);
 
-    // Notify ground crew
+    // Notify users at the same airport
     io.emit("chatUpdate", {
-      text: `Service request: ${req.service} for ${req.flight} at ${req.stand}`,
+      text: `Service request: ${req.service} for ${req.flight} at ${req.stand} (${req.airport})`,
       sender: "SYSTEM",
       stand: req.stand,
+      airport: req.airport,
       timestamp: new Date().toLocaleTimeString(),
       mode: "system"
     });
@@ -146,20 +170,29 @@ io.on("connection", (socket) => {
 
   socket.on("serviceAction", (data) => {
     const { requestId, action, crewMember } = data;
+    const userInfo = connectedUsers.get(socket.id);
     
-    if (serviceRequests[requestId]) {
-      serviceRequests[requestId].status = action;
-      serviceRequests[requestId].handledBy = crewMember;
-      serviceRequests[requestId].handledAt = new Date().toLocaleTimeString();
+    if (!userInfo || !userInfo.airport || !airportData[userInfo.airport]) {
+      socket.emit("error", { message: "Invalid airport or user not properly connected" });
+      return;
+    }
+    
+    const airport = userInfo.airport;
+    
+    if (airportData[airport].requests[requestId]) {
+      airportData[airport].requests[requestId].status = action;
+      airportData[airport].requests[requestId].handledBy = crewMember;
+      airportData[airport].requests[requestId].handledAt = new Date().toLocaleTimeString();
       
-      io.emit("serviceUpdate", serviceRequests);
+      io.emit("serviceUpdate", airportData[airport].requests);
       
-      // Notify all users
-      const request = serviceRequests[requestId];
+      // Notify users at the same airport
+      const request = airportData[airport].requests[requestId];
       io.emit("chatUpdate", {
-        text: `${crewMember} has ${action.toLowerCase()} ${request.service} service for ${request.flight}`,
+        text: `${crewMember} has ${action.toLowerCase()} ${request.service} service for ${request.flight} at ${airport}`,
         sender: "SYSTEM",
         stand: request.stand,
+        airport: airport,
         timestamp: new Date().toLocaleTimeString(),
         mode: "system"
       });
@@ -169,11 +202,24 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("❌ User disconnected:", socket.id);
     
+    const userInfo = connectedUsers.get(socket.id);
+    
     // Release any stands claimed by this user
-    for (const [stand, info] of Object.entries(stands)) {
-      if (info.requestedBy === socket.id) {
-        delete stands[stand];
-        io.emit("standUpdate", stands);
+    if (userInfo && userInfo.airport && airportData[userInfo.airport]) {
+      for (const [stand, info] of Object.entries(airportData[userInfo.airport].stands)) {
+        if (info.userId === userInfo.userId) {
+          delete airportData[userInfo.airport].stands[stand];
+          io.emit("standUpdate", airportData[userInfo.airport].stands);
+          
+          io.emit("chatUpdate", {
+            text: `${info.pilot} has disconnected. ${stand} is now available.`,
+            sender: "SYSTEM",
+            stand: stand,
+            airport: userInfo.airport,
+            timestamp: new Date().toLocaleTimeString(),
+            mode: "system"
+          });
+        }
       }
     }
     

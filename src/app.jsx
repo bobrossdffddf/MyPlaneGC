@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import "./App.css";
@@ -23,6 +22,13 @@ export default function App() {
     visibility: "10km",
     qnh: "1013"
   });
+  const [selectedAirport, setSelectedAirport] = useState("");
+
+  const ptfsAirports = [
+    "IRFD", "IORE", "IZOL", "ICYP", "IPPH", "IGRV", "ISAU", "IBTH", "ISKP",
+    "IGAR", "IBLT", "IMLR", "ITRC", "IDCS", "ITKO", "IJAF", "ISCM", "IBAR",
+    "IHEN", "ILAR", "IIAB", "IPAP", "ILKL", "IGRV", "IBTH", "IUFO", "ISKP"
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -232,6 +238,22 @@ export default function App() {
               </div>
             </div>
           </div>
+
+          <div className="airport-filter">
+            <h4>AIRPORT FILTER</h4>
+            <select
+              value={selectedAirport}
+              onChange={(e) => setSelectedAirport(e.target.value)}
+              className="cockpit-input"
+            >
+              <option value="">ALL PTFS AIRPORTS</option>
+              {ptfsAirports.map((airport) => (
+                <option key={airport} value={airport}>
+                  {airport}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="main-content">
@@ -419,7 +441,7 @@ export default function App() {
               <h4>GROUND CONTROL FREQUENCY</h4>
               <div className="frequency-display">121.900 MHz</div>
             </div>
-            
+
             <div className="chat-display">
               {messages
                 .filter(m => !selectedStand || m.stand === selectedStand)
@@ -442,9 +464,9 @@ export default function App() {
                 onKeyPress={(e) => e.key === "Enter" && sendMessage()}
                 placeholder={selectedStand ? `Transmit to ${selectedStand}...` : "Select stand first..."}
                 className="transmission-input"
-                disabled={!selectedStand}
+                disabled={!selectedStand || !selectedAirport}
               />
-              <button onClick={sendMessage} className="transmit-btn" disabled={!selectedStand}>
+              <button onClick={sendMessage} className="transmit-btn" disabled={!selectedStand || !selectedAirport}>
                 TRANSMIT
               </button>
             </div>
