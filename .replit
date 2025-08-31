@@ -29,3 +29,7 @@ args = "npm run build"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm start"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
