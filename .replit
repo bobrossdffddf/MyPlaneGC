@@ -1,18 +1,17 @@
-entrypoint = "index.js"
-modules = ["nodejs-22"]
+modules = ["nodejs-20", "web"]
 hidden = [".config", "package-lock.json"]
+run = "npm run dev"
 
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
 
 [nix]
-channel = "stable-24_11"
+channel = "stable-25_05"
 
 [deployment]
-run = ["sh", "-c", "node server.js"]
+run = ["sh", "-c", "npm run dev"]
 deploymentTarget = "autoscale"
 ignorePorts = false
-build = ["sh", "-c", "npm run build"]
 
 [workflows]
 runButton = "Run Full Stack App"
