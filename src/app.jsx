@@ -20,8 +20,6 @@ export default function App() {
   const [selectedAirport, setSelectedAirport] = useState("");
   const [activeMenu, setActiveMenu] = useState("main");
   const [customSvg, setCustomSvg] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [adminCustomSvgs, setAdminCustomSvgs] = useState({});
   const [checklists, setChecklists] = useState({
     preflight: [
       { item: "Aircraft Documents Review", checked: false, category: "Documentation" },
@@ -143,10 +141,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Check for admin mode via URL parameter
-    const urlParams = new URLSearchParams(window.location.search);
-    setIsAdmin(urlParams.get('admin') === 'true');
-
     fetch('/api/user')
       .then(res => res.ok ? res.json() : null)
       .then(userData => {
@@ -204,7 +198,8 @@ export default function App() {
         aircraft,
         pilot: user?.username,
         userId: user?.id,
-        airport: selectedAirport
+        airport: selectedAirport,
+        allowSwitch: true
       });
       addLog(`Stand claimed: ${selectedStand} for flight ${flightNumber}`);
     }
@@ -261,9 +256,14 @@ export default function App() {
   };
 
   const renderAircraftSvg = () => {
-    // Check if admin has set a custom SVG for this aircraft type
-    if (isAdmin && aircraft && adminCustomSvgs[aircraft]) {
-      return <div dangerouslySetInnerHTML={{ __html: adminCustomSvgs[aircraft] }} />;
+    // Try to load custom SVG from aircraft_svgs folder
+    if (aircraft) {
+      try {
+        // This would load from /aircraft_svgs/{aircraft}.svg if it exists
+        // For now, we'll use the enhanced default SVG
+      } catch (error) {
+        console.log(`No custom SVG found for ${aircraft}, using default`);
+      }
     }
 
     // Return enhanced default SVG with aircraft-specific details
@@ -544,64 +544,17 @@ export default function App() {
               </div>
 
               <div className="config-section">
-                <h4>CUSTOM AIRCRAFT SVG</h4>
-                {isAdmin ? (
-                  <div className="admin-svg-panel">
-                    <h5>ADMIN PANEL - Manage Aircraft SVGs</h5>
-                    <div className="admin-svg-controls">
-                      <select 
-                        value={aircraft} 
-                        onChange={(e) => setAircraft(e.target.value)}
-                        className="cockpit-input"
-                      >
-                        <option value="">Select Aircraft Type</option>
-                        {aircraftTypes.map(type => (
-                          <option key={type} value={type}>{type}</option>
-                        ))}
-                      </select>
-                      <textarea
-                        value={adminCustomSvgs[aircraft] || ""}
-                        onChange={(e) => setAdminCustomSvgs(prev => ({
-                          ...prev,
-                          [aircraft]: e.target.value
-                        }))}
-                        placeholder={`SVG code for ${aircraft || 'selected aircraft'}...`}
-                        className="cockpit-input svg-textarea"
-                        rows="8"
-                      />
-                      <div className="admin-svg-actions">
-                        <button 
-                          onClick={() => aircraft && setAdminCustomSvgs(prev => ({...prev, [aircraft]: ""}))}
-                          className="clear-svg-btn"
-                          disabled={!aircraft}
-                        >
-                          Clear {aircraft} SVG
-                        </button>
-                        <button 
-                          onClick={() => {
-                            const exported = JSON.stringify(adminCustomSvgs, null, 2);
-                            navigator.clipboard.writeText(exported);
-                            alert('SVG data copied to clipboard!');
-                          }}
-                          className="export-svg-btn"
-                        >
-                          Export All SVGs
-                        </button>
-                      </div>
+                <h4>AIRCRAFT DISPLAY</h4>
+                <div className="aircraft-svg-info">
+                  <p>Custom aircraft SVGs can be added to the <code>aircraft_svgs/</code> folder.</p>
+                  <p>Name files as <code>{aircraft || 'AIRCRAFT_TYPE'}.svg</code> to override default graphics.</p>
+                  <p>Current aircraft: {aircraft || 'None selected'}</p>
+                  {aircraft && (
+                    <div className="svg-file-info">
+                      Expected file: <code>aircraft_svgs/{aircraft}.svg</code>
                     </div>
-                    <div className="svg-preview">
-                      <h6>Preview for {aircraft || 'No Aircraft Selected'}</h6>
-                      {aircraft && adminCustomSvgs[aircraft] && (
-                        <div dangerouslySetInnerHTML={{ __html: adminCustomSvgs[aircraft] }} />
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="user-svg-display">
-                    <p>Aircraft SVG customization is managed by administrators.</p>
-                    <p>Current aircraft: {aircraft || 'None selected'}</p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -633,8 +586,8 @@ export default function App() {
               {Object.keys(checklists).map(phase => (
                 <button 
                   key={phase}
-                  className={`phase-btn ${activeMenu === phase ? 'active' : ''}`}
-                  onClick={() => setActiveMenu(phase)}
+                  className={`phase-btn ${activeMenu === `checklist-${phase}` ? 'active' : ''}`}
+                  onClick={() => setActiveMenu(`checklist-${phase}`)}
                 >
                   {phase.toUpperCase()}
                 </button>
@@ -665,7 +618,7 @@ export default function App() {
                         </div>
                         <button 
                           className="go-to-phase"
-                          onClick={() => setActiveMenu(phase)}
+                          onClick={() => setActiveMenu(`checklist-${phase}`)}
                         >
                           GO TO CHECKLIST
                         </button>
@@ -674,46 +627,53 @@ export default function App() {
                   })}
                 </div>
               </div>
-            ) : (
+            ) : activeMenu.startsWith('checklist-') ? (
               <div className="detailed-checklist">
-                <div className="checklist-header">
-                  <h4>{activeMenu.toUpperCase()} CHECKLIST</h4>
-                  <div className="checklist-stats">
-                    {checklists[activeMenu].filter(item => item.checked).length} / {checklists[activeMenu].length} Complete
-                  </div>
-                </div>
-                
-                <div className="categorized-items">
-                  {Object.entries(
-                    checklists[activeMenu].reduce((acc, item, index) => {
-                      const category = item.category || 'General';
-                      if (!acc[category]) acc[category] = [];
-                      acc[category].push({ ...item, index });
-                      return acc;
-                    }, {})
-                  ).map(([category, items]) => (
-                    <div key={category} className="checklist-category">
-                      <h5>{category}</h5>
-                      <div className="category-items">
-                        {items.map((item) => (
-                          <div key={item.index} className="checklist-item enhanced">
-                            <label>
-                              <input
-                                type="checkbox"
-                                checked={item.checked}
-                                onChange={() => toggleChecklistItem(activeMenu, item.index)}
-                              />
-                              <span className={item.checked ? 'checked' : ''}>{item.item}</span>
-                              <div className="item-status">
-                                {item.checked ? '✅' : '⭕'}
-                              </div>
-                            </label>
+                {(() => {
+                  const phase = activeMenu.replace('checklist-', '');
+                  return (
+                    <>
+                      <div className="checklist-header">
+                        <h4>{phase.toUpperCase()} CHECKLIST</h4>
+                        <div className="checklist-stats">
+                          {checklists[phase].filter(item => item.checked).length} / {checklists[phase].length} Complete
+                        </div>
+                      </div>
+                      
+                      <div className="categorized-items">
+                        {Object.entries(
+                          checklists[phase].reduce((acc, item, index) => {
+                            const category = item.category || 'General';
+                            if (!acc[category]) acc[category] = [];
+                            acc[category].push({ ...item, index });
+                            return acc;
+                          }, {})
+                        ).map(([category, items]) => (
+                          <div key={category} className="checklist-category">
+                            <h5>{category}</h5>
+                            <div className="category-items">
+                              {items.map((item) => (
+                                <div key={item.index} className="checklist-item enhanced">
+                                  <label>
+                                    <input
+                                      type="checkbox"
+                                      checked={item.checked}
+                                      onChange={() => toggleChecklistItem(phase, item.index)}
+                                    />
+                                    <span className={item.checked ? 'checked' : ''}>{item.item}</span>
+                                    <div className="item-status">
+                                      {item.checked ? '✅' : '⭕'}
+                                    </div>
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -775,9 +735,9 @@ export default function App() {
                       <button 
                         onClick={claimStand} 
                         className="claim-stand-btn" 
-                        disabled={!selectedStand || !flightNumber || !aircraft || stands[selectedStand]}
+                        disabled={!selectedStand || !flightNumber || !aircraft || (stands[selectedStand] && stands[selectedStand].userId !== user?.id)}
                       >
-                        CLAIM STAND
+                        {stands[selectedStand] && stands[selectedStand].userId === user?.id ? 'SWITCH TO STAND' : 'CLAIM STAND'}
                       </button>
                     </div>
                   </div>

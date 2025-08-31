@@ -106,17 +106,36 @@ io.on("connection", (socket) => {
   });
 
   socket.on("claimStand", (data) => {
-    const { stand, flightNumber, aircraft, pilot, userId, airport } = data;
+    const { stand, flightNumber, aircraft, pilot, userId, airport, allowSwitch } = data;
     
     if (!airport || !airportData[airport]) {
       socket.emit("error", { message: "Invalid airport selected" });
       return;
     }
     
-    // Check if stand is available
-    if (airportData[airport].stands[stand] && airportData[airport].stands[stand].occupied) {
-      socket.emit("error", { message: "Stand already occupied" });
+    // Check if stand is available or if user is switching their own stand
+    if (airportData[airport].stands[stand] && 
+        airportData[airport].stands[stand].occupied && 
+        airportData[airport].stands[stand].userId !== userId) {
+      socket.emit("error", { message: "Stand already occupied by another pilot" });
       return;
+    }
+
+    // Release any previous stands claimed by this user
+    if (allowSwitch) {
+      for (const [prevStand, standInfo] of Object.entries(airportData[airport].stands)) {
+        if (standInfo.userId === userId) {
+          delete airportData[airport].stands[prevStand];
+          io.to(airport).emit("chatUpdate", {
+            text: `${pilot} has released ${prevStand}`,
+            sender: "SYSTEM",
+            stand: prevStand,
+            airport: airport,
+            timestamp: new Date().toLocaleTimeString(),
+            mode: "system"
+          });
+        }
+      }
     }
 
     airportData[airport].stands[stand] = {
