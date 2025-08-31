@@ -92,10 +92,16 @@ io.on("connection", (socket) => {
       };
     }
     
-    // Send airport-specific data
+    // Add user to airport-specific data
     if (data.airport) {
+      airportData[data.airport].users.set(socket.id, data);
+      socket.join(data.airport); // Join airport-specific room
+      
+      // Send airport-specific data
       socket.emit("standUpdate", airportData[data.airport].stands);
       socket.emit("serviceUpdate", airportData[data.airport].requests);
+      
+      console.log(`User ${data.userId} joined ${data.airport} as ${data.mode}`);
     }
   });
 
@@ -122,11 +128,11 @@ io.on("connection", (socket) => {
       claimedAt: new Date().toLocaleTimeString()
     };
 
-    // Emit to users at the same airport
-    io.emit("standUpdate", airportData[airport].stands);
+    // Emit to users at the same airport only
+    io.to(airport).emit("standUpdate", airportData[airport].stands);
     
     // Notify users at the same airport
-    io.emit("chatUpdate", {
+    io.to(airport).emit("chatUpdate", {
       text: `${pilot} has claimed ${stand} with flight ${flightNumber} (${aircraft}) at ${airport}`,
       sender: "SYSTEM",
       stand: stand,
@@ -137,8 +143,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("chatMessage", (msg) => {
-    // Only broadcast to users on the same stand
-    io.emit("chatUpdate", msg);
+    // Only broadcast to users at the same airport
+    if (msg.airport) {
+      io.to(msg.airport).emit("chatUpdate", msg);
+    }
   });
 
   socket.on("serviceRequest", (req) => {
@@ -155,10 +163,10 @@ io.on("connection", (socket) => {
     };
     
     airportData[req.airport].requests.push(serviceRequest);
-    io.emit("serviceUpdate", airportData[req.airport].requests);
+    io.to(req.airport).emit("serviceUpdate", airportData[req.airport].requests);
 
     // Notify users at the same airport
-    io.emit("chatUpdate", {
+    io.to(req.airport).emit("chatUpdate", {
       text: `Service request: ${req.service} for ${req.flight} at ${req.stand} (${req.airport})`,
       sender: "SYSTEM",
       stand: req.stand,
@@ -184,11 +192,11 @@ io.on("connection", (socket) => {
       airportData[airport].requests[requestId].handledBy = crewMember;
       airportData[airport].requests[requestId].handledAt = new Date().toLocaleTimeString();
       
-      io.emit("serviceUpdate", airportData[airport].requests);
+      io.to(airport).emit("serviceUpdate", airportData[airport].requests);
       
       // Notify users at the same airport
       const request = airportData[airport].requests[requestId];
-      io.emit("chatUpdate", {
+      io.to(airport).emit("chatUpdate", {
         text: `${crewMember} has ${action.toLowerCase()} ${request.service} service for ${request.flight} at ${airport}`,
         sender: "SYSTEM",
         stand: request.stand,

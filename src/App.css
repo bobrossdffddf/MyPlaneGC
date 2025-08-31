@@ -969,6 +969,334 @@ body {
   color: #00d4ff;
 }
 
+/* Stats Panel */
+.stats-panel {
+  animation: fadeIn 0.5s ease;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: #00d4ff;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 212, 255, 0.2);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #00d4ff;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  color: #ccc;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.performance-chart {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 15px;
+  padding: 25px;
+}
+
+.chart-placeholder {
+  display: flex;
+  align-items: end;
+  justify-content: space-around;
+  height: 200px;
+  margin-top: 20px;
+}
+
+.chart-bar {
+  width: 40px;
+  background: linear-gradient(to top, #00d4ff, #0099cc);
+  border-radius: 4px 4px 0 0;
+  min-height: 20px;
+}
+
+/* Config Panel */
+.config-panel {
+  animation: fadeIn 0.5s ease;
+}
+
+.config-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.config-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 15px;
+  padding: 25px;
+}
+
+.config-section h4 {
+  color: #00d4ff;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.config-item {
+  margin-bottom: 15px;
+}
+
+.config-item label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ccc;
+  font-weight: bold;
+}
+
+.config-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #00d4ff;
+}
+
+.svg-textarea {
+  min-height: 120px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+}
+
+.clear-svg-btn, .clear-logs-btn {
+  background: linear-gradient(45deg, #ff6600, #cc5200);
+  border: 2px solid #ff6600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.clear-svg-btn:hover, .clear-logs-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 102, 0, 0.4);
+}
+
+/* Logs Panel */
+.logs-panel {
+  animation: fadeIn 0.5s ease;
+}
+
+.logs-container {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 10px;
+  height: 400px;
+  overflow-y: auto;
+  padding: 15px;
+  margin-bottom: 20px;
+  font-family: 'Courier New', monospace;
+}
+
+.log-entry {
+  display: flex;
+  margin-bottom: 8px;
+  padding: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.log-time {
+  color: #00d4ff;
+  margin-right: 15px;
+  min-width: 80px;
+  font-size: 0.8rem;
+}
+
+.log-message {
+  color: #ccc;
+  font-size: 0.8rem;
+}
+
+/* Checklists Panel */
+.checklists-panel {
+  animation: fadeIn 0.5s ease;
+}
+
+.checklists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.checklist-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+}
+
+.checklist-card h4 {
+  color: #00d4ff;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.checklist-items {
+  margin-bottom: 20px;
+}
+
+.checklist-item {
+  margin-bottom: 12px;
+}
+
+.checklist-item label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ccc;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.checklist-item label:hover {
+  color: #00d4ff;
+}
+
+.checklist-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #00cc66;
+}
+
+.checklist-item span.checked {
+  color: #00cc66;
+  text-decoration: line-through;
+}
+
+.checklist-progress {
+  text-align: center;
+  padding: 10px;
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: 8px;
+  color: #00d4ff;
+  font-weight: bold;
+}
+
+/* Enhanced Service Panels */
+.service-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.service-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.service-panel:hover::before {
+  left: 100%;
+}
+
+/* Enhanced Request Cards */
+.request-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.pilot-name {
+  font-size: 0.8rem;
+  color: #00d4ff;
+  margin-top: 5px;
+}
+
+/* Enhanced Terminal Stands */
+.terminal-stand {
+  position: relative;
+}
+
+.pilot-info {
+  font-size: 0.6rem;
+  color: #00d4ff;
+  margin-top: 2px;
+}
+
+/* Aircraft SVG Enhancements */
+.aircraft-diagram {
+  background: radial-gradient(circle at center, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.aircraft-svg {
+  filter: drop-shadow(0 5px 15px rgba(0, 212, 255, 0.3));
+}
+
+/* Enhanced Communication Center */
+.comm-message {
+  position: relative;
+  overflow: hidden;
+}
+
+.comm-message::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: currentColor;
+}
+
+.comm-message.pilot::before {
+  background: #0066cc;
+}
+
+.comm-message.groundcrew::before {
+  background: #ff6600;
+}
+
+.comm-message.system::before {
+  background: #00d4ff;
+}
+
+/* Loading Enhancements */
+.loading-panel p {
+  margin-top: 15px;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
