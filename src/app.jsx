@@ -20,27 +20,94 @@ export default function App() {
   const [selectedAirport, setSelectedAirport] = useState("");
   const [activeMenu, setActiveMenu] = useState("main");
   const [customSvg, setCustomSvg] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminCustomSvgs, setAdminCustomSvgs] = useState({});
   const [checklists, setChecklists] = useState({
     preflight: [
-      { item: "External Power Connected", checked: false },
-      { item: "GPU Connected", checked: false },
-      { item: "Fuel Quantity Check", checked: false },
-      { item: "Control Surfaces Check", checked: false },
-      { item: "Navigation Systems", checked: false }
+      { item: "Aircraft Documents Review", checked: false, category: "Documentation" },
+      { item: "Weather & NOTAM Brief", checked: false, category: "Documentation" },
+      { item: "Flight Plan Filed", checked: false, category: "Documentation" },
+      { item: "Weight & Balance Calculated", checked: false, category: "Documentation" },
+      { item: "External Visual Inspection", checked: false, category: "External" },
+      { item: "Fuel Quantity & Quality Check", checked: false, category: "External" },
+      { item: "Control Surface Movement", checked: false, category: "External" },
+      { item: "Tire & Landing Gear Inspection", checked: false, category: "External" },
+      { item: "Engine Intake Inspection", checked: false, category: "External" },
+      { item: "Cockpit Preparation", checked: false, category: "Cockpit" },
+      { item: "Navigation Systems Test", checked: false, category: "Cockpit" },
+      { item: "Communication Radio Check", checked: false, category: "Cockpit" },
+      { item: "Instrument Panel Check", checked: false, category: "Cockpit" },
+      { item: "Emergency Equipment Check", checked: false, category: "Cockpit" }
     ],
-    departure: [
-      { item: "Cabin Secured", checked: false },
-      { item: "Doors Armed", checked: false },
-      { item: "Pushback Clearance", checked: false },
-      { item: "Engine Start Clearance", checked: false },
-      { item: "ATC Clearance", checked: false }
+    beforestart: [
+      { item: "Seat Belts & Harnesses", checked: false, category: "Safety" },
+      { item: "Circuit Breakers Check", checked: false, category: "Electrical" },
+      { item: "Fuel Pumps ON", checked: false, category: "Fuel" },
+      { item: "Mixture Rich", checked: false, category: "Engine" },
+      { item: "Propeller High RPM", checked: false, category: "Engine" },
+      { item: "Landing Light ON", checked: false, category: "Lights" },
+      { item: "Beacon Light ON", checked: false, category: "Lights" },
+      { item: "Transponder STBY", checked: false, category: "Avionics" },
+      { item: "Flaps Set for Takeoff", checked: false, category: "Controls" },
+      { item: "Controls Free & Correct", checked: false, category: "Controls" }
     ],
-    arrival: [
-      { item: "Landing Gear Down", checked: false },
-      { item: "Flaps Set", checked: false },
-      { item: "Parking Brake Set", checked: false },
-      { item: "Engines Shutdown", checked: false },
-      { item: "Chocks In Position", checked: false }
+    beforetakeoff: [
+      { item: "Engine Parameters Check", checked: false, category: "Engine" },
+      { item: "Flight Controls Check", checked: false, category: "Controls" },
+      { item: "Engine Instruments Green", checked: false, category: "Engine" },
+      { item: "Navigation Set", checked: false, category: "Navigation" },
+      { item: "Autopilot Check", checked: false, category: "Navigation" },
+      { item: "Transponder ALT", checked: false, category: "Avionics" },
+      { item: "Takeoff Briefing Complete", checked: false, category: "Briefing" },
+      { item: "Cabin Secured", checked: false, category: "Safety" },
+      { item: "ATC Clearance Received", checked: false, category: "ATC" }
+    ],
+    cruise: [
+      { item: "Cruise Power Set", checked: false, category: "Engine" },
+      { item: "Fuel Flow Check", checked: false, category: "Fuel" },
+      { item: "Navigation on Track", checked: false, category: "Navigation" },
+      { item: "Weather Updates", checked: false, category: "Weather" },
+      { item: "Fuel Calculation", checked: false, category: "Fuel" },
+      { item: "Position Reports", checked: false, category: "ATC" },
+      { item: "Systems Monitoring", checked: false, category: "Systems" }
+    ],
+    descent: [
+      { item: "ATIS/Weather Check", checked: false, category: "Weather" },
+      { item: "Approach Briefing", checked: false, category: "Briefing" },
+      { item: "Descent Power Set", checked: false, category: "Engine" },
+      { item: "Altimeter Set", checked: false, category: "Instruments" },
+      { item: "Approach Navigation Set", checked: false, category: "Navigation" },
+      { item: "Landing Light ON", checked: false, category: "Lights" },
+      { item: "Fuel Quantity Check", checked: false, category: "Fuel" }
+    ],
+    beforelanding: [
+      { item: "Landing Gear DOWN", checked: false, category: "Landing Gear" },
+      { item: "Flaps Landing Position", checked: false, category: "Controls" },
+      { item: "Propeller High RPM", checked: false, category: "Engine" },
+      { item: "Mixture Rich", checked: false, category: "Engine" },
+      { item: "Seat Belts Secure", checked: false, category: "Safety" },
+      { item: "Final Approach Speed", checked: false, category: "Speed" },
+      { item: "Landing Clearance", checked: false, category: "ATC" }
+    ],
+    afterlanding: [
+      { item: "Flaps UP", checked: false, category: "Controls" },
+      { item: "Transponder STBY", checked: false, category: "Avionics" },
+      { item: "Landing Light OFF", checked: false, category: "Lights" },
+      { item: "Strobe Light OFF", checked: false, category: "Lights" },
+      { item: "Taxi Clearance", checked: false, category: "ATC" },
+      { item: "Ground Frequency", checked: false, category: "ATC" }
+    ],
+    shutdown: [
+      { item: "Parking Brake SET", checked: false, category: "Parking" },
+      { item: "Mixture LEAN", checked: false, category: "Engine" },
+      { item: "Engine SHUTDOWN", checked: false, category: "Engine" },
+      { item: "Electrical OFF", checked: false, category: "Electrical" },
+      { item: "Fuel Pumps OFF", checked: false, category: "Fuel" },
+      { item: "Master Switch OFF", checked: false, category: "Electrical" },
+      { item: "Beacon Light OFF", checked: false, category: "Lights" },
+      { item: "Chocks IN", checked: false, category: "Ground" },
+      { item: "Tie Downs Secure", checked: false, category: "Ground" },
+      { item: "Flight Log Complete", checked: false, category: "Documentation" }
     ]
   });
   const [stats, setStats] = useState({
@@ -76,6 +143,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    // Check for admin mode via URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    setIsAdmin(urlParams.get('admin') === 'true');
+
     fetch('/api/user')
       .then(res => res.ok ? res.json() : null)
       .then(userData => {
@@ -85,8 +156,11 @@ export default function App() {
       .catch(() => setLoading(false));
 
     socket.on("chatUpdate", (msg) => {
-      setMessages((prev) => [...prev, msg]);
-      addLog(`Chat: ${msg.sender} - ${msg.text}`);
+      // Only show messages for current airport or system messages without airport
+      if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
+        setMessages((prev) => [...prev, msg]);
+        addLog(`Chat: ${msg.sender} - ${msg.text}`);
+      }
     });
     
     socket.on("serviceUpdate", (req) => {
@@ -104,7 +178,7 @@ export default function App() {
       socket.off("serviceUpdate");
       socket.off("standUpdate");
     };
-  }, []);
+  }, [selectedAirport]);
 
   const addLog = (message) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -187,9 +261,27 @@ export default function App() {
   };
 
   const renderAircraftSvg = () => {
-    if (customSvg) {
-      return <div dangerouslySetInnerHTML={{ __html: customSvg }} />;
+    // Check if admin has set a custom SVG for this aircraft type
+    if (isAdmin && aircraft && adminCustomSvgs[aircraft]) {
+      return <div dangerouslySetInnerHTML={{ __html: adminCustomSvgs[aircraft] }} />;
     }
+
+    // Return enhanced default SVG with aircraft-specific details
+    const getAircraftConfig = (type) => {
+      const configs = {
+        'A320': { engines: 2, winglets: true, size: 'medium', color: '#0066cc' },
+        'A330': { engines: 2, winglets: false, size: 'large', color: '#0066cc' },
+        'A380': { engines: 4, winglets: false, size: 'xlarge', color: '#0066cc' },
+        'B737-800': { engines: 2, winglets: true, size: 'medium', color: '#006600' },
+        'B747-400': { engines: 4, winglets: false, size: 'xlarge', color: '#006600' },
+        'B777-300': { engines: 2, winglets: false, size: 'large', color: '#006600' },
+        'B787-9': { engines: 2, winglets: true, size: 'large', color: '#006600' }
+      };
+      return configs[type] || { engines: 2, winglets: false, size: 'medium', color: '#0066cc' };
+    };
+
+    const config = getAircraftConfig(aircraft);
+    const scale = config.size === 'xlarge' ? 1.3 : config.size === 'large' ? 1.15 : 1;
 
     return (
       <svg viewBox="0 0 500 300" className="aircraft-svg">
@@ -199,45 +291,82 @@ export default function App() {
             <stop offset="50%" stopColor="#b3d9ff" />
             <stop offset="100%" stopColor="#80bfff" />
           </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge> 
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
         
-        {/* Fuselage */}
-        <ellipse cx="250" cy="150" rx="200" ry="25" fill="url(#fuselage)" stroke="#0066cc" strokeWidth="2"/>
-        
-        {/* Wings */}
-        <path d="M150 150 L150 100 L200 90 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <path d="M150 150 L150 200 L200 210 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <path d="M300 150 L300 120 L350 110 L350 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <path d="M300 150 L300 180 L350 190 L350 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        
-        {/* Engines */}
-        <ellipse cx="175" cy="130" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
-        <ellipse cx="175" cy="170" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
-        
-        {/* Nose */}
-        <path d="M450 150 L480 145 L480 155 Z" fill="#b3d9ff" stroke="#0066cc" strokeWidth="2"/>
-        
-        {/* Tail */}
-        <path d="M50 150 L20 130 L30 150 L20 170 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        
-        {/* Windows */}
-        <circle cx="400" cy="150" r="4" fill="#001a33" stroke="#0066cc"/>
-        <circle cx="380" cy="150" r="3" fill="#001a33" stroke="#0066cc"/>
-        <circle cx="360" cy="150" r="3" fill="#001a33" stroke="#0066cc"/>
-        <circle cx="340" cy="150" r="3" fill="#001a33" stroke="#0066cc"/>
-        <circle cx="320" cy="150" r="3" fill="#001a33" stroke="#0066cc"/>
-        
-        {/* Service Points */}
-        <circle cx="120" cy="150" r="6" fill="#ff6600" stroke="#fff" strokeWidth="2"/>
-        <circle cx="200" cy="150" r="6" fill="#00cc66" stroke="#fff" strokeWidth="2"/>
-        <circle cx="280" cy="150" r="6" fill="#ffcc00" stroke="#fff" strokeWidth="2"/>
-        <circle cx="360" cy="150" r="6" fill="#cc00ff" stroke="#fff" strokeWidth="2"/>
-        
-        {/* Landing Gear */}
-        <rect x="240" y="175" width="4" height="20" fill="#666"/>
-        <rect x="260" y="175" width="4" height="20" fill="#666"/>
-        <circle cx="242" cy="198" r="3" fill="#333"/>
-        <circle cx="262" cy="198" r="3" fill="#333"/>
+        <g transform={`scale(${scale}) translate(${(1-scale)*250}, ${(1-scale)*150})`}>
+          {/* Fuselage */}
+          <ellipse cx="250" cy="150" rx="200" ry="25" fill="url(#fuselage)" stroke={config.color} strokeWidth="2" filter="url(#glow)"/>
+          
+          {/* Wings */}
+          <path d="M150 150 L150 100 L200 90 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
+          <path d="M150 150 L150 200 L200 210 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
+          <path d="M300 150 L300 120 L350 110 L350 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
+          <path d="M300 150 L300 180 L350 190 L350 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
+          
+          {/* Winglets if applicable */}
+          {config.winglets && (
+            <>
+              <path d="M350 110 L355 105 L355 115 Z" fill="#666" stroke="#333"/>
+              <path d="M350 190 L355 185 L355 195 Z" fill="#666" stroke="#333"/>
+            </>
+          )}
+          
+          {/* Engines */}
+          <ellipse cx="175" cy="130" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
+          <ellipse cx="175" cy="170" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
+          
+          {/* Additional engines for 4-engine aircraft */}
+          {config.engines === 4 && (
+            <>
+              <ellipse cx="325" cy="130" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
+              <ellipse cx="325" cy="170" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
+            </>
+          )}
+          
+          {/* Nose */}
+          <path d="M450 150 L480 145 L480 155 Z" fill="#b3d9ff" stroke={config.color} strokeWidth="2"/>
+          
+          {/* Tail */}
+          <path d="M50 150 L20 130 L30 150 L20 170 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
+          
+          {/* Windows */}
+          <circle cx="400" cy="150" r="4" fill="#001a33" stroke={config.color}/>
+          <circle cx="380" cy="150" r="3" fill="#001a33" stroke={config.color}/>
+          <circle cx="360" cy="150" r="3" fill="#001a33" stroke={config.color}/>
+          <circle cx="340" cy="150" r="3" fill="#001a33" stroke={config.color}/>
+          <circle cx="320" cy="150" r="3" fill="#001a33" stroke={config.color}/>
+          
+          {/* Service Points with labels */}
+          <circle cx="120" cy="150" r="8" fill="#ff6600" stroke="#fff" strokeWidth="2"/>
+          <text x="120" y="135" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">GPU</text>
+          
+          <circle cx="200" cy="150" r="8" fill="#00cc66" stroke="#fff" strokeWidth="2"/>
+          <text x="200" y="135" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">FUEL</text>
+          
+          <circle cx="280" cy="150" r="8" fill="#ffcc00" stroke="#fff" strokeWidth="2"/>
+          <text x="280" y="135" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">CAT</text>
+          
+          <circle cx="360" cy="150" r="8" fill="#cc00ff" stroke="#fff" strokeWidth="2"/>
+          <text x="360" y="135" textAnchor="middle" fill="#fff" fontSize="8" fontWeight="bold">STRS</text>
+          
+          {/* Landing Gear */}
+          <rect x="240" y="175" width="4" height="20" fill="#666"/>
+          <rect x="260" y="175" width="4" height="20" fill="#666"/>
+          <circle cx="242" cy="198" r="4" fill="#333"/>
+          <circle cx="262" cy="198" r="4" fill="#333"/>
+          
+          {/* Aircraft Type Label */}
+          <text x="250" y="280" textAnchor="middle" fill={config.color} fontSize="14" fontWeight="bold">
+            {aircraft || "SELECT AIRCRAFT"}
+          </text>
+        </g>
       </svg>
     );
   };
@@ -416,16 +545,63 @@ export default function App() {
 
               <div className="config-section">
                 <h4>CUSTOM AIRCRAFT SVG</h4>
-                <textarea
-                  value={customSvg}
-                  onChange={(e) => setCustomSvg(e.target.value)}
-                  placeholder="Paste your custom SVG code here..."
-                  className="cockpit-input svg-textarea"
-                  rows="6"
-                />
-                <button onClick={() => setCustomSvg("")} className="clear-svg-btn">
-                  Reset to Default
-                </button>
+                {isAdmin ? (
+                  <div className="admin-svg-panel">
+                    <h5>ADMIN PANEL - Manage Aircraft SVGs</h5>
+                    <div className="admin-svg-controls">
+                      <select 
+                        value={aircraft} 
+                        onChange={(e) => setAircraft(e.target.value)}
+                        className="cockpit-input"
+                      >
+                        <option value="">Select Aircraft Type</option>
+                        {aircraftTypes.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                      <textarea
+                        value={adminCustomSvgs[aircraft] || ""}
+                        onChange={(e) => setAdminCustomSvgs(prev => ({
+                          ...prev,
+                          [aircraft]: e.target.value
+                        }))}
+                        placeholder={`SVG code for ${aircraft || 'selected aircraft'}...`}
+                        className="cockpit-input svg-textarea"
+                        rows="8"
+                      />
+                      <div className="admin-svg-actions">
+                        <button 
+                          onClick={() => aircraft && setAdminCustomSvgs(prev => ({...prev, [aircraft]: ""}))}
+                          className="clear-svg-btn"
+                          disabled={!aircraft}
+                        >
+                          Clear {aircraft} SVG
+                        </button>
+                        <button 
+                          onClick={() => {
+                            const exported = JSON.stringify(adminCustomSvgs, null, 2);
+                            navigator.clipboard.writeText(exported);
+                            alert('SVG data copied to clipboard!');
+                          }}
+                          className="export-svg-btn"
+                        >
+                          Export All SVGs
+                        </button>
+                      </div>
+                    </div>
+                    <div className="svg-preview">
+                      <h6>Preview for {aircraft || 'No Aircraft Selected'}</h6>
+                      {aircraft && adminCustomSvgs[aircraft] && (
+                        <div dangerouslySetInnerHTML={{ __html: adminCustomSvgs[aircraft] }} />
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="user-svg-display">
+                    <p>Aircraft SVG customization is managed by administrators.</p>
+                    <p>Current aircraft: {aircraft || 'None selected'}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -452,31 +628,94 @@ export default function App() {
       case "checklists":
         return (
           <div className="checklists-panel">
-            <h3>FLIGHT CHECKLISTS</h3>
-            <div className="checklists-grid">
-              {Object.entries(checklists).map(([category, items]) => (
-                <div key={category} className="checklist-card">
-                  <h4>{category.toUpperCase()} CHECKLIST</h4>
-                  <div className="checklist-items">
-                    {items.map((item, i) => (
-                      <div key={i} className="checklist-item">
-                        <label>
-                          <input
-                            type="checkbox"
-                            checked={item.checked}
-                            onChange={() => toggleChecklistItem(category, i)}
-                          />
-                          <span className={item.checked ? 'checked' : ''}>{item.item}</span>
-                        </label>
+            <h3>COMPREHENSIVE FLIGHT CHECKLISTS</h3>
+            <div className="checklist-phase-selector">
+              {Object.keys(checklists).map(phase => (
+                <button 
+                  key={phase}
+                  className={`phase-btn ${activeMenu === phase ? 'active' : ''}`}
+                  onClick={() => setActiveMenu(phase)}
+                >
+                  {phase.toUpperCase()}
+                </button>
+              ))}
+              <button 
+                className="phase-btn overview"
+                onClick={() => setActiveMenu('checklists')}
+              >
+                OVERVIEW
+              </button>
+            </div>
+            
+            {activeMenu === 'checklists' ? (
+              <div className="checklist-overview">
+                <div className="phase-progress-grid">
+                  {Object.entries(checklists).map(([phase, items]) => {
+                    const completed = items.filter(item => item.checked).length;
+                    const total = items.length;
+                    const percentage = Math.round((completed / total) * 100);
+                    return (
+                      <div key={phase} className="phase-progress-card">
+                        <h4>{phase.toUpperCase()}</h4>
+                        <div className="progress-circle">
+                          <div className="progress-text">{percentage}%</div>
+                        </div>
+                        <div className="progress-details">
+                          {completed}/{total} Complete
+                        </div>
+                        <button 
+                          className="go-to-phase"
+                          onClick={() => setActiveMenu(phase)}
+                        >
+                          GO TO CHECKLIST
+                        </button>
                       </div>
-                    ))}
-                  </div>
-                  <div className="checklist-progress">
-                    Progress: {items.filter(item => item.checked).length}/{items.length}
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="detailed-checklist">
+                <div className="checklist-header">
+                  <h4>{activeMenu.toUpperCase()} CHECKLIST</h4>
+                  <div className="checklist-stats">
+                    {checklists[activeMenu].filter(item => item.checked).length} / {checklists[activeMenu].length} Complete
                   </div>
                 </div>
-              ))}
-            </div>
+                
+                <div className="categorized-items">
+                  {Object.entries(
+                    checklists[activeMenu].reduce((acc, item, index) => {
+                      const category = item.category || 'General';
+                      if (!acc[category]) acc[category] = [];
+                      acc[category].push({ ...item, index });
+                      return acc;
+                    }, {})
+                  ).map(([category, items]) => (
+                    <div key={category} className="checklist-category">
+                      <h5>{category}</h5>
+                      <div className="category-items">
+                        {items.map((item) => (
+                          <div key={item.index} className="checklist-item enhanced">
+                            <label>
+                              <input
+                                type="checkbox"
+                                checked={item.checked}
+                                onChange={() => toggleChecklistItem(activeMenu, item.index)}
+                              />
+                              <span className={item.checked ? 'checked' : ''}>{item.item}</span>
+                              <div className="item-status">
+                                {item.checked ? '✅' : '⭕'}
+                              </div>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
       
@@ -628,22 +867,51 @@ export default function App() {
 
               <div className="terminal-layout">
                 <h3>TERMINAL OVERVIEW - {selectedAirport}</h3>
-                <div className="terminal-grid">
+                <div className="terminal-stats">
+                  <div className="stat-item">
+                    <span className="stat-label">OCCUPIED STANDS</span>
+                    <span className="stat-value">{Object.keys(stands).length}/25</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">AVAILABLE STANDS</span>
+                    <span className="stat-value">{25 - Object.keys(stands).length}/25</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-label">OCCUPANCY RATE</span>
+                    <span className="stat-value">{Math.round((Object.keys(stands).length / 25) * 100)}%</span>
+                  </div>
+                </div>
+                
+                <div className="terminal-grid enhanced">
                   {Array.from({length: 25}, (_, i) => i + 1).map(num => {
                     const standKey = `Gate ${num}`;
                     const standInfo = stands[standKey];
                     return (
-                      <div key={num} className={`terminal-stand ${standInfo ? 'occupied' : 'available'}`}>
-                        <div className="stand-number">{num}</div>
-                        <div className="stand-status">
+                      <div key={num} className={`terminal-stand ${standInfo ? 'occupied' : 'available'} enhanced`}>
+                        <div className="stand-header">
+                          <div className="stand-number">G{num}</div>
+                          <div className={`stand-indicator ${standInfo ? 'occupied' : 'available'}`}>
+                            {standInfo ? '🔴' : '🟢'}
+                          </div>
+                        </div>
+                        <div className="stand-details">
                           {standInfo ? (
                             <>
-                              <div className="flight-info">{standInfo.flight}</div>
-                              <div className="aircraft-info">{standInfo.aircraft}</div>
-                              <div className="pilot-info">{standInfo.pilot}</div>
+                              <div className="flight-code">{standInfo.flight}</div>
+                              <div className="aircraft-type">{standInfo.aircraft}</div>
+                              <div className="pilot-name">👨‍✈️ {standInfo.pilot}</div>
+                              <div className="claim-time">🕐 {standInfo.claimedAt}</div>
+                              <div className="services-count">
+                                🔧 {requests.filter(r => r.stand === standKey && r.status !== 'COMPLETED').length} pending
+                              </div>
                             </>
                           ) : (
-                            <div className="available-text">AVAILABLE</div>
+                            <>
+                              <div className="available-text">AVAILABLE</div>
+                              <div className="stand-type">
+                                {num <= 10 ? 'NARROW BODY' : num <= 20 ? 'WIDE BODY' : 'CARGO'}
+                              </div>
+                            </>
                           )}
                         </div>
                       </div>

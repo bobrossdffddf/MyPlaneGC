@@ -1266,6 +1266,13 @@ body {
 .comm-message {
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.comm-message:hover {
+  transform: translateX(5px);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .comm-message::before {
@@ -1288,6 +1295,457 @@ body {
 
 .comm-message.system::before {
   background: #00d4ff;
+}
+
+/* Admin Panel Styling */
+.admin-svg-panel {
+  border: 2px solid #ff6600;
+  border-radius: 12px;
+  padding: 20px;
+  background: rgba(255, 102, 0, 0.05);
+}
+
+.admin-svg-panel h5 {
+  color: #ff6600;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.admin-svg-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.admin-svg-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.export-svg-btn {
+  background: linear-gradient(45deg, #00cc66, #009944);
+  border: 2px solid #00cc66;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.export-svg-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 204, 102, 0.4);
+}
+
+.svg-preview {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.svg-preview h6 {
+  color: #00d4ff;
+  margin-bottom: 10px;
+}
+
+.user-svg-display {
+  padding: 20px;
+  text-align: center;
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+
+/* Enhanced Checklist Styling */
+.checklist-phase-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.phase-btn {
+  padding: 12px 20px;
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #00d4ff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.phase-btn:hover, .phase-btn.active {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.phase-btn.overview {
+  background: linear-gradient(45deg, #ff6600, #cc5200);
+  border-color: #ff6600;
+  color: white;
+}
+
+.checklist-overview {
+  animation: fadeIn 0.5s ease;
+}
+
+.phase-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.phase-progress-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.phase-progress-card:hover {
+  border-color: #00d4ff;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 212, 255, 0.2);
+}
+
+.progress-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: conic-gradient(#00cc66 0deg, #00cc66 calc(var(--progress, 0) * 3.6deg), rgba(255, 255, 255, 0.1) calc(var(--progress, 0) * 3.6deg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 15px auto;
+  position: relative;
+}
+
+.progress-circle::before {
+  content: '';
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.8);
+  position: absolute;
+}
+
+.progress-text {
+  position: relative;
+  z-index: 1;
+  font-weight: bold;
+  color: #00d4ff;
+}
+
+.go-to-phase {
+  background: linear-gradient(45deg, #00d4ff, #0099cc);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+}
+
+.go-to-phase:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 212, 255, 0.4);
+}
+
+.detailed-checklist {
+  animation: fadeIn 0.5s ease;
+}
+
+.checklist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.checklist-stats {
+  color: #00d4ff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.categorized-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checklist-category {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 4px solid #00d4ff;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.checklist-category h5 {
+  color: #00d4ff;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.category-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checklist-item.enhanced {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 12px 15px;
+  transition: all 0.3s ease;
+}
+
+.checklist-item.enhanced:hover {
+  background: rgba(0, 212, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.checklist-item.enhanced label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.item-status {
+  font-size: 1.2rem;
+  margin-left: auto;
+}
+
+/* Enhanced Terminal Layout */
+.terminal-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 25px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.terminal-stats .stat-item {
+  text-align: center;
+}
+
+.terminal-stats .stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 5px;
+}
+
+.terminal-stats .stat-value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #00d4ff;
+}
+
+.terminal-grid.enhanced {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.terminal-stand.enhanced {
+  aspect-ratio: 1;
+  border: 2px solid;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.terminal-stand.enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: all 0.5s ease;
+}
+
+.terminal-stand.enhanced:hover::before {
+  left: 100%;
+}
+
+.terminal-stand.enhanced:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.terminal-stand.enhanced.available {
+  border-color: #00cc66;
+  background: linear-gradient(135deg, rgba(0, 204, 102, 0.1), rgba(0, 204, 102, 0.05));
+}
+
+.terminal-stand.enhanced.occupied {
+  border-color: #ff6600;
+  background: linear-gradient(135deg, rgba(255, 102, 0, 0.1), rgba(255, 102, 0, 0.05));
+}
+
+.stand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.stand-number {
+  font-weight: bold;
+  color: #00d4ff;
+  font-size: 1rem;
+}
+
+.stand-indicator {
+  font-size: 1.2rem;
+}
+
+.stand-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.flight-code {
+  font-size: 0.8rem;
+  color: white;
+  font-weight: bold;
+  background: rgba(0, 212, 255, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.aircraft-type {
+  font-size: 0.7rem;
+  color: #ccc;
+}
+
+.pilot-name {
+  font-size: 0.6rem;
+  color: #00d4ff;
+  margin-top: 2px;
+}
+
+.claim-time {
+  font-size: 0.6rem;
+  color: #999;
+}
+
+.services-count {
+  font-size: 0.6rem;
+  color: #ffaa00;
+  background: rgba(255, 170, 0, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+.stand-type {
+  font-size: 0.7rem;
+  color: #00cc66;
+  font-weight: bold;
+}
+
+/* Enhanced Aircraft SVG */
+.aircraft-svg {
+  filter: drop-shadow(0 8px 20px rgba(0, 212, 255, 0.4));
+  transition: all 0.3s ease;
+}
+
+.aircraft-svg:hover {
+  filter: drop-shadow(0 12px 30px rgba(0, 212, 255, 0.6));
+  transform: scale(1.02);
+}
+
+/* Enhanced Service Panels */
+.service-panel {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.service-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1));
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+}
+
+.service-panel:hover::after {
+  transform: translateX(0);
+}
+
+/* Request Cards Enhancement */
+.request-card {
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.request-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Enhanced Scrollbars */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, rgba(0, 212, 255, 0.6), rgba(0, 153, 204, 0.8));
+  border-radius: 6px;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, rgba(0, 212, 255, 0.8), rgba(0, 153, 204, 1));
 }
 
 /* Loading Enhancements */
