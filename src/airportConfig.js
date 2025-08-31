@@ -2,8 +2,8 @@
 const airportConfigs = {
   "IRFD": {
     stands: [
-      { id: "A1", type: "narrow", capacity: "narrow-body" },
-      { id: "A2", type: "narrow", capacity: "narrow-body" },
+      { id: "01", type: "narrow", capacity: "narrow-body" },
+      { id: "02", type: "narrow", capacity: "narrow-body" },
       { id: "A3", type: "narrow", capacity: "narrow-body" },
       { id: "A4", type: "narrow", capacity: "narrow-body" },
       { id: "B1", type: "medium", capacity: "wide-body" },
