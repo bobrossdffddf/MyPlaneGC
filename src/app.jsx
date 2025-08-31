@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { getAirportConfig } from "./airportConfig.js";
@@ -120,8 +118,8 @@ export default function App() {
 
   const aircraftTypes = [
     "A318", "A319", "A320", "A321", "A330", "A340", "A350", "A380",
-    "B737-700", "B737-800", "B737-900", "B747-400", "B747-8", "B777-200", 
-    "B777-300", "B787-8", "B787-9", "B787-10", "CRJ-200", "CRJ-700", 
+    "B737-700", "B737-800", "B737-900", "B747-400", "B747-8", "B777-200",
+    "B777-300", "B787-8", "B787-9", "B787-10", "CRJ-200", "CRJ-700",
     "CRJ-900", "E170", "E175", "E190", "DHC-8", "ATR-72", "MD-80", "MD-90"
   ];
 
@@ -170,11 +168,11 @@ export default function App() {
         setMessages((prev) => [...prev, msg]);
       }
     });
-    
+
     socket.on("serviceUpdate", (req) => {
       setRequests(req);
     });
-    
+
     socket.on("standUpdate", (standData) => {
       setStands(standData);
     });
@@ -251,7 +249,7 @@ export default function App() {
   const toggleChecklistItem = (category, index) => {
     setChecklists(prev => ({
       ...prev,
-      [category]: prev[category].map((item, i) => 
+      [category]: prev[category].map((item, i) =>
         i === index ? { ...item, checked: !item.checked } : item
       )
     }));
@@ -261,7 +259,7 @@ export default function App() {
     if (aircraftSvg) {
       return <div dangerouslySetInnerHTML={{ __html: aircraftSvg }} className="custom-aircraft-svg" />;
     }
-    
+
     // Fallback to default SVG
     return (
       <svg viewBox="0 0 500 300" className="aircraft-svg">
@@ -272,7 +270,7 @@ export default function App() {
             <stop offset="100%" stopColor="#80bfff" />
           </linearGradient>
         </defs>
-        
+
         <ellipse cx="250" cy="150" rx="200" ry="25" fill="url(#fuselage)" stroke="#0066cc" strokeWidth="2"/>
         <path d="M150 150 L150 100 L200 90 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
         <path d="M150 150 L150 200 L200 210 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
@@ -337,7 +335,7 @@ export default function App() {
             <h1>ROLE & AIRPORT SELECTION</h1>
             <div className="user-welcome">Welcome, {user.username}</div>
           </div>
-          
+
           <div className="airport-selector">
             <h2>SELECT AIRPORT</h2>
             <div className="airport-grid-modern">
@@ -386,7 +384,7 @@ export default function App() {
                 <h2>FLIGHT CHECKLISTS</h2>
                 <div className="phase-selector">
                   {Object.keys(checklists).map(phase => (
-                    <button 
+                    <button
                       key={phase}
                       className={`phase-btn ${activeChecklistPhase === phase ? 'active' : ''}`}
                       onClick={() => setActiveChecklistPhase(phase)}
@@ -396,12 +394,12 @@ export default function App() {
                   ))}
                 </div>
               </div>
-              
+
               <div className="checklist-content">
                 <div className="checklist-progress">
                   {checklists[activeChecklistPhase].filter(item => item.checked).length} / {checklists[activeChecklistPhase].length} Complete
                 </div>
-                
+
                 <div className="checklist-items">
                   {checklists[activeChecklistPhase].map((item, index) => (
                     <div key={index} className="checklist-item">
@@ -420,10 +418,30 @@ export default function App() {
               </div>
             </div>
           );
-        
+
         default:
           return (
             <div className="pilot-main">
+              <div className="airport-info-panel">
+                <div className="airport-info-header">
+                  <h2>{selectedAirport} OPERATIONS</h2>
+                  <div className="airport-stats">
+                    <div className="stat-item">
+                      <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length}</span>
+                      <span className="stat-label">AVAILABLE</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length}</span>
+                      <span className="stat-label">OCCUPIED</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-value">{getCurrentAirportStands().length}</span>
+                      <span className="stat-label">TOTAL STANDS</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="flight-setup">
                 <h2>FLIGHT INFORMATION</h2>
                 <div className="input-grid">
@@ -469,9 +487,9 @@ export default function App() {
                     </select>
                   </div>
                   <div className="input-field">
-                    <button 
-                      onClick={claimStand} 
-                      className="claim-btn" 
+                    <button
+                      onClick={claimStand}
+                      className="claim-btn"
                       disabled={!selectedStand || !flightNumber || !aircraft || (stands[selectedStand] && stands[selectedStand].userId !== user?.id)}
                     >
                       {stands[selectedStand] && stands[selectedStand].userId === user?.id ? 'SWITCH STAND' : 'CLAIM STAND'}
@@ -502,9 +520,9 @@ export default function App() {
                     { name: "Lavatory Service", icon: "🚽", code: "LAV" },
                     { name: "De-icing", icon: "❄️", code: "DEICE" }
                   ].map((service) => (
-                    <button 
-                      key={service.name} 
-                      className="service-card" 
+                    <button
+                      key={service.name}
+                      className="service-card"
                       onClick={() => requestService(service.name)}
                       disabled={!selectedStand}
                     >
@@ -700,7 +718,7 @@ export default function App() {
             <h3>GROUND FREQ</h3>
             <div className="freq-display">121.900</div>
           </div>
-          
+
           <div className="messages-area">
             {messages
               .filter(m => {
@@ -739,14 +757,14 @@ export default function App() {
 
       {userMode === "pilot" && (
         <div className="bottom-nav">
-          <button 
+          <button
             className={`nav-btn ${activeTab === 'main' ? 'active' : ''}`}
             onClick={() => setActiveTab('main')}
           >
             <span className="nav-icon">🏠</span>
             <span>MAIN</span>
           </button>
-          <button 
+          <button
             className={`nav-btn ${activeTab === 'checklists' ? 'active' : ''}`}
             onClick={() => setActiveTab('checklists')}
           >
