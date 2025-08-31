@@ -211,7 +211,11 @@ export default function App() {
   };
 
   const sendMessage = () => {
-    if (input.trim() === "" || !selectedStand) return;
+    if (input.trim() === "") return;
+    if (!selectedStand) {
+      alert("Please select a stand first to send messages");
+      return;
+    }
     const message = {
       text: input,
       sender: user?.username,
@@ -226,7 +230,7 @@ export default function App() {
 
   const requestService = (service) => {
     if (!selectedStand) {
-      alert("Please claim a stand first");
+      alert("Please select and claim a stand first to request services");
       return;
     }
     socket.emit("serviceRequest", {
@@ -699,8 +703,13 @@ export default function App() {
           
           <div className="messages-area">
             {messages
-              .filter(m => !selectedStand || m.stand === selectedStand || m.mode === 'system')
-              .slice(-10)
+              .filter(m => {
+                // Only show messages from the current airport
+                if (m.airport && m.airport !== selectedAirport) return false;
+                // Show system messages and messages for the selected stand
+                return m.mode === 'system' || !selectedStand || m.stand === selectedStand;
+              })
+              .slice(-15)
               .map((msg, i) => (
                 <div key={i} className={`message ${msg.mode || 'system'}`}>
                   <div className="message-header">

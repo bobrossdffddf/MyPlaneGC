@@ -53,6 +53,9 @@ let connectedUsers = new Map();
 // Serve frontend build
 app.use(express.static(path.join(__dirname, "dist")));
 
+// Serve aircraft SVGs
+app.use('/aircraft_svgs', express.static(path.join(__dirname, 'aircraft_svgs')));
+
 // Auth routes
 app.get('/auth/discord', passport.authenticate('discord'));
 
@@ -151,18 +154,20 @@ io.on("connection", (socket) => {
 
     // Notify users at the same airport
     io.to(airport).emit("chatUpdate", {
-      text: `${pilot} has claimed ${stand} with flight ${flightNumber} (${aircraft}) at ${airport}`,
-      sender: "SYSTEM",
+      text: `${pilot} has claimed ${stand} with flight ${flightNumber} (${aircraft})`,
+      sender: "GROUND CONTROL",
       stand: stand,
       airport: airport,
       timestamp: new Date().toLocaleTimeString(),
-      mode: "system"
+      mode: "system",
+      priority: "normal"
     });
   });
 
   socket.on("chatMessage", (msg) => {
-    // Only broadcast to users at the same airport
-    if (msg.airport) {
+    // Only broadcast to users at the same airport and ensure airport is set
+    if (msg.airport && airportData[msg.airport]) {
+      msg.airport = msg.airport; // Ensure airport is preserved in message
       io.to(msg.airport).emit("chatUpdate", msg);
     }
   });
@@ -183,14 +188,15 @@ io.on("connection", (socket) => {
     airportData[req.airport].requests.push(serviceRequest);
     io.to(req.airport).emit("serviceUpdate", airportData[req.airport].requests);
 
-    // Notify users at the same airport
+    // Notify users at the same airport with pilot color coding
     io.to(req.airport).emit("chatUpdate", {
-      text: `Service request: ${req.service} for ${req.flight} at ${req.stand} (${req.airport})`,
-      sender: "SYSTEM",
+      text: `Service request: ${req.service} for ${req.flight} at ${req.stand}`,
+      sender: "PILOT REQUEST",
       stand: req.stand,
       airport: req.airport,
       timestamp: new Date().toLocaleTimeString(),
-      mode: "system"
+      mode: "pilot",
+      priority: "high"
     });
   });
 
@@ -220,7 +226,8 @@ io.on("connection", (socket) => {
         stand: request.stand,
         airport: airport,
         timestamp: new Date().toLocaleTimeString(),
-        mode: "groundcrew"
+        mode: "groundcrew",
+        priority: "normal"
       });
     }
   });
