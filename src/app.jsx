@@ -19,6 +19,7 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedAirport, setSelectedAirport] = useState("");
   const [activeMenu, setActiveMenu] = useState("main");
+  const [activeChecklistPhase, setActiveChecklistPhase] = useState("preflight");
   const [customSvg, setCustomSvg] = useState("");
   const [checklists, setChecklists] = useState({
     preflight: [
@@ -583,24 +584,24 @@ export default function App() {
           <div className="checklists-panel">
             <h3>COMPREHENSIVE FLIGHT CHECKLISTS</h3>
             <div className="checklist-phase-selector">
+              <button 
+                className="phase-btn overview"
+                onClick={() => setActiveChecklistPhase('overview')}
+              >
+                OVERVIEW
+              </button>
               {Object.keys(checklists).map(phase => (
                 <button 
                   key={phase}
-                  className={`phase-btn ${activeMenu === `checklist-${phase}` ? 'active' : ''}`}
-                  onClick={() => setActiveMenu(`checklist-${phase}`)}
+                  className={`phase-btn ${activeChecklistPhase === phase ? 'active' : ''}`}
+                  onClick={() => setActiveChecklistPhase(phase)}
                 >
                   {phase.toUpperCase()}
                 </button>
               ))}
-              <button 
-                className="phase-btn overview"
-                onClick={() => setActiveMenu('checklists')}
-              >
-                OVERVIEW
-              </button>
             </div>
             
-            {activeMenu === 'checklists' ? (
+            {activeChecklistPhase === 'overview' ? (
               <div className="checklist-overview">
                 <div className="phase-progress-grid">
                   {Object.entries(checklists).map(([phase, items]) => {
@@ -608,7 +609,7 @@ export default function App() {
                     const total = items.length;
                     const percentage = Math.round((completed / total) * 100);
                     return (
-                      <div key={phase} className="phase-progress-card">
+                      <div key={phase} className="phase-progress-card" style={{'--progress': percentage}}>
                         <h4>{phase.toUpperCase()}</h4>
                         <div className="progress-circle">
                           <div className="progress-text">{percentage}%</div>
@@ -618,7 +619,7 @@ export default function App() {
                         </div>
                         <button 
                           className="go-to-phase"
-                          onClick={() => setActiveMenu(`checklist-${phase}`)}
+                          onClick={() => setActiveChecklistPhase(phase)}
                         >
                           GO TO CHECKLIST
                         </button>
@@ -627,55 +628,48 @@ export default function App() {
                   })}
                 </div>
               </div>
-            ) : activeMenu.startsWith('checklist-') ? (
+            ) : (
               <div className="detailed-checklist">
-                {(() => {
-                  const phase = activeMenu.replace('checklist-', '');
-                  return (
-                    <>
-                      <div className="checklist-header">
-                        <h4>{phase.toUpperCase()} CHECKLIST</h4>
-                        <div className="checklist-stats">
-                          {checklists[phase].filter(item => item.checked).length} / {checklists[phase].length} Complete
-                        </div>
-                      </div>
-                      
-                      <div className="categorized-items">
-                        {Object.entries(
-                          checklists[phase].reduce((acc, item, index) => {
-                            const category = item.category || 'General';
-                            if (!acc[category]) acc[category] = [];
-                            acc[category].push({ ...item, index });
-                            return acc;
-                          }, {})
-                        ).map(([category, items]) => (
-                          <div key={category} className="checklist-category">
-                            <h5>{category}</h5>
-                            <div className="category-items">
-                              {items.map((item) => (
-                                <div key={item.index} className="checklist-item enhanced">
-                                  <label>
-                                    <input
-                                      type="checkbox"
-                                      checked={item.checked}
-                                      onChange={() => toggleChecklistItem(phase, item.index)}
-                                    />
-                                    <span className={item.checked ? 'checked' : ''}>{item.item}</span>
-                                    <div className="item-status">
-                                      {item.checked ? '✅' : '⭕'}
-                                    </div>
-                                  </label>
-                                </div>
-                              ))}
-                            </div>
+                <div className="checklist-header">
+                  <h4>{activeChecklistPhase.toUpperCase()} CHECKLIST</h4>
+                  <div className="checklist-stats">
+                    {checklists[activeChecklistPhase].filter(item => item.checked).length} / {checklists[activeChecklistPhase].length} Complete
+                  </div>
+                </div>
+                
+                <div className="categorized-items">
+                  {Object.entries(
+                    checklists[activeChecklistPhase].reduce((acc, item, index) => {
+                      const category = item.category || 'General';
+                      if (!acc[category]) acc[category] = [];
+                      acc[category].push({ ...item, index });
+                      return acc;
+                    }, {})
+                  ).map(([category, items]) => (
+                    <div key={category} className="checklist-category">
+                      <h5>{category}</h5>
+                      <div className="category-items">
+                        {items.map((item) => (
+                          <div key={item.index} className="checklist-item enhanced">
+                            <label>
+                              <input
+                                type="checkbox"
+                                checked={item.checked}
+                                onChange={() => toggleChecklistItem(activeChecklistPhase, item.index)}
+                              />
+                              <span className={item.checked ? 'checked' : ''}>{item.item}</span>
+                              <div className="item-status">
+                                {item.checked ? '✅' : '⭕'}
+                              </div>
+                            </label>
                           </div>
                         ))}
                       </div>
-                    </>
-                  );
-                })()}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : null}
+            )}
           </div>
         );
       
