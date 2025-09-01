@@ -457,12 +457,24 @@ export default function App() {
               </div>
               <h2>SELECT ROLE</h2>
               <div className="role-cards">
-                <button onClick={() => selectMode("pilot", selectedAirport)} className="role-card pilot">
+                <button 
+                  onClick={() => {
+                    console.log('Pilot role clicked for airport:', selectedAirport);
+                    selectMode("pilot", selectedAirport);
+                  }} 
+                  className="role-card pilot"
+                >
                   <div className="role-icon">👨‍✈️</div>
                   <div className="role-title">FLIGHT CREW</div>
                   <div className="role-description">Request ground services & manage flight operations</div>
                 </button>
-                <button onClick={() => selectMode("groundcrew", selectedAirport)} className="role-card groundcrew">
+                <button 
+                  onClick={() => {
+                    console.log('Ground crew role clicked for airport:', selectedAirport);
+                    selectMode("groundcrew", selectedAirport);
+                  }} 
+                  className="role-card groundcrew"
+                >
                   <div className="role-icon">👷‍♂️</div>
                   <div className="role-title">GROUND OPERATIONS</div>
                   <div className="role-description">Handle service requests & manage ground operations</div>

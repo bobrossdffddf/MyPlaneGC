@@ -449,12 +449,20 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
+  color: white;
+  font-family: inherit;
+  outline: none;
 }
 
 .role-card:hover {
   border-color: rgba(255, 149, 0, 0.5);
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(255, 149, 0, 0.2);
+}
+
+.role-card:active {
+  transform: translateY(-1px);
+  border-color: #ff9500;
 }
 
 .role-icon {
