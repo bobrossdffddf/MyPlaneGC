@@ -624,9 +624,7 @@ export default function App() {
     }
   };
 
-  const [showPermitForm, setShowPermitForm] = useState(false);
-  const [permitType, setPermitType] = useState(null);
-  const [permitData, setPermitData] = useState({});
+  
 
 
   const generatePassengerManifest = (aircraftType) => {
@@ -897,10 +895,7 @@ export default function App() {
     }
   };
 
-  const openPermitForm = (type) => {
-    setPermitType(type);
-    setShowPermitForm(true);
-  };
+  
 
   const renderAircraftDisplay = () => {
     if (aircraftModel) {
@@ -1654,226 +1649,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="roleplay-section">
-                <h2>FLIGHT OPERATIONS</h2>
-                <div className="rp-categories">
-                  <div className="rp-category">
-                    <h3>PRE-FLIGHT COORDINATION</h3>
-                    <div className="rp-actions">
-                      <button className="rp-btn coordination" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🎯 Requesting weather update and NOTAM briefing for departure",
-                          sender: "FLIGHT OPERATIONS",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Weather & NOTAM Request</button>
-                      <button className="rp-btn coordination" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "📋 Requesting final passenger count and weight/balance calculations",
-                          sender: "FLIGHT OPERATIONS",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Final Load Sheet</button>
-                      <button className="rp-btn coordination" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🔧 Requesting pre-flight inspection completion confirmation",
-                          sender: "FLIGHT OPERATIONS",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Pre-flight Inspection</button>
-                    </div>
-                  </div>
-
-                  <div className="rp-category">
-                    <h3>FLIGHT PLAN & DISPATCH</h3>
-                    <div className="rp-actions">
-                      <button className="rp-btn dispatch" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "📍 Flight plan filed: ${flightNumber} ${selectedAirport} to destination, requesting route clearance",
-                          sender: "DISPATCH",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>File Flight Plan</button>
-                      <button className="rp-btn dispatch" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "⚠️ Requesting alternate airport briefing due to weather concerns at destination",
-                          sender: "DISPATCH",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Alternate Airport Brief</button>
-                      <button className="rp-btn dispatch" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "⏱️ Requesting updated departure slot time due to operational delays",
-                          sender: "DISPATCH",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Slot Time Coordination</button>
-                    </div>
-                  </div>
-
-                  <div className="rp-category">
-                    <h3>CARGO OPERATIONS</h3>
-                    <div className="rp-actions">
-                      <button className="rp-btn cargo" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "📦 Confirming cargo manifest: 15 pallets, 8.5 tons total, all dangerous goods properly declared",
-                          sender: "CARGO OPS",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Cargo Manifest Review</button>
-                      <button className="rp-btn cargo" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🌡️ Temperature-sensitive cargo requires refrigeration unit monitoring during flight",
-                          sender: "CARGO OPS",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Special Handling Cargo</button>
-                      <button className="rp-btn cargo" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "📋 Live animal cargo on board - confirming veterinary certificates and IATA LAR compliance",
-                          sender: "CARGO OPS",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Live Animal Handling</button>
-                    </div>
-                  </div>
-
-                  <div className="rp-category">
-                    <h3>PASSENGER SERVICES</h3>
-                    <div className="rp-actions">
-                      <button className="rp-btn passenger" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "👥 Boarding complete: ${passengerManifest.length} passengers, 15 unaccompanied minors, 3 wheelchair assists",
-                          sender: "PASSENGER SERVICES",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Boarding Completion</button>
-                      <button className="rp-btn passenger" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🏃‍♂️ Standby passengers available: 12 confirmed, requesting boarding priority list",
-                          sender: "PASSENGER SERVICES",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Standby Passenger List</button>
-                      <button className="rp-btn passenger" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🚨 Medical passenger requires oxygen during flight - confirming portable oxygen supply",
-                          sender: "PASSENGER SERVICES",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Medical Passenger</button>
-                    </div>
-                  </div>
-
-                  <div className="rp-category">
-                    <h3>MAINTENANCE & SAFETY</h3>
-                    <div className="rp-actions">
-                      <button className="rp-btn maintenance" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🔧 Aircraft maintenance log review complete - no outstanding write-ups, aircraft airworthy",
-                          sender: "MAINTENANCE",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Maintenance Sign-off</button>
-                      <button className="rp-btn maintenance" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "⚠️ MEL item: Passenger entertainment system inoperative seat 12A - flight approved per MEL",
-                          sender: "MAINTENANCE",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>MEL Deferral</button>
-                      <button className="rp-btn maintenance" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🛡️ Security search complete - aircraft secured, no suspicious items found",
-                          sender: "SECURITY",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Security Clearance</button>
-                    </div>
-                  </div>
-
-                  <div className="rp-category">
-                    <h3>CABIN CREW COORDINATION</h3>
-                    <div className="rp-actions">
-                      <button className="rp-btn cabin" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "✈️ Cabin crew briefing complete - safety demo ready, cabin secured for departure",
-                          sender: "CABIN CREW",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Cabin Ready Report</button>
-                      <button className="rp-btn cabin" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🍽️ Special meal distribution confirmed - 8 kosher, 4 vegetarian, 2 diabetic meals loaded",
-                          sender: "CABIN CREW",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Special Meals Confirmed</button>
-                      <button className="rp-btn cabin" onClick={() => {
-                        socket.emit("chatMessage", {
-                          text: "🚨 Cabin crew reports disruptive passenger - requesting ground security assistance",
-                          sender: "CABIN CREW",
-                          stand: selectedStand,
-                          airport: selectedAirport,
-                          timestamp: new Date().toLocaleTimeString(),
-                          mode: "pilot"
-                        });
-                      }}>Passenger Issue</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              
             </div>
           );
       }
@@ -2195,10 +1971,7 @@ export default function App() {
               <span className="nav-icon">👥</span>
               <span>MANIFEST</span>
             </button>
-            <button className="nav-btn" onClick={() => openPermitForm("flightplan")}>
-              <span className="nav-icon">📄</span>
-              <span>PERMITS</span>
-            </button>
+            
           </>
         )}
         {userMode === "groundcrew" && (
@@ -2220,7 +1993,6 @@ export default function App() {
           </>
         )}
       </div>
-      {renderPermitForm()}
     </div>
   );
 }
