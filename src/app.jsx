@@ -22,6 +22,17 @@ export default function App() {
   const [activeChecklistPhase, setActiveChecklistPhase] = useState("preflight");
   const [aircraftModel, setAircraftModel] = useState("");
   const [aircraftData, setAircraftData] = useState(null);
+  const [trainingMode, setTrainingMode] = useState(false);
+  const [supervisorMode, setSupervisorMode] = useState(false);
+  const [passengerManifest, setPassengerManifest] = useState([]);
+  const [dashboardLayout, setDashboardLayout] = useState({
+    weather: { x: 0, y: 0, enabled: true },
+    services: { x: 1, y: 0, enabled: true },
+    aircraft: { x: 0, y: 1, enabled: true },
+    communication: { x: 1, y: 1, enabled: true }
+  });
+  const [currentTrainingStep, setCurrentTrainingStep] = useState(0);
+  const [trainingScenario, setTrainingScenario] = useState("basic_operations");
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
     wind: '270°/08KT',
@@ -132,6 +143,63 @@ export default function App() {
     "CRJ-900", "E170", "E175", "E190", "DHC-8", "ATR-72", "MD-80", "MD-90"
   ];
 
+  const trainingScenarios = {
+    basic_operations: {
+      name: "Basic Ground Operations",
+      steps: [
+        { title: "Select Airport", description: "Choose an airport from the list", target: "airport-selection" },
+        { title: "Claim Stand", description: "Enter flight details and claim a stand", target: "stand-selection" },
+        { title: "Request Service", description: "Request ground power service", target: "service-request" },
+        { title: "Communication", description: "Send a message to ground control", target: "communication" }
+      ]
+    },
+    emergency_procedures: {
+      name: "Emergency Procedures",
+      steps: [
+        { title: "Emergency Declaration", description: "Declare medical emergency", target: "emergency" },
+        { title: "Priority Services", description: "Request emergency services", target: "priority-services" },
+        { title: "Coordinate Response", description: "Communicate with emergency teams", target: "emergency-comm" }
+      ]
+    },
+    supervisor_training: {
+      name: "Supervisor Operations",
+      steps: [
+        { title: "Monitor Operations", description: "View all airport activities", target: "supervisor-view" },
+        { title: "Manage Resources", description: "Allocate ground crew efficiently", target: "resource-management" },
+        { title: "Handle Conflicts", description: "Resolve service conflicts", target: "conflict-resolution" }
+      ]
+    }
+  };
+
+  const generatePassengerManifest = (aircraftType) => {
+    const maxSeats = aircraftData?.maxSeats || 180;
+    const passengerCount = Math.floor(maxSeats * (0.7 + Math.random() * 0.25));
+    const manifest = [];
+    
+    const firstNames = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "Robert", "Anna", "James", "Maria"];
+    const lastNames = ["Smith", "Johnson", "Brown", "Davis", "Wilson", "Miller", "Moore", "Taylor", "Anderson", "Thomas"];
+    const seatClasses = ["Economy", "Premium Economy", "Business", "First"];
+    
+    for (let i = 0; i < passengerCount; i++) {
+      const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+      const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+      const seatRow = Math.floor(Math.random() * 40) + 1;
+      const seatLetter = String.fromCharCode(65 + Math.floor(Math.random() * 6));
+      
+      manifest.push({
+        id: i + 1,
+        name: `${firstName} ${lastName}`,
+        seat: `${seatRow}${seatLetter}`,
+        class: seatClasses[Math.floor(Math.random() * seatClasses.length)],
+        checkedIn: Math.random() > 0.1,
+        specialRequests: Math.random() > 0.8 ? ["Wheelchair", "Dietary", "Unaccompanied Minor"][Math.floor(Math.random() * 3)] : null,
+        frequent: Math.random() > 0.7
+      });
+    }
+    
+    return manifest;
+  };
+
   const getCurrentAirportStands = () => {
     if (!selectedAirport) return [];
     return getAirportConfig(selectedAirport).stands;
@@ -175,10 +243,13 @@ export default function App() {
         })
         .then(data => {
           setAircraftData(data);
+          // Generate passenger manifest when aircraft data is loaded
+          const manifest = generatePassengerManifest(aircraft);
+          setPassengerManifest(manifest);
         })
         .catch(() => {
           // Use default aircraft data
-          setAircraftData({
+          const defaultData = {
             type: aircraft,
             manufacturer: aircraft.startsWith('A') ? 'Airbus' : 'Boeing',
             maxSeats: aircraft.includes('380') ? 850 : aircraft.includes('747') ? 660 : 180,
@@ -186,11 +257,15 @@ export default function App() {
             maxSpeed: 560,
             engines: aircraft.includes('A380') || aircraft.includes('747') ? 4 : 2,
             fuelCapacity: aircraft.includes('A380') ? 84535 : 26020
-          });
+          };
+          setAircraftData(defaultData);
+          const manifest = generatePassengerManifest(aircraft);
+          setPassengerManifest(manifest);
         });
     } else {
       setAircraftModel("");
       setAircraftData(null);
+      setPassengerManifest([]);
     }
   }, [aircraft]);
 
@@ -350,6 +425,48 @@ export default function App() {
         mode: "checklist"
       });
     }
+  };
+
+  const advanceTrainingStep = () => {
+    const scenario = trainingScenarios[trainingScenario];
+    if (currentTrainingStep < scenario.steps.length - 1) {
+      setCurrentTrainingStep(currentTrainingStep + 1);
+    } else {
+      // Training completed
+      setTrainingMode(false);
+      setCurrentTrainingStep(0);
+      socket.emit("chatMessage", {
+        text: `🎓 Training scenario "${scenario.name}" completed successfully!`,
+        sender: "TRAINING SYSTEM",
+        stand: selectedStand || "TRAINING",
+        airport: selectedAirport,
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "system"
+      });
+    }
+  };
+
+  const startTrainingMode = (scenarioType) => {
+    setTrainingMode(true);
+    setTrainingScenario(scenarioType);
+    setCurrentTrainingStep(0);
+    socket.emit("chatMessage", {
+      text: `🎯 Starting training: ${trainingScenarios[scenarioType].name}`,
+      sender: "TRAINING SYSTEM",
+      stand: selectedStand || "TRAINING",
+      airport: selectedAirport,
+      timestamp: new Date().toLocaleTimeString(),
+      mode: "system"
+    });
+  };
+
+  const toggleSupervisorMode = () => {
+    setSupervisorMode(!supervisorMode);
+    socket.emit("userMode", { 
+      mode: supervisorMode ? userMode : "supervisor", 
+      airport: selectedAirport, 
+      userId: user?.id 
+    });
   };
 
   const renderAircraftDisplay = () => {
@@ -675,6 +792,189 @@ export default function App() {
             </div>
           );
 
+        case "training":
+          return (
+            <div className="training-container">
+              <div className="training-header">
+                <h2>TRAINING CENTER</h2>
+                <div className="training-controls">
+                  <button 
+                    className={`training-toggle ${trainingMode ? 'active' : ''}`}
+                    onClick={() => setTrainingMode(!trainingMode)}
+                  >
+                    {trainingMode ? 'EXIT TRAINING' : 'ENTER TRAINING MODE'}
+                  </button>
+                </div>
+              </div>
+
+              {trainingMode ? (
+                <div className="training-active">
+                  <div className="training-scenario">
+                    <h3>{trainingScenarios[trainingScenario].name}</h3>
+                    <div className="training-progress">
+                      Step {currentTrainingStep + 1} of {trainingScenarios[trainingScenario].steps.length}
+                    </div>
+                  </div>
+                  
+                  <div className="training-step">
+                    <div className="step-content">
+                      <h4>{trainingScenarios[trainingScenario].steps[currentTrainingStep].title}</h4>
+                      <p>{trainingScenarios[trainingScenario].steps[currentTrainingStep].description}</p>
+                    </div>
+                    <button className="training-next" onClick={advanceTrainingStep}>
+                      {currentTrainingStep < trainingScenarios[trainingScenario].steps.length - 1 ? 'NEXT STEP' : 'COMPLETE TRAINING'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="training-scenarios">
+                  <h3>Available Training Scenarios</h3>
+                  <div className="scenario-grid">
+                    {Object.entries(trainingScenarios).map(([key, scenario]) => (
+                      <div key={key} className="scenario-card">
+                        <h4>{scenario.name}</h4>
+                        <p>{scenario.steps.length} steps</p>
+                        <button onClick={() => startTrainingMode(key)} className="start-training">
+                          START TRAINING
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+
+        case "manifest":
+          return (
+            <div className="manifest-container">
+              <div className="manifest-header">
+                <h2>PASSENGER MANIFEST</h2>
+                <div className="manifest-stats">
+                  <div className="stat">
+                    <span className="stat-value">{passengerManifest.length}</span>
+                    <span className="stat-label">TOTAL PAX</span>
+                  </div>
+                  <div className="stat">
+                    <span className="stat-value">{passengerManifest.filter(p => p.checkedIn).length}</span>
+                    <span className="stat-label">CHECKED IN</span>
+                  </div>
+                  <div className="stat">
+                    <span className="stat-value">{passengerManifest.filter(p => p.specialRequests).length}</span>
+                    <span className="stat-label">SPECIAL REQ</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="manifest-content">
+                <div className="manifest-filters">
+                  <select className="filter-select">
+                    <option value="all">All Passengers</option>
+                    <option value="checkedIn">Checked In</option>
+                    <option value="notCheckedIn">Not Checked In</option>
+                    <option value="special">Special Requests</option>
+                  </select>
+                </div>
+
+                <div className="passenger-list">
+                  {passengerManifest.map((passenger) => (
+                    <div key={passenger.id} className={`passenger-item ${passenger.checkedIn ? 'checked-in' : 'not-checked-in'}`}>
+                      <div className="passenger-info">
+                        <div className="passenger-name">{passenger.name}</div>
+                        <div className="passenger-details">
+                          <span className="seat">{passenger.seat}</span>
+                          <span className="class">{passenger.class}</span>
+                          {passenger.frequent && <span className="frequent">FREQUENT</span>}
+                        </div>
+                      </div>
+                      <div className="passenger-status">
+                        <div className={`check-status ${passenger.checkedIn ? 'checked' : 'pending'}`}>
+                          {passenger.checkedIn ? '✓' : '○'}
+                        </div>
+                        {passenger.specialRequests && (
+                          <div className="special-req">{passenger.specialRequests}</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+
+        case "dashboard":
+          return (
+            <div className="dashboard-container">
+              <div className="dashboard-header">
+                <h2>CUSTOMIZABLE DASHBOARD</h2>
+                <button className="dashboard-edit">EDIT LAYOUT</button>
+              </div>
+
+              <div className="dashboard-grid">
+                {dashboardLayout.weather.enabled && (
+                  <div className="dashboard-widget weather-widget">
+                    <h3>Weather Information</h3>
+                    <div className="weather-data">
+                      <div className="weather-item">
+                        <span>Wind:</span>
+                        <span>{atisData.wind}</span>
+                      </div>
+                      <div className="weather-item">
+                        <span>QNH:</span>
+                        <span>{atisData.qnh}</span>
+                      </div>
+                      <div className="weather-item">
+                        <span>Temperature:</span>
+                        <span>{atisData.temperature}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {dashboardLayout.services.enabled && (
+                  <div className="dashboard-widget services-widget">
+                    <h3>Active Services</h3>
+                    <div className="services-summary">
+                      <div className="service-count">
+                        <span>{requests.filter(r => r.status === "REQUESTED").length}</span>
+                        <span>Pending</span>
+                      </div>
+                      <div className="service-count">
+                        <span>{requests.filter(r => r.status === "ACCEPTED").length}</span>
+                        <span>In Progress</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {dashboardLayout.aircraft.enabled && (
+                  <div className="dashboard-widget aircraft-widget">
+                    <h3>Aircraft Status</h3>
+                    <div className="aircraft-summary">
+                      <div className="aircraft-type">{aircraft || "No Aircraft Selected"}</div>
+                      <div className="aircraft-stand">{selectedStand || "No Stand"}</div>
+                      <div className="aircraft-flight">{flightNumber || "No Flight"}</div>
+                    </div>
+                  </div>
+                )}
+
+                {dashboardLayout.communication.enabled && (
+                  <div className="dashboard-widget communication-widget">
+                    <h3>Recent Communications</h3>
+                    <div className="recent-messages">
+                      {messages.slice(-5).map((msg, i) => (
+                        <div key={i} className="message-preview">
+                          <span className="sender">{msg.sender}:</span>
+                          <span className="text">{msg.text.substring(0, 50)}...</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+
         default:
           return (
             <div className="pilot-main">
@@ -940,10 +1240,92 @@ export default function App() {
       const lowPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Cleaning", "Water Service", "Lavatory Service"].includes(r.service));
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
+      if (supervisorMode) {
+        return (
+          <div className="supervisor-main">
+            <div className="supervisor-header">
+              <h2>SUPERVISOR CONTROL - {selectedAirport}</h2>
+              <div className="supervisor-controls">
+                <button onClick={toggleSupervisorMode} className="exit-supervisor">
+                  EXIT SUPERVISOR MODE
+                </button>
+              </div>
+            </div>
+
+            <div className="supervisor-overview">
+              <div className="overview-stats">
+                <div className="stat-card">
+                  <span className="stat-number">{getCurrentAirportStands().filter(s => stands[s.id]).length}</span>
+                  <span className="stat-label">OCCUPIED STANDS</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-number">{requests.length}</span>
+                  <span className="stat-label">TOTAL REQUESTS</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-number">{Object.values(stands).length}</span>
+                  <span className="stat-label">ACTIVE FLIGHTS</span>
+                </div>
+              </div>
+
+              <div className="supervisor-sections">
+                <div className="stands-overview">
+                  <h3>STAND OCCUPANCY</h3>
+                  <div className="stands-grid">
+                    {getCurrentAirportStands().map(stand => {
+                      const occupant = stands[stand.id];
+                      return (
+                        <div key={stand.id} className={`stand-item ${occupant ? 'occupied' : 'available'}`}>
+                          <div className="stand-id">{stand.id}</div>
+                          <div className="stand-info">
+                            {occupant ? (
+                              <>
+                                <div className="flight">{occupant.flight}</div>
+                                <div className="aircraft">{occupant.aircraft}</div>
+                                <div className="pilot">{occupant.pilot}</div>
+                              </>
+                            ) : (
+                              <div className="status">AVAILABLE</div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="crew-allocation">
+                  <h3>CREW ALLOCATION</h3>
+                  <div className="crew-status">
+                    <div className="crew-metric">
+                      <span>Available Crew:</span>
+                      <span className="crew-count">12</span>
+                    </div>
+                    <div className="crew-metric">
+                      <span>Busy Crew:</span>
+                      <span className="crew-count">{inProgressRequests.length}</span>
+                    </div>
+                    <div className="crew-metric">
+                      <span>Efficiency:</span>
+                      <span className="efficiency">94%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="groundcrew-main">
           <div className="queue-header">
             <h2>SERVICE QUEUE - {selectedAirport}</h2>
+            <div className="queue-controls">
+              <button onClick={toggleSupervisorMode} className="supervisor-btn">
+                SUPERVISOR MODE
+              </button>
+            </div>
             <div className="queue-stats">
               <div className="stat">
                 <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length}</span>
@@ -1184,6 +1566,27 @@ export default function App() {
           >
             <span className="nav-icon">✅</span>
             <span>CHECKLISTS</span>
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'training' ? 'active' : ''}`}
+            onClick={() => setActiveTab('training')}
+          >
+            <span className="nav-icon">🎓</span>
+            <span>TRAINING</span>
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'manifest' ? 'active' : ''}`}
+            onClick={() => setActiveTab('manifest')}
+          >
+            <span className="nav-icon">👥</span>
+            <span>MANIFEST</span>
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dashboard')}
+          >
+            <span className="nav-icon">📊</span>
+            <span>DASHBOARD</span>
           </button>
         </div>
       )}
