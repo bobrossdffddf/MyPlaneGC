@@ -7,6 +7,7 @@ import session from "express-session";
 import passport from "passport";
 import { Strategy as DiscordStrategy } from "passport-discord";
 import dotenv from "dotenv";
+import WebSocket from "ws";
 
 dotenv.config();
 
@@ -49,37 +50,108 @@ passport.deserializeUser((user, done) => {
 // In-memory storage for demo (use database in production)
 let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {} } }
 let connectedUsers = new Map();
+let ptfsAtisData = {}; // Store real ATIS data from PTFS
 
-// Simulate ATIS updates every 5 minutes
-const generateAtisData = (airport) => {
-  const infoLetters = ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT'];
-  const windDirections = ['270', '280', '290', '260', '250'];
-  const windSpeeds = ['08', '12', '15', '06', '10'];
-  const qnhValues = ['1013', '1015', '1011', '1018', '1009'];
-  const runways = ['27', '09', '18', '36'];
+// Parse ATIS content to extract useful information
+const parseAtisContent = (atisInfo) => {
+  const lines = atisInfo.lines || [];
+  const content = atisInfo.content || '';
+  
+  let wind = 'CALM';
+  let qnh = '1013';
+  let runway = 'UNKNOWN';
+  let conditions = 'CAVOK';
+  let temperature = 'N/A';
+  
+  // Parse wind information (format: 094/12)
+  const windMatch = content.match(/(\d{3})\/(\d{2,3})/);
+  if (windMatch) {
+    const windDir = windMatch[1];
+    const windSpeed = windMatch[2];
+    wind = `${windDir}°/${windSpeed}KT`;
+  }
+  
+  // Parse QNH (format: Q1013)
+  const qnhMatch = content.match(/Q(\d{4})/);
+  if (qnhMatch) {
+    qnh = qnhMatch[1];
+  }
+  
+  // Parse runway information
+  const runwayMatch = content.match(/(?:DEP RWY|ARR RWY|RWY)\s+(\d{2}[LRC]?)/);
+  if (runwayMatch) {
+    runway = `${runwayMatch[1]} ACTIVE`;
+  }
+  
+  // Parse temperature (format: 13/11 where first is temp, second is dewpoint)
+  const tempMatch = content.match(/(\d{2})\/\d{2}/);
+  if (tempMatch) {
+    temperature = `${tempMatch[1]}°C`;
+  }
   
   return {
-    airport: airport,
-    info: infoLetters[Math.floor(Math.random() * infoLetters.length)],
-    wind: `${windDirections[Math.floor(Math.random() * windDirections.length)]}°/${windSpeeds[Math.floor(Math.random() * windSpeeds.length)]}KT`,
-    qnh: qnhValues[Math.floor(Math.random() * qnhValues.length)],
-    runway: `${runways[Math.floor(Math.random() * runways.length)]} ACTIVE`,
-    conditions: 'CAVOK',
-    temperature: `${Math.floor(Math.random() * 10) + 10}°C`,
-    timestamp: new Date().toLocaleTimeString()
+    airport: atisInfo.airport,
+    info: `INFO ${atisInfo.letter}`,
+    wind: wind,
+    qnh: qnh,
+    runway: runway,
+    conditions: conditions,
+    temperature: temperature,
+    timestamp: new Date().toLocaleTimeString(),
+    raw: content
   };
 };
 
-// Update ATIS every 5 minutes for all active airports
-setInterval(() => {
-  Object.keys(airportData).forEach(airport => {
-    if (airportData[airport].users.size > 0) {
-      const atisData = generateAtisData(airport);
-      airportData[airport].atis = atisData;
-      io.to(airport).emit("atisUpdate", atisData);
+// Connect to PTFS WebSocket for real ATIS data
+const connectToPTFSWebSocket = () => {
+  console.log('🔌 Connecting to PTFS WebSocket...');
+  
+  const ws = new WebSocket('wss://24data.ptfs.app/wss', {
+    headers: {
+      'Origin': '' // Empty origin as required by PTFS API
     }
   });
-}, 300000); // 5 minutes
+  
+  ws.on('open', () => {
+    console.log('✅ Connected to PTFS WebSocket');
+  });
+  
+  ws.on('message', (data) => {
+    try {
+      const message = JSON.parse(data.toString());
+      
+      if (message.t === 'ATIS') {
+        const atisInfo = message.d;
+        const parsedAtis = parseAtisContent(atisInfo);
+        
+        // Store the ATIS data
+        ptfsAtisData[atisInfo.airport] = parsedAtis;
+        
+        // Update connected users at this airport
+        if (airportData[atisInfo.airport]) {
+          airportData[atisInfo.airport].atis = parsedAtis;
+          io.to(atisInfo.airport).emit("atisUpdate", parsedAtis);
+        }
+        
+        console.log(`📡 ATIS update for ${atisInfo.airport}: INFO ${atisInfo.letter}`);
+      }
+    } catch (error) {
+      console.error('Error parsing PTFS WebSocket message:', error);
+    }
+  });
+  
+  ws.on('error', (error) => {
+    console.error('❌ PTFS WebSocket error:', error);
+  });
+  
+  ws.on('close', () => {
+    console.log('🔌 PTFS WebSocket closed, attempting to reconnect in 10 seconds...');
+    setTimeout(connectToPTFSWebSocket, 10000);
+  });
+};
+
+// Initialize PTFS WebSocket connection
+connectToPTFSWebSocket();
 
 // Serve frontend build
 app.use(express.static(path.join(__dirname, "dist")));
@@ -122,7 +194,16 @@ io.on("connection", (socket) => {
         stands: {},
         requests: [],
         users: new Map(),
-        atis: generateAtisData(data.airport)
+        atis: ptfsAtisData[data.airport] || {
+          airport: data.airport,
+          info: 'INFO ALPHA',
+          wind: 'CALM',
+          qnh: '1013',
+          runway: 'UNKNOWN',
+          conditions: 'CAVOK',
+          temperature: 'N/A',
+          timestamp: new Date().toLocaleTimeString()
+        }
       };
     }
 

@@ -711,10 +711,11 @@ export default function App() {
           );
       }
     } else {
-      // Ground Crew Interface
+      // Ground Crew Interface - Comprehensive priority coverage
+      const criticalPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["De-icing", "Aircraft Maintenance", "Security Check", "Pushback"].includes(r.service));
+      const highPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Ground Power", "Fuel Service", "Documentation"].includes(r.service));
+      const mediumPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Catering", "Baggage", "Passenger Stairs", "Cargo Loading"].includes(r.service));
       const lowPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Cleaning", "Water Service", "Lavatory Service"].includes(r.service));
-      const mediumPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Catering", "Baggage", "Passenger Stairs"].includes(r.service));
-      const highPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Ground Power", "Fuel Service", "Pushback", "De-icing"].includes(r.service));
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
       return (
@@ -738,6 +739,30 @@ export default function App() {
           </div>
 
           <div className="priority-columns">
+            <div className="priority-column critical">
+              <div className="column-header">
+                <h3>CRITICAL</h3>
+                <span className="count">{criticalPriorityRequests.length}</span>
+              </div>
+              <div className="requests-list">
+                {criticalPriorityRequests.map((request, i) => (
+                  <div key={i} className="request-card critical">
+                    <div className="request-header">
+                      <span className="flight">{request.flight}</span>
+                      <span className="timer">{request.timestamp}</span>
+                    </div>
+                    <div className="request-details">
+                      <div className="service">{request.service}</div>
+                      <div className="stand">{request.stand}</div>
+                    </div>
+                    <button onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} className="accept-btn critical">
+                      URGENT ACCEPT
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="priority-column high">
               <div className="column-header">
                 <h3>HIGH PRIORITY</h3>
