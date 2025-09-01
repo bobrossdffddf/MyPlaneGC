@@ -231,15 +231,37 @@ export default function App() {
       alert("Please select and claim a stand first to request services");
       return;
     }
-    socket.emit("serviceRequest", {
-      service,
-      stand: selectedStand,
-      flight: flightNumber,
-      pilot: user?.username,
-      airport: selectedAirport,
-      timestamp: new Date().toLocaleTimeString(),
-      status: "REQUESTED"
-    });
+    
+    if (service === "Full Service") {
+      // Request multiple services at once
+      const fullServices = [
+        "Ground Power", "Fuel Service", "Catering", "Passenger Stairs", 
+        "Cleaning", "Baggage", "Water Service", "Lavatory Service"
+      ];
+      
+      fullServices.forEach(individualService => {
+        socket.emit("serviceRequest", {
+          service: individualService,
+          stand: selectedStand,
+          flight: flightNumber,
+          pilot: user?.username,
+          airport: selectedAirport,
+          timestamp: new Date().toLocaleTimeString(),
+          status: "REQUESTED",
+          isFullService: true
+        });
+      });
+    } else {
+      socket.emit("serviceRequest", {
+        service,
+        stand: selectedStand,
+        flight: flightNumber,
+        pilot: user?.username,
+        airport: selectedAirport,
+        timestamp: new Date().toLocaleTimeString(),
+        status: "REQUESTED"
+      });
+    }
   };
 
   const handleServiceAction = (requestId, action) => {
@@ -253,6 +275,19 @@ export default function App() {
         i === index ? { ...item, checked: !item.checked } : item
       )
     }));
+    
+    // Send system message when checklist item is completed
+    const item = checklists[category][index];
+    if (!item.checked && selectedStand) {
+      socket.emit("chatMessage", {
+        text: `✅ ${item.item} - ${category.toUpperCase()} completed`,
+        sender: "CHECKLIST",
+        stand: selectedStand,
+        airport: selectedAirport,
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "checklist"
+      });
+    }
   };
 
   const renderAircraftDisplay = () => {
@@ -424,19 +459,41 @@ export default function App() {
             <div className="pilot-main">
               <div className="airport-info-panel">
                 <div className="airport-info-header">
-                  <h2>{selectedAirport} OPERATIONS</h2>
+                  <h2>{selectedAirport} TOWER CONTROL</h2>
+                  <div className="weather-strip">
+                    <div className="weather-item">
+                      <span className="weather-label">METAR:</span>
+                      <span className="weather-value">CAVOK 15°C QNH 1013</span>
+                    </div>
+                    <div className="weather-item">
+                      <span className="weather-label">WIND:</span>
+                      <span className="weather-value">270°/08KT</span>
+                    </div>
+                    <div className="weather-item">
+                      <span className="weather-label">RWY:</span>
+                      <span className="weather-value">27 ACTIVE</span>
+                    </div>
+                  </div>
                   <div className="airport-stats">
-                    <div className="stat-item">
+                    <div className="stat-item available">
                       <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length}</span>
                       <span className="stat-label">AVAILABLE</span>
+                      <div className="stat-indicator"></div>
                     </div>
-                    <div className="stat-item">
+                    <div className="stat-item occupied">
                       <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length}</span>
                       <span className="stat-label">OCCUPIED</span>
+                      <div className="stat-indicator"></div>
                     </div>
-                    <div className="stat-item">
+                    <div className="stat-item total">
                       <span className="stat-value">{getCurrentAirportStands().length}</span>
-                      <span className="stat-label">TOTAL STANDS</span>
+                      <span className="stat-label">TOTAL</span>
+                      <div className="stat-indicator"></div>
+                    </div>
+                    <div className="stat-item requests">
+                      <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length}</span>
+                      <span className="stat-label">PENDING</span>
+                      <div className="stat-indicator"></div>
                     </div>
                   </div>
                 </div>
@@ -499,9 +556,62 @@ export default function App() {
               </div>
 
               <div className="aircraft-section">
-                <h2>AIRCRAFT DIAGRAM</h2>
+                <h2>AIRCRAFT STATUS</h2>
                 <div className="aircraft-display">
                   {renderAircraftDisplay()}
+                </div>
+                <div className="aircraft-data">
+                  <div className="data-row">
+                    <div className="data-item">
+                      <span className="data-label">FUEL:</span>
+                      <span className="data-value">85%</span>
+                    </div>
+                    <div className="data-item">
+                      <span className="data-label">PAX:</span>
+                      <span className="data-value">156/180</span>
+                    </div>
+                    <div className="data-item">
+                      <span className="data-label">CARGO:</span>
+                      <span className="data-value">8.2T</span>
+                    </div>
+                    <div className="data-item">
+                      <span className="data-label">STATUS:</span>
+                      <span className="data-value status-ready">READY</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flight-planning-section">
+                <h2>FLIGHT PLANNING</h2>
+                <div className="planning-grid">
+                  <div className="planning-item">
+                    <label>DEPARTURE TIME</label>
+                    <input type="time" className="planning-input" defaultValue="14:30" />
+                  </div>
+                  <div className="planning-item">
+                    <label>DESTINATION</label>
+                    <select className="planning-select">
+                      <option value="">SELECT DESTINATION</option>
+                      {ptfsAirports.filter(apt => apt !== selectedAirport).map(airport => (
+                        <option key={airport} value={airport}>{airport}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="planning-item">
+                    <label>FLIGHT LEVEL</label>
+                    <select className="planning-select">
+                      <option value="FL100">FL100</option>
+                      <option value="FL200">FL200</option>
+                      <option value="FL300">FL300</option>
+                      <option value="FL350">FL350</option>
+                      <option value="FL390">FL390</option>
+                    </select>
+                  </div>
+                  <div className="planning-item">
+                    <label>ROUTE</label>
+                    <input type="text" className="planning-input" placeholder="DIRECT" />
+                  </div>
                 </div>
               </div>
 
@@ -509,26 +619,34 @@ export default function App() {
                 <h2>GROUND SERVICES</h2>
                 <div className="services-grid">
                   {[
-                    { name: "Ground Power", icon: "🔌", code: "GPU" },
-                    { name: "Fuel Service", icon: "⛽", code: "FUEL" },
-                    { name: "Catering", icon: "🍽️", code: "CAT" },
-                    { name: "Pushback", icon: "🚛", code: "PUSH" },
-                    { name: "Passenger Stairs", icon: "🪜", code: "STAIRS" },
-                    { name: "Cleaning", icon: "🧹", code: "CLEAN" },
-                    { name: "Baggage", icon: "🧳", code: "BAG" },
-                    { name: "Water Service", icon: "💧", code: "H2O" },
-                    { name: "Lavatory Service", icon: "🚽", code: "LAV" },
-                    { name: "De-icing", icon: "❄️", code: "DEICE" }
+                    { name: "Full Service", icon: "🛠️", code: "FULL", priority: "high", category: "complete" },
+                    { name: "Ground Power", icon: "🔌", code: "GPU", priority: "high", category: "power" },
+                    { name: "Fuel Service", icon: "⛽", code: "FUEL", priority: "high", category: "fuel" },
+                    { name: "Pushback", icon: "🚛", code: "PUSH", priority: "high", category: "movement" },
+                    { name: "De-icing", icon: "❄️", code: "DEICE", priority: "high", category: "safety" },
+                    { name: "Catering", icon: "🍽️", code: "CAT", priority: "medium", category: "service" },
+                    { name: "Passenger Stairs", icon: "🪜", code: "STAIRS", priority: "medium", category: "access" },
+                    { name: "Baggage", icon: "🧳", code: "BAG", priority: "medium", category: "cargo" },
+                    { name: "Cleaning", icon: "🧹", code: "CLEAN", priority: "low", category: "maintenance" },
+                    { name: "Water Service", icon: "💧", code: "H2O", priority: "low", category: "maintenance" },
+                    { name: "Lavatory Service", icon: "🚽", code: "LAV", priority: "low", category: "maintenance" },
+                    { name: "Cargo Loading", icon: "📦", code: "CARGO", priority: "medium", category: "cargo" },
+                    { name: "Aircraft Maintenance", icon: "🔧", code: "MAINT", priority: "high", category: "safety" },
+                    { name: "Security Check", icon: "🛡️", code: "SEC", priority: "high", category: "safety" },
+                    { name: "Documentation", icon: "📋", code: "DOC", priority: "medium", category: "admin" }
                   ].map((service) => (
                     <button
                       key={service.name}
-                      className="service-card"
+                      className={`service-card ${service.priority} ${service.category}`}
                       onClick={() => requestService(service.name)}
                       disabled={!selectedStand}
                     >
                       <div className="service-icon">{service.icon}</div>
                       <div className="service-name">{service.name}</div>
-                      <div className="service-code">{service.code}</div>
+                      <div className="service-details">
+                        <div className="service-code">{service.code}</div>
+                        <div className="service-priority">{service.priority.toUpperCase()}</div>
+                      </div>
                     </button>
                   ))}
                 </div>
