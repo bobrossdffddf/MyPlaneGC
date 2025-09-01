@@ -204,6 +204,7 @@ export default function App() {
   };
 
   const selectMode = (mode, airport) => {
+    console.log('Selecting mode:', mode, 'for airport:', airport);
     setUserMode(mode);
     setSelectedAirport(airport);
     socket.emit("userMode", { mode, airport, userId: user?.id });
@@ -378,6 +379,7 @@ export default function App() {
   }
 
   if (!userMode || !selectedAirport) {
+    console.log('Mode selection screen - userMode:', userMode, 'selectedAirport:', selectedAirport);
     return (
       <div className="tablet-mode-select">
         <div className="mode-select-content">
@@ -446,6 +448,13 @@ export default function App() {
 
           {selectedAirport && (
             <div className="role-selector">
+              <div className="airport-confirmation">
+                <h3>Airport Selected: {selectedAirport}</h3>
+                <div className="confirmation-details">
+                  <span>Stands Available: {getAirportConfig(selectedAirport).stands.length}</span>
+                  <span>Status: OPERATIONAL</span>
+                </div>
+              </div>
               <h2>SELECT ROLE</h2>
               <div className="role-cards">
                 <button onClick={() => selectMode("pilot", selectedAirport)} className="role-card pilot">
