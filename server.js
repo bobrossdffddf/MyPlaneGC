@@ -177,26 +177,315 @@ app.get('/api/user', (req, res) => {
   }
 });
 
-// Aircraft data API
+// Aircraft data API with comprehensive realistic data
 const aircraftDatabase = {
-  "A318": { type: "A318", manufacturer: "Airbus", maxSeats: 132, range: 3100, maxSpeed: 500, engines: 2, fuelCapacity: 24210 },
-  "A319": { type: "A319", manufacturer: "Airbus", maxSeats: 156, range: 3700, maxSpeed: 500, engines: 2, fuelCapacity: 24210 },
-  "A320": { type: "A320", manufacturer: "Airbus", maxSeats: 180, range: 3300, maxSpeed: 500, engines: 2, fuelCapacity: 26020 },
-  "A321": { type: "A321", manufacturer: "Airbus", maxSeats: 220, range: 3200, maxSpeed: 500, engines: 2, fuelCapacity: 32940 },
-  "A330": { type: "A330", manufacturer: "Airbus", maxSeats: 440, range: 7250, maxSpeed: 560, engines: 2, fuelCapacity: 139090 },
-  "A340": { type: "A340", manufacturer: "Airbus", maxSeats: 440, range: 9000, maxSpeed: 560, engines: 4, fuelCapacity: 195300 },
-  "A350": { type: "A350", manufacturer: "Airbus", maxSeats: 440, range: 8100, maxSpeed: 560, engines: 2, fuelCapacity: 138000 },
-  "A380": { type: "A380", manufacturer: "Airbus", maxSeats: 850, range: 8000, maxSpeed: 560, engines: 4, fuelCapacity: 84535 },
-  "B737-700": { type: "B737-700", manufacturer: "Boeing", maxSeats: 149, range: 3365, maxSpeed: 514, engines: 2, fuelCapacity: 26020 },
-  "B737-800": { type: "B737-800", manufacturer: "Boeing", maxSeats: 189, range: 2935, maxSpeed: 514, engines: 2, fuelCapacity: 26020 },
-  "B737-900": { type: "B737-900", manufacturer: "Boeing", maxSeats: 220, range: 2800, maxSpeed: 514, engines: 2, fuelCapacity: 26020 },
-  "B747-400": { type: "B747-400", manufacturer: "Boeing", maxSeats: 660, range: 7260, maxSpeed: 570, engines: 4, fuelCapacity: 216840 },
-  "B747-8": { type: "B747-8", manufacturer: "Boeing", maxSeats: 700, range: 7730, maxSpeed: 570, engines: 4, fuelCapacity: 238610 },
-  "B777-200": { type: "B777-200", manufacturer: "Boeing", maxSeats: 440, range: 5240, maxSpeed: 560, engines: 2, fuelCapacity: 117348 },
-  "B777-300": { type: "B777-300", manufacturer: "Boeing", maxSeats: 550, range: 5845, maxSpeed: 560, engines: 2, fuelCapacity: 181280 },
-  "B787-8": { type: "B787-8", manufacturer: "Boeing", maxSeats: 330, range: 7355, maxSpeed: 560, engines: 2, fuelCapacity: 126206 },
-  "B787-9": { type: "B787-9", manufacturer: "Boeing", maxSeats: 420, range: 7635, maxSpeed: 560, engines: 2, fuelCapacity: 126206 },
-  "B787-10": { type: "B787-10", manufacturer: "Boeing", maxSeats: 440, range: 6430, maxSpeed: 560, engines: 2, fuelCapacity: 126206 }
+  "A318": { 
+    type: "A318", manufacturer: "Airbus", maxSeats: 132, range: 3100, maxSpeed: 500, cruiseSpeed: 447, 
+    engines: 2, fuelCapacity: 24210, maxTakeoffWeight: 68000, maxLandingWeight: 57500, 
+    wingspan: 34.1, length: 31.4, height: 12.6, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "2002", variants: ["A318-100"]
+  },
+  "A319": { 
+    type: "A319", manufacturer: "Airbus", maxSeats: 156, range: 3700, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 24210, maxTakeoffWeight: 75500, maxLandingWeight: 62500,
+    wingspan: 35.8, length: 33.8, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "1995", variants: ["A319-100", "A319neo"]
+  },
+  "A320": { 
+    type: "A320", manufacturer: "Airbus", maxSeats: 180, range: 3300, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 78000, maxLandingWeight: 66000,
+    wingspan: 35.8, length: 37.6, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "1987", variants: ["A320-200", "A320neo"]
+  },
+  "A321": { 
+    type: "A321", manufacturer: "Airbus", maxSeats: 220, range: 3200, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 32940, maxTakeoffWeight: 93500, maxLandingWeight: 77800,
+    wingspan: 35.8, length: 44.5, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "1993", variants: ["A321-200", "A321neo", "A321XLR"]
+  },
+  "A330": { 
+    type: "A330", manufacturer: "Airbus", maxSeats: 440, range: 7250, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 2, fuelCapacity: 139090, maxTakeoffWeight: 242000, maxLandingWeight: 187000,
+    wingspan: 60.3, length: 63.7, height: 16.9, serviceCeiling: 41000, engineType: "Trent 700/CF6-80E",
+    category: "wide-body", firstFlight: "1992", variants: ["A330-200", "A330-300", "A330-900neo"]
+  },
+  "A340": { 
+    type: "A340", manufacturer: "Airbus", maxSeats: 440, range: 9000, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 4, fuelCapacity: 195300, maxTakeoffWeight: 380000, maxLandingWeight: 265000,
+    wingspan: 63.5, length: 75.4, height: 17.1, serviceCeiling: 41000, engineType: "Trent 500/CFM56",
+    category: "wide-body", firstFlight: "1991", variants: ["A340-200", "A340-300", "A340-500", "A340-600"]
+  },
+  "A350": { 
+    type: "A350", manufacturer: "Airbus", maxSeats: 440, range: 8100, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 2, fuelCapacity: 138000, maxTakeoffWeight: 316000, maxLandingWeight: 213000,
+    wingspan: 64.8, length: 66.8, height: 17.1, serviceCeiling: 43000, engineType: "Trent XWB",
+    category: "wide-body", firstFlight: "2013", variants: ["A350-900", "A350-1000"]
+  },
+  "A380": { 
+    type: "A380", manufacturer: "Airbus", maxSeats: 850, range: 8000, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 4, fuelCapacity: 84535, maxTakeoffWeight: 575000, maxLandingWeight: 394000,
+    wingspan: 79.8, length: 72.7, height: 24.1, serviceCeiling: 43000, engineType: "Trent 900/GP7200",
+    category: "double-decker", firstFlight: "2005", variants: ["A380-800"]
+  },
+  "B737-700": { 
+    type: "B737-700", manufacturer: "Boeing", maxSeats: 149, range: 3365, maxSpeed: 514, cruiseSpeed: 453,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 70080, maxLandingWeight: 58060,
+    wingspan: 35.8, length: 33.6, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
+    category: "narrow-body", firstFlight: "1997", variants: ["B737-700", "B737-700ER"]
+  },
+  "B737-800": { 
+    type: "B737-800", manufacturer: "Boeing", maxSeats: 189, range: 2935, maxSpeed: 514, cruiseSpeed: 453,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 79010, maxLandingWeight: 66360,
+    wingspan: 35.8, length: 39.5, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
+    category: "narrow-body", firstFlight: "1997", variants: ["B737-800", "B737-800BCF"]
+  },
+  "B737-900": { 
+    type: "B737-900", manufacturer: "Boeing", maxSeats: 220, range: 2800, maxSpeed: 514, cruiseSpeed: 453,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 85130, maxLandingWeight: 71210,
+    wingspan: 35.8, length: 42.1, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
+    category: "narrow-body", firstFlight: "2000", variants: ["B737-900", "B737-900ER"]
+  },
+  "B747-400": { 
+    type: "B747-400", manufacturer: "Boeing", maxSeats: 660, range: 7260, maxSpeed: 570, cruiseSpeed: 533,
+    engines: 4, fuelCapacity: 216840, maxTakeoffWeight: 412775, maxLandingWeight: 295745,
+    wingspan: 64.4, length: 70.7, height: 19.4, serviceCeiling: 43000, engineType: "CF6-80C2/PW4000",
+    category: "wide-body", firstFlight: "1988", variants: ["B747-400", "B747-400ER", "B747-400F"]
+  },
+  "B747-8": { 
+    type: "B747-8", manufacturer: "Boeing", maxSeats: 700, range: 7730, maxSpeed: 570, cruiseSpeed: 533,
+    engines: 4, fuelCapacity: 238610, maxTakeoffWeight: 447700, maxLandingWeight: 346091,
+    wingspan: 68.4, length: 76.3, height: 19.4, serviceCeiling: 43000, engineType: "GEnx-2B67",
+    category: "wide-body", firstFlight: "2010", variants: ["B747-8I", "B747-8F"]
+  },
+  "B777-200": { 
+    type: "B777-200", manufacturer: "Boeing", maxSeats: 440, range: 5240, maxSpeed: 560, cruiseSpeed: 493,
+    engines: 2, fuelCapacity: 117348, maxTakeoffWeight: 297550, maxLandingWeight: 201840,
+    wingspan: 60.9, length: 63.7, height: 18.5, serviceCeiling: 43100, engineType: "GE90/PW4000/Trent 800",
+    category: "wide-body", firstFlight: "1994", variants: ["B777-200", "B777-200ER", "B777-200LR"]
+  },
+  "B777-300": { 
+    type: "B777-300", manufacturer: "Boeing", maxSeats: 550, range: 5845, maxSpeed: 560, cruiseSpeed: 493,
+    engines: 2, fuelCapacity: 181280, maxTakeoffWeight: 351500, maxLandingWeight: 251290,
+    wingspan: 64.8, length: 73.9, height: 18.5, serviceCeiling: 43100, engineType: "GE90-115B/Trent 800",
+    category: "wide-body", firstFlight: "1997", variants: ["B777-300", "B777-300ER"]
+  },
+  "B787-8": { 
+    type: "B787-8", manufacturer: "Boeing", maxSeats: 330, range: 7355, maxSpeed: 560, cruiseSpeed: 488,
+    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 227930, maxLandingWeight: 172365,
+    wingspan: 60.1, length: 56.7, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
+    category: "wide-body", firstFlight: "2009", variants: ["B787-8"]
+  },
+  "B787-9": { 
+    type: "B787-9", manufacturer: "Boeing", maxSeats: 420, range: 7635, maxSpeed: 560, cruiseSpeed: 488,
+    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 254011, maxLandingWeight: 192776,
+    wingspan: 60.1, length: 62.8, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
+    category: "wide-body", firstFlight: "2013", variants: ["B787-9"]
+  },
+  "B787-10": { 
+    type: "B787-10", manufacturer: "Boeing", maxSeats: 440, range: 6430, maxSpeed: 560, cruiseSpeed: 488,
+    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 254011, maxLandingWeight: 192776,
+    wingspan: 60.1, length: 68.3, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
+    category: "wide-body", firstFlight: "2017", variants: ["B787-10"]
+  }
+};</old_str>
+<new_str>// Aircraft data API with comprehensive realistic data
+const aircraftDatabase = {
+  "A318": { 
+    type: "A318", manufacturer: "Airbus", maxSeats: 132, range: 3100, maxSpeed: 500, cruiseSpeed: 447, 
+    engines: 2, fuelCapacity: 24210, maxTakeoffWeight: 68000, maxLandingWeight: 57500, 
+    wingspan: 34.1, length: 31.4, height: 12.6, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "2002", variants: ["A318-100"], cargoCapacity: 21.21,
+    maxZeroFuelWeight: 57000, operatingEmptyWeight: 39000, maxFuelWeight: 24210, climbRate: 2500
+  },
+  "A319": { 
+    type: "A319", manufacturer: "Airbus", maxSeats: 156, range: 3700, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 24210, maxTakeoffWeight: 75500, maxLandingWeight: 62500,
+    wingspan: 35.8, length: 33.8, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "1995", variants: ["A319-100", "A319neo"], cargoCapacity: 27.62,
+    maxZeroFuelWeight: 61000, operatingEmptyWeight: 40800, maxFuelWeight: 24210, climbRate: 2500
+  },
+  "A320": { 
+    type: "A320", manufacturer: "Airbus", maxSeats: 180, range: 3300, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 78000, maxLandingWeight: 66000,
+    wingspan: 35.8, length: 37.6, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "1987", variants: ["A320-200", "A320neo"], cargoCapacity: 37.41,
+    maxZeroFuelWeight: 62800, operatingEmptyWeight: 42600, maxFuelWeight: 26020, climbRate: 2500
+  },
+  "A321": { 
+    type: "A321", manufacturer: "Airbus", maxSeats: 220, range: 3200, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 32940, maxTakeoffWeight: 93500, maxLandingWeight: 77800,
+    wingspan: 35.8, length: 44.5, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
+    category: "narrow-body", firstFlight: "1993", variants: ["A321-200", "A321neo", "A321XLR"], cargoCapacity: 51.7,
+    maxZeroFuelWeight: 73800, operatingEmptyWeight: 48500, maxFuelWeight: 32940, climbRate: 2500
+  },
+  "A330": { 
+    type: "A330", manufacturer: "Airbus", maxSeats: 440, range: 7250, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 2, fuelCapacity: 139090, maxTakeoffWeight: 242000, maxLandingWeight: 187000,
+    wingspan: 60.3, length: 63.7, height: 16.9, serviceCeiling: 41000, engineType: "Trent 700/CF6-80E",
+    category: "wide-body", firstFlight: "1992", variants: ["A330-200", "A330-300", "A330-900neo"], cargoCapacity: 162,
+    maxZeroFuelWeight: 175000, operatingEmptyWeight: 120500, maxFuelWeight: 139090, climbRate: 2000
+  },
+  "A340": { 
+    type: "A340", manufacturer: "Airbus", maxSeats: 440, range: 9000, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 4, fuelCapacity: 195300, maxTakeoffWeight: 380000, maxLandingWeight: 265000,
+    wingspan: 63.5, length: 75.4, height: 17.1, serviceCeiling: 41000, engineType: "Trent 500/CFM56",
+    category: "wide-body", firstFlight: "1991", variants: ["A340-200", "A340-300", "A340-500", "A340-600"], cargoCapacity: 190,
+    maxZeroFuelWeight: 250000, operatingEmptyWeight: 170400, maxFuelWeight: 195300, climbRate: 1800
+  },
+  "A350": { 
+    type: "A350", manufacturer: "Airbus", maxSeats: 440, range: 8100, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 2, fuelCapacity: 138000, maxTakeoffWeight: 316000, maxLandingWeight: 213000,
+    wingspan: 64.8, length: 66.8, height: 17.1, serviceCeiling: 43000, engineType: "Trent XWB",
+    category: "wide-body", firstFlight: "2013", variants: ["A350-900", "A350-1000"], cargoCapacity: 162,
+    maxZeroFuelWeight: 218000, operatingEmptyWeight: 142400, maxFuelWeight: 138000, climbRate: 2200
+  },
+  "A380": { 
+    type: "A380", manufacturer: "Airbus", maxSeats: 850, range: 8000, maxSpeed: 560, cruiseSpeed: 520,
+    engines: 4, fuelCapacity: 84535, maxTakeoffWeight: 575000, maxLandingWeight: 394000,
+    wingspan: 79.8, length: 72.7, height: 24.1, serviceCeiling: 43000, engineType: "Trent 900/GP7200",
+    category: "double-decker", firstFlight: "2005", variants: ["A380-800"], cargoCapacity: 858,
+    maxZeroFuelWeight: 361000, operatingEmptyWeight: 276800, maxFuelWeight: 84535, climbRate: 1500
+  },
+  "B737-700": { 
+    type: "B737-700", manufacturer: "Boeing", maxSeats: 149, range: 3365, maxSpeed: 514, cruiseSpeed: 453,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 70080, maxLandingWeight: 58060,
+    wingspan: 35.8, length: 33.6, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
+    category: "narrow-body", firstFlight: "1997", variants: ["B737-700", "B737-700ER"], cargoCapacity: 30.2,
+    maxZeroFuelWeight: 54660, operatingEmptyWeight: 38147, maxFuelWeight: 26020, climbRate: 2500
+  },
+  "B737-800": { 
+    type: "B737-800", manufacturer: "Boeing", maxSeats: 189, range: 2935, maxSpeed: 514, cruiseSpeed: 453,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 79010, maxLandingWeight: 66360,
+    wingspan: 35.8, length: 39.5, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
+    category: "narrow-body", firstFlight: "1997", variants: ["B737-800", "B737-800BCF"], cargoCapacity: 44.3,
+    maxZeroFuelWeight: 61690, operatingEmptyWeight: 41413, maxFuelWeight: 26020, climbRate: 2500
+  },
+  "B737-900": { 
+    type: "B737-900", manufacturer: "Boeing", maxSeats: 220, range: 2800, maxSpeed: 514, cruiseSpeed: 453,
+    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 85130, maxLandingWeight: 71210,
+    wingspan: 35.8, length: 42.1, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
+    category: "narrow-body", firstFlight: "2000", variants: ["B737-900", "B737-900ER"], cargoCapacity: 52.5,
+    maxZeroFuelWeight: 67130, operatingEmptyWeight: 44676, maxFuelWeight: 26020, climbRate: 2500
+  },
+  "B747-400": { 
+    type: "B747-400", manufacturer: "Boeing", maxSeats: 660, range: 7260, maxSpeed: 570, cruiseSpeed: 533,
+    engines: 4, fuelCapacity: 216840, maxTakeoffWeight: 412775, maxLandingWeight: 295745,
+    wingspan: 64.4, length: 70.7, height: 19.4, serviceCeiling: 43000, engineType: "CF6-80C2/PW4000",
+    category: "wide-body", firstFlight: "1988", variants: ["B747-400", "B747-400ER", "B747-400F"], cargoCapacity: 858,
+    maxZeroFuelWeight: 295742, operatingEmptyWeight: 183380, maxFuelWeight: 216840, climbRate: 1800
+  },
+  "B747-8": { 
+    type: "B747-8", manufacturer: "Boeing", maxSeats: 700, range: 7730, maxSpeed: 570, cruiseSpeed: 533,
+    engines: 4, fuelCapacity: 238610, maxTakeoffWeight: 447700, maxLandingWeight: 346091,
+    wingspan: 68.4, length: 76.3, height: 19.4, serviceCeiling: 43000, engineType: "GEnx-2B67",
+    category: "wide-body", firstFlight: "2010", variants: ["B747-8I", "B747-8F"], cargoCapacity: 858,
+    maxZeroFuelWeight: 322050, operatingEmptyWeight: 220128, maxFuelWeight: 238610, climbRate: 1800
+  },
+  "B777-200": { 
+    type: "B777-200", manufacturer: "Boeing", maxSeats: 440, range: 5240, maxSpeed: 560, cruiseSpeed: 493,
+    engines: 2, fuelCapacity: 117348, maxTakeoffWeight: 297550, maxLandingWeight: 201840,
+    wingspan: 60.9, length: 63.7, height: 18.5, serviceCeiling: 43100, engineType: "GE90/PW4000/Trent 800",
+    category: "wide-body", firstFlight: "1994", variants: ["B777-200", "B777-200ER", "B777-200LR"], cargoCapacity: 162,
+    maxZeroFuelWeight: 181000, operatingEmptyWeight: 138100, maxFuelWeight: 117348, climbRate: 2000
+  },
+  "B777-300": { 
+    type: "B777-300", manufacturer: "Boeing", maxSeats: 550, range: 5845, maxSpeed: 560, cruiseSpeed: 493,
+    engines: 2, fuelCapacity: 181280, maxTakeoffWeight: 351500, maxLandingWeight: 251290,
+    wingspan: 64.8, length: 73.9, height: 18.5, serviceCeiling: 43100, engineType: "GE90-115B/Trent 800",
+    category: "wide-body", firstFlight: "1997", variants: ["B777-300", "B777-300ER"], cargoCapacity: 202,
+    maxZeroFuelWeight: 215000, operatingEmptyWeight: 167829, maxFuelWeight: 181280, climbRate: 2000
+  },
+  "B787-8": { 
+    type: "B787-8", manufacturer: "Boeing", maxSeats: 330, range: 7355, maxSpeed: 560, cruiseSpeed: 488,
+    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 227930, maxLandingWeight: 172365,
+    wingspan: 60.1, length: 56.7, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
+    category: "wide-body", firstFlight: "2009", variants: ["B787-8"], cargoCapacity: 137,
+    maxZeroFuelWeight: 161000, operatingEmptyWeight: 119950, maxFuelWeight: 126206, climbRate: 2200
+  },
+  "B787-9": { 
+    type: "B787-9", manufacturer: "Boeing", maxSeats: 420, range: 7635, maxSpeed: 560, cruiseSpeed: 488,
+    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 254011, maxLandingWeight: 192776,
+    wingspan: 60.1, length: 62.8, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
+    category: "wide-body", firstFlight: "2013", variants: ["B787-9"], cargoCapacity: 162,
+    maxZeroFuelWeight: 181000, operatingEmptyWeight: 128850, maxFuelWeight: 126206, climbRate: 2200
+  },
+  "B787-10": { 
+    type: "B787-10", manufacturer: "Boeing", maxSeats: 440, range: 6430, maxSpeed: 560, cruiseSpeed: 488,
+    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 254011, maxLandingWeight: 192776,
+    wingspan: 60.1, length: 68.3, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
+    category: "wide-body", firstFlight: "2017", variants: ["B787-10"], cargoCapacity: 172,
+    maxZeroFuelWeight: 181000, operatingEmptyWeight: 135400, maxFuelWeight: 126206, climbRate: 2200
+  },
+  "CRJ-200": {
+    type: "CRJ-200", manufacturer: "Bombardier", maxSeats: 50, range: 1650, maxSpeed: 490, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 5888, maxTakeoffWeight: 23133, maxLandingWeight: 21319,
+    wingspan: 21.2, length: 26.8, height: 6.2, serviceCeiling: 41000, engineType: "CF34-3A1",
+    category: "regional", firstFlight: "1991", variants: ["CRJ-200ER", "CRJ-200LR"], cargoCapacity: 8.5,
+    maxZeroFuelWeight: 19500, operatingEmptyWeight: 14500, maxFuelWeight: 5888, climbRate: 3000
+  },
+  "CRJ-700": {
+    type: "CRJ-700", manufacturer: "Bombardier", maxSeats: 78, range: 2100, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 9200, maxTakeoffWeight: 34019, maxLandingWeight: 30844,
+    wingspan: 23.2, length: 32.3, height: 7.6, serviceCeiling: 41000, engineType: "CF34-8C1",
+    category: "regional", firstFlight: "1999", variants: ["CRJ-700", "CRJ-700ER"], cargoCapacity: 15.8,
+    maxZeroFuelWeight: 28100, operatingEmptyWeight: 20200, maxFuelWeight: 9200, climbRate: 2800
+  },
+  "CRJ-900": {
+    type: "CRJ-900", manufacturer: "Bombardier", maxSeats: 90, range: 2100, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 9200, maxTakeoffWeight: 38329, maxLandingWeight: 34473,
+    wingspan: 24.9, length: 36.4, height: 7.6, serviceCeiling: 41000, engineType: "CF34-8C5",
+    category: "regional", firstFlight: "2001", variants: ["CRJ-900", "CRJ-900ER"], cargoCapacity: 21.1,
+    maxZeroFuelWeight: 31800, operatingEmptyWeight: 22200, maxFuelWeight: 9200, climbRate: 2800
+  },
+  "E170": {
+    type: "E170", manufacturer: "Embraer", maxSeats: 80, range: 2150, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 9387, maxTakeoffWeight: 37200, maxLandingWeight: 33600,
+    wingspan: 26.0, length: 29.9, height: 9.9, serviceCeiling: 41000, engineType: "CF34-8E",
+    category: "regional", firstFlight: "2002", variants: ["E170", "E170-STD"], cargoCapacity: 20.1,
+    maxZeroFuelWeight: 31000, operatingEmptyWeight: 21800, maxFuelWeight: 9387, climbRate: 2800
+  },
+  "E175": {
+    type: "E175", manufacturer: "Embraer", maxSeats: 88, range: 2200, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 9387, maxTakeoffWeight: 38790, maxLandingWeight: 35300,
+    wingspan: 26.0, length: 31.7, height: 9.9, serviceCeiling: 41000, engineType: "CF34-8E",
+    category: "regional", firstFlight: "2003", variants: ["E175", "E175-E2"], cargoCapacity: 22.5,
+    maxZeroFuelWeight: 32400, operatingEmptyWeight: 22400, maxFuelWeight: 9387, climbRate: 2800
+  },
+  "E190": {
+    type: "E190", manufacturer: "Embraer", maxSeats: 114, range: 2400, maxSpeed: 500, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 13100, maxTakeoffWeight: 51800, maxLandingWeight: 45000,
+    wingspan: 28.7, length: 36.2, height: 10.6, serviceCeiling: 41000, engineType: "CF34-10E",
+    category: "regional", firstFlight: "2004", variants: ["E190", "E190-E2"], cargoCapacity: 30.1,
+    maxZeroFuelWeight: 40800, operatingEmptyWeight: 28200, maxFuelWeight: 13100, climbRate: 2600
+  },
+  "DHC-8": {
+    type: "DHC-8", manufacturer: "De Havilland Canada", maxSeats: 78, range: 1200, maxSpeed: 360, cruiseSpeed: 315,
+    engines: 2, fuelCapacity: 2400, maxTakeoffWeight: 29574, maxLandingWeight: 28009,
+    wingspan: 27.4, length: 32.8, height: 8.3, serviceCeiling: 25000, engineType: "PW150A",
+    category: "turboprop", firstFlight: "1983", variants: ["DHC-8-100", "DHC-8-200", "DHC-8-300", "DHC-8-400"], cargoCapacity: 15.6,
+    maxZeroFuelWeight: 25855, operatingEmptyWeight: 17120, maxFuelWeight: 2400, climbRate: 1500
+  },
+  "ATR-72": {
+    type: "ATR-72", manufacturer: "ATR", maxSeats: 78, range: 825, maxSpeed: 320, cruiseSpeed: 275,
+    engines: 2, fuelCapacity: 4920, maxTakeoffWeight: 23000, maxLandingWeight: 22500,
+    wingspan: 27.1, length: 27.2, height: 7.6, serviceCeiling: 25000, engineType: "PW127",
+    category: "turboprop", firstFlight: "1988", variants: ["ATR-72-200", "ATR-72-500", "ATR-72-600"], cargoCapacity: 7.8,
+    maxZeroFuelWeight: 20000, operatingEmptyWeight: 13500, maxFuelWeight: 4920, climbRate: 1200
+  },
+  "MD-80": {
+    type: "MD-80", manufacturer: "McDonnell Douglas", maxSeats: 172, range: 2504, maxSpeed: 504, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 20900, maxTakeoffWeight: 67812, maxLandingWeight: 58967,
+    wingspan: 32.9, length: 45.1, height: 9.0, serviceCeiling: 37000, engineType: "JT8D-217",
+    category: "narrow-body", firstFlight: "1979", variants: ["MD-81", "MD-82", "MD-83", "MD-88"], cargoCapacity: 38.6,
+    maxZeroFuelWeight: 52163, operatingEmptyWeight: 35560, maxFuelWeight: 20900, climbRate: 2200
+  },
+  "MD-90": {
+    type: "MD-90", manufacturer: "McDonnell Douglas", maxSeats: 172, range: 2400, maxSpeed: 504, cruiseSpeed: 447,
+    engines: 2, fuelCapacity: 20900, maxTakeoffWeight: 70760, maxLandingWeight: 58967,
+    wingspan: 32.9, length: 46.5, height: 9.0, serviceCeiling: 37000, engineType: "V2525-D5",
+    category: "narrow-body", firstFlight: "1993", variants: ["MD-90-30", "MD-90-30ER"], cargoCapacity: 40.2,
+    maxZeroFuelWeight: 54430, operatingEmptyWeight: 39020, maxFuelWeight: 20900, climbRate: 2200
+  }
 };
 
 app.get('/api/aircraft/:type', (req, res) => {
@@ -250,7 +539,7 @@ io.on("connection", (socket) => {
       socket.emit("serviceUpdate", airportData[data.airport].requests);
       socket.emit("atisUpdate", airportData[data.airport].atis);
 
-      console.log(`User ${data.userId} joined ${data.airport} as ${data.mode}`);
+      console.log(`👤 User joined: ${data.userId} (Discord ID) → ${data.airport} as ${data.mode.toUpperCase()}`);
     }
   });
 
@@ -316,6 +605,9 @@ io.on("connection", (socket) => {
     if (msg.airport && airportData[msg.airport]) {
       msg.airport = msg.airport; // Ensure airport is preserved in message
       io.to(msg.airport).emit("chatUpdate", msg);
+      
+      // Log chat messages to console
+      console.log(`💬 [${msg.airport}] ${msg.sender} (${msg.stand || 'GROUND'}): ${msg.text}`);
     }
   });
 
@@ -380,18 +672,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("❌ User disconnected:", socket.id);
-
     const userInfo = connectedUsers.get(socket.id);
+    
+    if (userInfo && userInfo.userId) {
+      console.log(`❌ User disconnected: ${userInfo.userId} (Discord ID) from ${userInfo.airport || 'unknown airport'} - was ${userInfo.mode || 'unknown role'}`);
+    } else {
+      console.log("❌ Unknown user disconnected:", socket.id);
+    }
 
     // Release any stands claimed by this user
     if (userInfo && userInfo.airport && airportData[userInfo.airport]) {
       for (const [stand, info] of Object.entries(airportData[userInfo.airport].stands)) {
         if (info.userId === userInfo.userId) {
           delete airportData[userInfo.airport].stands[stand];
-          io.emit("standUpdate", airportData[userInfo.airport].stands);
+          io.to(userInfo.airport).emit("standUpdate", airportData[userInfo.airport].stands);
 
-          io.emit("chatUpdate", {
+          io.to(userInfo.airport).emit("chatUpdate", {
             text: `${info.pilot} has disconnected. ${stand} is now available.`,
             sender: "SYSTEM",
             stand: stand,
@@ -399,8 +695,13 @@ io.on("connection", (socket) => {
             timestamp: new Date().toLocaleTimeString(),
             mode: "system"
           });
+          
+          console.log(`🏢 Stand released: ${stand} at ${userInfo.airport} (was ${info.pilot})`);
         }
       }
+      
+      // Remove user from airport data
+      airportData[userInfo.airport].users.delete(socket.id);
     }
 
     connectedUsers.delete(socket.id);
