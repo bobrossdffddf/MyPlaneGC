@@ -23,16 +23,12 @@ export default function App() {
   const [aircraftModel, setAircraftModel] = useState("");
   const [aircraftData, setAircraftData] = useState(null);
   const [trainingMode, setTrainingMode] = useState(false);
-  const [supervisorMode, setSupervisorMode] = useState(false);
   const [passengerManifest, setPassengerManifest] = useState([]);
-  const [dashboardLayout, setDashboardLayout] = useState({
-    weather: { x: 0, y: 0, enabled: true },
-    services: { x: 1, y: 0, enabled: true },
-    aircraft: { x: 0, y: 1, enabled: true },
-    communication: { x: 1, y: 1, enabled: true }
-  });
   const [currentTrainingStep, setCurrentTrainingStep] = useState(0);
-  const [trainingScenario, setTrainingScenario] = useState("basic_operations");
+  const [trainingScenario, setTrainingScenario] = useState("basic_atc");
+  const [atcCurrentQuestion, setAtcCurrentQuestion] = useState(0);
+  const [atcScore, setAtcScore] = useState(0);
+  const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
     wind: '270°/08KT',
@@ -43,20 +39,24 @@ export default function App() {
   });
   const [checklists, setChecklists] = useState({
     preflight: [
-      { item: "Aircraft Documents Review", checked: false, category: "Documentation" },
-      { item: "Weather & NOTAM Brief", checked: false, category: "Documentation" },
-      { item: "Flight Plan Filed", checked: false, category: "Documentation" },
-      { item: "Weight & Balance Calculated", checked: false, category: "Documentation" },
-      { item: "External Visual Inspection", checked: false, category: "External" },
-      { item: "Fuel Quantity & Quality Check", checked: false, category: "External" },
-      { item: "Control Surface Movement", checked: false, category: "External" },
-      { item: "Tire & Landing Gear Inspection", checked: false, category: "External" },
-      { item: "Engine Intake Inspection", checked: false, category: "External" },
-      { item: "Cockpit Preparation", checked: false, category: "Cockpit" },
-      { item: "Navigation Systems Test", checked: false, category: "Cockpit" },
-      { item: "Communication Radio Check", checked: false, category: "Cockpit" },
-      { item: "Instrument Panel Check", checked: false, category: "Cockpit" },
-      { item: "Emergency Equipment Check", checked: false, category: "Cockpit" }
+      { item: "Aircraft Documents Review - Check airworthiness certificate, registration, weight & balance", checked: false, category: "Documentation" },
+      { item: "Weather & NOTAM Brief - Review current and forecast weather, NOTAMs for departure and destination", checked: false, category: "Documentation" },
+      { item: "Flight Plan Filed - Ensure flight plan is filed with ATC and route is loaded in FMS", checked: false, category: "Documentation" },
+      { item: "Weight & Balance Calculated - Verify passenger/cargo loading within limits", checked: false, category: "Documentation" },
+      { item: "External Visual Inspection - Walk around aircraft checking for damage, leaks, obstructions", checked: false, category: "External" },
+      { item: "Fuel Quantity & Quality Check - Verify fuel quantity matches flight plan, check for contamination", checked: false, category: "External" },
+      { item: "Control Surface Movement - Check ailerons, elevators, rudder move freely and correctly", checked: false, category: "External" },
+      { item: "Tire & Landing Gear Inspection - Check tire condition, strut extension, gear pins removed", checked: false, category: "External" },
+      { item: "Engine Intake Inspection - Check for foreign objects, cover removal, fan blade condition", checked: false, category: "External" },
+      { item: "Static Port & Pitot Tube Check - Ensure covers removed and ports clear", checked: false, category: "External" },
+      { item: "Navigation Light Test - Verify all exterior lights operational", checked: false, category: "External" },
+      { item: "Cockpit Preparation - Seat adjustment, harness check, oxygen mask test", checked: false, category: "Cockpit" },
+      { item: "Navigation Systems Test - Test GPS, VOR, ILS, autopilot systems", checked: false, category: "Cockpit" },
+      { item: "Communication Radio Check - Test VHF, ATC, company frequency radios", checked: false, category: "Cockpit" },
+      { item: "Instrument Panel Check - Verify all instruments operational and within limits", checked: false, category: "Cockpit" },
+      { item: "Emergency Equipment Check - Locate and test emergency exits, life vests, oxygen", checked: false, category: "Cockpit" },
+      { item: "Transponder & TCAS Check - Set squawk code and verify TCAS operational", checked: false, category: "Avionics" },
+      { item: "Ground Proximity Warning Test - Test GPWS and terrain awareness systems", checked: false, category: "Avionics" }
     ],
     beforestart: [
       { item: "Seat Belts & Harnesses", checked: false, category: "Safety" },
@@ -143,30 +143,228 @@ export default function App() {
     "CRJ-900", "E170", "E175", "E190", "DHC-8", "ATR-72", "MD-80", "MD-90"
   ];
 
-  const trainingScenarios = {
-    basic_operations: {
-      name: "Basic Ground Operations",
-      steps: [
-        { title: "Select Airport", description: "Choose an airport from the list", target: "airport-selection" },
-        { title: "Claim Stand", description: "Enter flight details and claim a stand", target: "stand-selection" },
-        { title: "Request Service", description: "Request ground power service", target: "service-request" },
-        { title: "Communication", description: "Send a message to ground control", target: "communication" }
+  const atcTrainingQuestions = {
+    basic_atc: [
+      {
+        scenario: "You're approaching IRFD airport and need to contact ground control.",
+        atcMessage: "November Charlie Bravo Whiskey, taxi via Alpha Kilo, hold short runway 27.",
+        question: "What's your correct response?",
+        options: [
+          "November Charlie Bravo Whiskey, taxi via Alpha Kilo, hold short runway 27",
+          "Roger, taxi Alpha Kilo, hold short 27, November Charlie Bravo Whiskey",
+          "Copy that, heading to runway 27",
+          "Affirmative, proceeding to Alpha Kilo"
+        ],
+        correct: 1,
+        explanation: "Always read back taxi instructions and your callsign for confirmation."
+      },
+      {
+        scenario: "Ground control gives you pushback clearance.",
+        atcMessage: "November Charlie Bravo Whiskey, pushback approved, face east.",
+        question: "What's your response?",
+        options: [
+          "Pushback approved, November Charlie Bravo Whiskey",
+          "Pushback approved, face east, November Charlie Bravo Whiskey",
+          "Roger, pushing back",
+          "Copy pushback"
+        ],
+        correct: 1,
+        explanation: "Read back pushback clearance including direction and your callsign."
+      },
+      {
+        scenario: "You're ready for takeoff.",
+        atcMessage: "November Charlie Bravo Whiskey, runway 27, cleared for takeoff.",
+        question: "What's your response?",
+        options: [
+          "Cleared for takeoff runway 27, November Charlie Bravo Whiskey",
+          "Roger, taking off",
+          "Copy that, departing",
+          "Affirmative, runway 27"
+        ],
+        correct: 0,
+        explanation: "Always read back takeoff clearance with runway number and callsign."
+      },
+      {
+        scenario: "Tower asks you to contact departure.",
+        atcMessage: "November Charlie Bravo Whiskey, contact departure 124.8, good day.",
+        question: "What's your response?",
+        options: [
+          "Good day, November Charlie Bravo Whiskey",
+          "124.8, November Charlie Bravo Whiskey, good day",
+          "Roger, switching to departure",
+          "Copy, going to 124.8"
+        ],
+        correct: 1,
+        explanation: "Read back the frequency and include your callsign when switching."
+      },
+      {
+        scenario: "You need to request taxi to the gate after landing.",
+        atcMessage: "November Charlie Bravo Whiskey, turn left Bravo 3, contact ground 121.9.",
+        question: "What's your correct response?",
+        options: [
+          "Left Bravo 3, ground 121.9, November Charlie Bravo Whiskey",
+          "Roger, turning left",
+          "Copy ground frequency",
+          "Switching to ground"
+        ],
+        correct: 0,
+        explanation: "Read back taxi instructions and frequency change with your callsign."
+      }
+    ],
+    emergency_atc: [
+      {
+        scenario: "You have a medical emergency on board.",
+        atcMessage: "All stations, all stations, November Charlie Bravo Whiskey declaring medical emergency.",
+        question: "What information should you provide next?",
+        options: [
+          "Request immediate landing",
+          "Souls on board, fuel remaining, nature of emergency",
+          "Just the location",
+          "Aircraft type only"
+        ],
+        correct: 1,
+        explanation: "Always provide souls on board, fuel remaining, and nature of emergency."
+      },
+      {
+        scenario: "Tower responds to your emergency.",
+        atcMessage: "November Charlie Bravo Whiskey, emergency services alerted, runway 27 available, report souls and fuel.",
+        question: "How do you respond?",
+        options: [
+          "November Charlie Bravo Whiskey, 156 souls, 2 hours fuel, requesting medical assistance on arrival",
+          "We have emergency",
+          "Landing runway 27",
+          "Medical emergency confirmed"
+        ],
+        correct: 0,
+        explanation: "Provide exact numbers and specific assistance needed."
+      }
+    ],
+    ground_coordination: [
+      {
+        scenario: "You're at the gate and need ground power.",
+        atcMessage: "Ground, November Charlie Bravo Whiskey at gate A12, requesting ground power.",
+        question: "What's the appropriate way to make this request?",
+        options: [
+          "Ground power please",
+          "November Charlie Bravo Whiskey, gate A12, requesting ground power connection",
+          "We need power",
+          "Connect ground power"
+        ],
+        correct: 1,
+        explanation: "Use your callsign, state your position, and make specific requests."
+      },
+      {
+        scenario: "Ground crew asks for passenger count.",
+        atcMessage: "November Charlie Bravo Whiskey, ground crew requests passenger count for catering.",
+        question: "How do you respond?",
+        options: [
+          "November Charlie Bravo Whiskey, 156 passengers on board",
+          "Full load",
+          "Normal capacity",
+          "Check the manifest"
+        ],
+        correct: 0,
+        explanation: "Provide exact passenger count for catering and ground services."
+      }
+    ]
+  };
+
+  const groundCrewGuides = {
+    fueling: {
+      title: "Aircraft Fueling Procedures",
+      sections: [
+        {
+          title: "Safety First",
+          image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400&h=200&fit=crop",
+          steps: [
+            "Ensure aircraft engines are shut down",
+            "Check for proper grounding equipment",
+            "Verify no smoking signs are posted",
+            "Confirm fire extinguisher is available",
+            "Check fuel truck positioning"
+          ]
+        },
+        {
+          title: "Fuel Connection",
+          image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop",
+          steps: [
+            "Connect static grounding wire first",
+            "Remove fuel cap carefully",
+            "Insert fuel nozzle properly",
+            "Secure all connections",
+            "Begin fuel flow slowly"
+          ]
+        },
+        {
+          title: "Monitoring Process",
+          image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=200&fit=crop",
+          steps: [
+            "Monitor fuel quantity gauges",
+            "Check for any leaks or spills",
+            "Communicate with flight crew",
+            "Watch for proper fuel distribution",
+            "Stop at required quantity"
+          ]
+        }
       ]
     },
-    emergency_procedures: {
-      name: "Emergency Procedures",
-      steps: [
-        { title: "Emergency Declaration", description: "Declare medical emergency", target: "emergency" },
-        { title: "Priority Services", description: "Request emergency services", target: "priority-services" },
-        { title: "Coordinate Response", description: "Communicate with emergency teams", target: "emergency-comm" }
+    pushback: {
+      title: "Pushback Operations",
+      sections: [
+        {
+          title: "Pre-Pushback Checks",
+          image: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=200&fit=crop",
+          steps: [
+            "Verify pushback clearance from ATC",
+            "Check area is clear of obstacles",
+            "Ensure tow bar is properly connected",
+            "Test communication with cockpit",
+            "Position safety cones if needed"
+          ]
+        },
+        {
+          title: "Pushback Execution",
+          image: "https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=400&h=200&fit=crop",
+          steps: [
+            "Begin pushback slowly and smoothly",
+            "Monitor aircraft nose wheel steering",
+            "Communicate direction changes to pilots",
+            "Watch for other aircraft and vehicles",
+            "Stop at designated position"
+          ]
+        }
       ]
     },
-    supervisor_training: {
-      name: "Supervisor Operations",
-      steps: [
-        { title: "Monitor Operations", description: "View all airport activities", target: "supervisor-view" },
-        { title: "Manage Resources", description: "Allocate ground crew efficiently", target: "resource-management" },
-        { title: "Handle Conflicts", description: "Resolve service conflicts", target: "conflict-resolution" }
+    baggage: {
+      title: "Baggage Handling",
+      sections: [
+        {
+          title: "Loading Procedures",
+          image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop",
+          steps: [
+            "Check baggage compartment is clear",
+            "Load heavy items first",
+            "Distribute weight evenly",
+            "Secure all containers properly",
+            "Close and lock compartment doors"
+          ]
+        }
+      ]
+    },
+    catering: {
+      title: "Catering Services",
+      sections: [
+        {
+          title: "Catering Setup",
+          image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400&h=200&fit=crop",
+          steps: [
+            "Position catering truck at correct door",
+            "Raise platform to door level",
+            "Open aircraft catering doors",
+            "Remove old catering supplies",
+            "Load new catering items systematically"
+          ]
+        }
       ]
     }
   };
@@ -427,47 +625,9 @@ export default function App() {
     }
   };
 
-  const advanceTrainingStep = () => {
-    const scenario = trainingScenarios[trainingScenario];
-    if (currentTrainingStep < scenario.steps.length - 1) {
-      setCurrentTrainingStep(currentTrainingStep + 1);
-    } else {
-      // Training completed
-      setTrainingMode(false);
-      setCurrentTrainingStep(0);
-      socket.emit("chatMessage", {
-        text: `🎓 Training scenario "${scenario.name}" completed successfully!`,
-        sender: "TRAINING SYSTEM",
-        stand: selectedStand || "TRAINING",
-        airport: selectedAirport,
-        timestamp: new Date().toLocaleTimeString(),
-        mode: "system"
-      });
-    }
-  };
+  
 
-  const startTrainingMode = (scenarioType) => {
-    setTrainingMode(true);
-    setTrainingScenario(scenarioType);
-    setCurrentTrainingStep(0);
-    socket.emit("chatMessage", {
-      text: `🎯 Starting training: ${trainingScenarios[scenarioType].name}`,
-      sender: "TRAINING SYSTEM",
-      stand: selectedStand || "TRAINING",
-      airport: selectedAirport,
-      timestamp: new Date().toLocaleTimeString(),
-      mode: "system"
-    });
-  };
-
-  const toggleSupervisorMode = () => {
-    setSupervisorMode(!supervisorMode);
-    socket.emit("userMode", { 
-      mode: supervisorMode ? userMode : "supervisor", 
-      airport: selectedAirport, 
-      userId: user?.id 
-    });
-  };
+  
 
   const renderAircraftDisplay = () => {
     if (aircraftModel) {
@@ -794,52 +954,115 @@ export default function App() {
 
         case "training":
           return (
-            <div className="training-container">
-              <div className="training-header">
-                <h2>TRAINING CENTER</h2>
-                <div className="training-controls">
-                  <button 
-                    className={`training-toggle ${trainingMode ? 'active' : ''}`}
-                    onClick={() => setTrainingMode(!trainingMode)}
-                  >
-                    {trainingMode ? 'EXIT TRAINING' : 'ENTER TRAINING MODE'}
-                  </button>
+            <div className="atc-training-container">
+              <div className="atc-training-header">
+                <h2>ATC COMMUNICATION TRAINING</h2>
+                <div className="training-stats">
+                  <div className="stat">Score: {atcScore}/{atcCurrentQuestion}</div>
+                  <div className="stat">Question: {atcCurrentQuestion + 1}/{atcTrainingQuestions[trainingScenario]?.length || 0}</div>
                 </div>
               </div>
 
-              {trainingMode ? (
-                <div className="training-active">
-                  <div className="training-scenario">
-                    <h3>{trainingScenarios[trainingScenario].name}</h3>
-                    <div className="training-progress">
-                      Step {currentTrainingStep + 1} of {trainingScenarios[trainingScenario].steps.length}
-                    </div>
-                  </div>
-
-                  <div className="training-step">
-                    <div className="step-content">
-                      <h4>{trainingScenarios[trainingScenario].steps[currentTrainingStep].title}</h4>
-                      <p>{trainingScenarios[trainingScenario].steps[currentTrainingStep].description}</p>
-                    </div>
-                    <button className="training-next" onClick={advanceTrainingStep}>
-                      {currentTrainingStep < trainingScenarios[trainingScenario].steps.length - 1 ? 'NEXT STEP' : 'COMPLETE TRAINING'}
-                    </button>
-                  </div>
+              {!trainingMode ? (
+                <div className="scenario-modules">
+                  <h3>Choose Training Module</h3>
+                  <button 
+                    className={`module-btn ${trainingScenario === 'basic_atc' ? 'active' : ''}`}
+                    onClick={() => setTrainingScenario('basic_atc')}
+                  >
+                    Basic ATC Communications
+                  </button>
+                  <button 
+                    className={`module-btn ${trainingScenario === 'emergency_atc' ? 'active' : ''}`}
+                    onClick={() => setTrainingScenario('emergency_atc')}
+                  >
+                    Emergency Procedures
+                  </button>
+                  <button 
+                    className={`module-btn ${trainingScenario === 'ground_coordination' ? 'active' : ''}`}
+                    onClick={() => setTrainingScenario('ground_coordination')}
+                  >
+                    Ground Coordination
+                  </button>
+                  <button 
+                    className="start-training"
+                    onClick={() => {
+                      setTrainingMode(true);
+                      setAtcCurrentQuestion(0);
+                      setAtcScore(0);
+                    }}
+                  >
+                    START TRAINING
+                  </button>
                 </div>
               ) : (
-                <div className="training-scenarios">
-                  <h3>Available Training Scenarios</h3>
-                  <div className="scenario-grid">
-                    {Object.entries(trainingScenarios).map(([key, scenario]) => (
-                      <div key={key} className="scenario-card">
-                        <h4>{scenario.name}</h4>
-                        <p>{scenario.steps.length} steps</p>
-                        <button onClick={() => startTrainingMode(key)} className="start-training">
-                          START TRAINING
-                        </button>
+                <div className="atc-scenario-active">
+                  {atcTrainingQuestions[trainingScenario] && atcCurrentQuestion < atcTrainingQuestions[trainingScenario].length ? (
+                    <div className="current-question">
+                      <div className="situation-panel">
+                        <h4>Situation</h4>
+                        <p>{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].scenario}</p>
                       </div>
-                    ))}
-                  </div>
+                      
+                      <div className="atc-message">
+                        <div className="atc-speaker">ATC:</div>
+                        <div className="atc-text">"{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].atcMessage}"</div>
+                      </div>
+
+                      <div className="question-section">
+                        <h4>{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].question}</h4>
+                        <div className="multiple-choice">
+                          {atcTrainingQuestions[trainingScenario][atcCurrentQuestion].options.map((option, index) => (
+                            <button 
+                              key={index}
+                              className="choice-btn"
+                              onClick={() => {
+                                const isCorrect = index === atcTrainingQuestions[trainingScenario][atcCurrentQuestion].correct;
+                                if (isCorrect) setAtcScore(atcScore + 1);
+                                
+                                socket.emit("chatMessage", {
+                                  text: isCorrect ? 
+                                    `✅ Correct! ${atcTrainingQuestions[trainingScenario][atcCurrentQuestion].explanation}` :
+                                    `❌ Incorrect. ${atcTrainingQuestions[trainingScenario][atcCurrentQuestion].explanation}`,
+                                  sender: "ATC TRAINING",
+                                  stand: selectedStand || "TRAINING",
+                                  airport: selectedAirport,
+                                  timestamp: new Date().toLocaleTimeString(),
+                                  mode: "system"
+                                });
+                                
+                                setTimeout(() => {
+                                  setAtcCurrentQuestion(atcCurrentQuestion + 1);
+                                }, 2000);
+                              }}
+                            >
+                              {option}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="training-complete">
+                      <h3>Training Complete!</h3>
+                      <p>Final Score: {atcScore}/{atcTrainingQuestions[trainingScenario].length}</p>
+                      <button 
+                        className="restart-training"
+                        onClick={() => {
+                          setAtcCurrentQuestion(0);
+                          setAtcScore(0);
+                        }}
+                      >
+                        RESTART
+                      </button>
+                      <button 
+                        className="exit-training"
+                        onClick={() => setTrainingMode(false)}
+                      >
+                        EXIT TRAINING
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -902,75 +1125,48 @@ export default function App() {
             </div>
           );
 
-        case "dashboard":
+        case "guides":
           return (
-            <div className="dashboard-container">
-              <div className="dashboard-header">
-                <h2>CUSTOMIZABLE DASHBOARD</h2>
-                <button className="dashboard-edit">EDIT LAYOUT</button>
+            <div className="guides-container">
+              <div className="guides-header">
+                <h2>GROUND CREW OPERATIONS GUIDES</h2>
+                <div className="guide-tabs">
+                  {Object.keys(groundCrewGuides).map(category => (
+                    <button
+                      key={category}
+                      className={`guide-tab ${activeGuideCategory === category ? 'active' : ''}`}
+                      onClick={() => setActiveGuideCategory(category)}
+                    >
+                      {groundCrewGuides[category].title}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="dashboard-grid">
-                {dashboardLayout.weather.enabled && (
-                  <div className="dashboard-widget weather-widget">
-                    <h3>Weather Information</h3>
-                    <div className="weather-data">
-                      <div className="weather-item">
-                        <span>Wind:</span>
-                        <span>{atisData.wind}</span>
-                      </div>
-                      <div className="weather-item">
-                        <span>QNH:</span>
-                        <span>{atisData.qnh}</span>
-                      </div>
-                      <div className="weather-item">
-                        <span>Temperature:</span>
-                        <span>{atisData.temperature}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {dashboardLayout.services.enabled && (
-                  <div className="dashboard-widget services-widget">
-                    <h3>Active Services</h3>
-                    <div className="services-summary">
-                      <div className="service-count">
-                        <span>{requests.filter(r => r.status === "REQUESTED").length}</span>
-                        <span>Pending</span>
-                      </div>
-                      <div className="service-count">
-                        <span>{requests.filter(r => r.status === "ACCEPTED").length}</span>
-                        <span>In Progress</span>
+              <div className="guide-content">
+                <h3>{groundCrewGuides[activeGuideCategory].title}</h3>
+                {groundCrewGuides[activeGuideCategory].sections.map((section, index) => (
+                  <div key={index} className="guide-section">
+                    <div className="guide-item">
+                      <img 
+                        src={section.image} 
+                        alt={section.title}
+                        className="guide-image"
+                        onError={(e) => {
+                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+R3JvdW5kIE9wZXJhdGlvbnM8L3RleHQ+Cjwvc3ZnPgo=';
+                        }}
+                      />
+                      <div className="guide-text">
+                        <h4>{section.title}</h4>
+                        <ol>
+                          {section.steps.map((step, stepIndex) => (
+                            <li key={stepIndex}>{step}</li>
+                          ))}
+                        </ol>
                       </div>
                     </div>
                   </div>
-                )}
-
-                {dashboardLayout.aircraft.enabled && (
-                  <div className="dashboard-widget aircraft-widget">
-                    <h3>Aircraft Status</h3>
-                    <div className="aircraft-summary">
-                      <div className="aircraft-type">{aircraft || "No Aircraft Selected"}</div>
-                      <div className="aircraft-stand">{selectedStand || "No Stand"}</div>
-                      <div className="aircraft-flight">{flightNumber || "No Flight"}</div>
-                    </div>
-                  </div>
-                )}
-
-                {dashboardLayout.communication.enabled && (
-                  <div className="dashboard-widget communication-widget">
-                    <h3>Recent Communications</h3>
-                    <div className="recent-messages">
-                      {messages.slice(-5).map((msg, i) => (
-                        <div key={i} className="message-preview">
-                          <span className="sender">{msg.sender}:</span>
-                          <span className="text">{msg.text.substring(0, 50)}...</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                ))}
               </div>
             </div>
           );
@@ -1420,8 +1616,8 @@ export default function App() {
 
         <div className="comm-panel">
           <div className="comm-header">
-            <h3>GROUND FREQ</h3>
-            <div className="freq-display">121.900</div>
+            <h3>GROUND COMMUNICATIONS</h3>
+            <div className="comm-status">ONLINE</div>
           </div>
 
           <div className="messages-area">
@@ -1503,11 +1699,11 @@ export default function App() {
             <span>MANIFEST</span>
           </button>
           <button
-            className={`nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
+            className={`nav-btn ${activeTab === 'guides' ? 'active' : ''}`}
+            onClick={() => setActiveTab('guides')}
           >
-            <span className="nav-icon">📊</span>
-            <span>DASHBOARD</span>
+            <span className="nav-icon">📖</span>
+            <span>GUIDES</span>
           </button>
         </div>
       )}
