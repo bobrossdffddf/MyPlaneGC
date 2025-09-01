@@ -287,6 +287,12 @@ body {
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(20px);
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.airport-terminal * {
+  pointer-events: none;
 }
 
 .airport-terminal::before {
@@ -298,6 +304,8 @@ body {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.1), transparent);
   transition: left 0.5s ease;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .airport-terminal:hover::before {

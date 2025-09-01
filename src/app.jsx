@@ -404,11 +404,16 @@ export default function App() {
                 <div
                   key={airport}
                   className={`airport-terminal ${selectedAirport === airport ? 'selected' : ''}`}
-                  onClick={() => setSelectedAirport(airport)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Airport clicked:', airport);
+                    setSelectedAirport(airport);
+                  }}
                 >
                   <div className="terminal-header">
                     <div className="terminal-indicator"></div>
-                    <div className="terminal-code">{airport}</div>
+                    <div className="terminal-code" style={{pointerEvents: 'none'}}>{airport}</div>
                     <div className="terminal-status">
                       <div className="status-light active"></div>
                       <span>ACTIVE</span>
