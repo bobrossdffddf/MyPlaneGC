@@ -22,12 +22,18 @@ export default function App() {
   const [activeChecklistPhase, setActiveChecklistPhase] = useState("preflight");
   const [aircraftModel, setAircraftModel] = useState("");
   const [aircraftData, setAircraftData] = useState(null);
-  const [trainingMode, setTrainingMode] = useState(false);
   const [passengerManifest, setPassengerManifest] = useState([]);
-  const [currentTrainingStep, setCurrentTrainingStep] = useState(0);
-  const [trainingScenario, setTrainingScenario] = useState("basic_atc");
-  const [atcCurrentQuestion, setAtcCurrentQuestion] = useState(0);
-  const [atcScore, setAtcScore] = useState(0);
+  const [permits, setPermits] = useState([]);
+  const [activePermitForm, setActivePermitForm] = useState(null);
+  const [flightDocuments, setFlightDocuments] = useState({
+    flightPlan: { filed: false, route: "", altitude: "", departure: "", destination: "" },
+    weightBalance: { completed: false, totalWeight: 0, cg: 0, fuel: 0 },
+    weatherBrief: { obtained: false, conditions: "", visibility: "", winds: "" },
+    notams: { reviewed: false, count: 0, critical: [] },
+    permits: { special: [], diplomatic: [], overweight: [] }
+  });
+  const [callsignCounter, setCallsignCounter] = useState(1);
+  const [assignedCallsign, setAssignedCallsign] = useState("");
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
@@ -627,6 +633,43 @@ export default function App() {
 
 
 
+  // Aircraft compatibility mapping
+  const getAircraftCategory = (aircraftType) => {
+    const wideBodyAircraft = ["A330", "A340", "A350", "A380", "B747-400", "B747-8", "B777-200", "B777-300", "B787-8", "B787-9", "B787-10"];
+    const narrowBodyAircraft = ["A318", "A319", "A320", "A321", "B737-700", "B737-800", "B737-900"];
+    const regionalAircraft = ["CRJ-200", "CRJ-700", "CRJ-900", "E170", "E175", "E190", "DHC-8", "ATR-72"];
+    
+    if (wideBodyAircraft.includes(aircraftType)) return "wide-body";
+    if (narrowBodyAircraft.includes(aircraftType)) return "narrow-body";
+    if (regionalAircraft.includes(aircraftType)) return "regional";
+    return "narrow-body"; // default
+  };
+
+  const isStandCompatible = (standType, aircraftType) => {
+    const aircraftCategory = getAircraftCategory(aircraftType);
+    
+    // Stand compatibility rules
+    switch (standType) {
+      case "narrow":
+        return aircraftCategory === "narrow-body" || aircraftCategory === "regional";
+      case "medium":
+        return aircraftCategory === "narrow-body" || aircraftCategory === "wide-body" || aircraftCategory === "regional";
+      case "wide":
+        return true; // Wide stands can accommodate all aircraft
+      case "cargo":
+        return true; // Cargo stands can accommodate all aircraft
+      default:
+        return true;
+    }
+  };
+
+  const assignCallsign = () => {
+    const newCallsign = `Ground ${callsignCounter}`;
+    setAssignedCallsign(newCallsign);
+    setCallsignCounter(prev => prev + 1);
+    return newCallsign;
+  };
+
   const generatePassengerManifest = (aircraftType) => {
     const maxSeats = aircraftData?.maxSeats || 180;
     const passengerCount = Math.floor(maxSeats * (0.7 + Math.random() * 0.25));
@@ -871,6 +914,36 @@ export default function App() {
 
   const handleServiceAction = (requestId, action) => {
     socket.emit("serviceAction", { requestId, action, crewMember: user?.username });
+  };
+
+  const submitPermit = (permitType, formData) => {
+    const newPermit = {
+      id: Date.now(),
+      type: permitType,
+      data: formData,
+      status: "SUBMITTED",
+      submittedAt: new Date().toLocaleTimeString(),
+      callsign: assignedCallsign || assignCallsign()
+    };
+    
+    setPermits(prev => [...prev, newPermit]);
+    setActivePermitForm(null);
+    
+    socket.emit("chatMessage", {
+      text: `${permitType} permit submitted by ${assignedCallsign}`,
+      sender: "PERMITS",
+      stand: selectedStand,
+      airport: selectedAirport,
+      timestamp: new Date().toLocaleTimeString(),
+      mode: "system"
+    });
+  };
+
+  const updateFlightDocument = (docType, updates) => {
+    setFlightDocuments(prev => ({
+      ...prev,
+      [docType]: { ...prev[docType], ...updates }
+    }));
   };
 
   const toggleChecklistItem = (category, index) => {
@@ -1219,118 +1292,208 @@ export default function App() {
             </div>
           );
 
-        case "training":
+        case "permits":
           return (
-            <div className="atc-training-container">
-              <div className="atc-training-header">
-                <h2>ATC COMMUNICATION TRAINING</h2>
-                <div className="training-stats">
-                  <div className="stat">Score: {atcScore}/{atcCurrentQuestion}</div>
-                  <div className="stat">Question: {atcCurrentQuestion + 1}/{atcTrainingQuestions[trainingScenario]?.length || 0}</div>
+            <div className="permits-container">
+              <div className="permits-header">
+                <h2>PERMITS & DOCUMENTATION</h2>
+                <div className="callsign-display">
+                  <span className="callsign-label">CALLSIGN:</span>
+                  <span className="callsign-value">{assignedCallsign || "NOT ASSIGNED"}</span>
                 </div>
               </div>
 
-              {!trainingMode ? (
-                <div className="scenario-modules">
-                  <h3>Choose Training Module</h3>
-                  <button
-                    className={`module-btn ${trainingScenario === 'basic_atc' ? 'active' : ''}`}
-                    onClick={() => setTrainingScenario('basic_atc')}
-                  >
-                    Basic ATC Communications
-                  </button>
-                  <button
-                    className={`module-btn ${trainingScenario === 'emergency_atc' ? 'active' : ''}`}
-                    onClick={() => setTrainingScenario('emergency_atc')}
-                  >
-                    Emergency Procedures
-                  </button>
-                  <button
-                    className={`module-btn ${trainingScenario === 'ground_coordination' ? 'active' : ''}`}
-                    onClick={() => setTrainingScenario('ground_coordination')}
-                  >
-                    Ground Coordination
-                  </button>
-                  <button
-                    className="start-training"
-                    onClick={() => {
-                      setTrainingMode(true);
-                      setAtcCurrentQuestion(0);
-                      setAtcScore(0);
-                    }}
-                  >
-                    START TRAINING
-                  </button>
-                </div>
-              ) : (
-                <div className="atc-scenario-active">
-                  {atcTrainingQuestions[trainingScenario] && atcCurrentQuestion < atcTrainingQuestions[trainingScenario].length ? (
-                    <div className="current-question">
-                      <div className="situation-panel">
-                        <h4>Situation</h4>
-                        <p>{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].scenario}</p>
-                      </div>
-
-                      <div className="atc-message">
-                        <div className="atc-speaker">ATC:</div>
-                        <div className="atc-text">"{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].atcMessage}"</div>
-                      </div>
-
-                      <div className="question-section">
-                        <h4>{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].question}</h4>
-                        <div className="multiple-choice">
-                          {atcTrainingQuestions[trainingScenario][atcCurrentQuestion].options.map((option, index) => (
-                            <button
-                              key={index}
-                              className="choice-btn"
-                              onClick={() => {
-                                const isCorrect = index === atcTrainingQuestions[trainingScenario][atcCurrentQuestion].correct;
-                                if (isCorrect) setAtcScore(atcScore + 1);
-
-                                socket.emit("chatMessage", {
-                                  text: isCorrect ?
-                                    `✅ Correct! ${atcTrainingQuestions[trainingScenario][atcCurrentQuestion].explanation}` :
-                                    `❌ Incorrect. ${atcTrainingQuestions[trainingScenario][atcCurrentQuestion].explanation}`,
-                                  sender: "ATC TRAINING",
-                                  stand: selectedStand || "TRAINING",
-                                  airport: selectedAirport,
-                                  timestamp: new Date().toLocaleTimeString(),
-                                  mode: "system"
-                                });
-
-                                setTimeout(() => {
-                                  setAtcCurrentQuestion(atcCurrentQuestion + 1);
-                                }, 2000);
-                              }}
-                            >
-                              {option}
-                            </button>
-                          ))}
+              {activePermitForm ? (
+                <div className="permit-form">
+                  <div className="form-header">
+                    <h3>{activePermitForm.toUpperCase()} PERMIT APPLICATION</h3>
+                    <button onClick={() => setActivePermitForm(null)} className="close-form">×</button>
+                  </div>
+                  
+                  <div className="form-content">
+                    {activePermitForm === "overweight" && (
+                      <div className="permit-fields">
+                        <div className="permit-field">
+                          <label>Aircraft Registration:</label>
+                          <input type="text" className="permit-input" placeholder="N123AB" />
+                        </div>
+                        <div className="permit-field">
+                          <label>Total Weight (kg):</label>
+                          <input type="number" className="permit-input" placeholder="75000" />
+                        </div>
+                        <div className="permit-field">
+                          <label>Standard MTOW (kg):</label>
+                          <input type="number" className="permit-input" placeholder="70000" />
+                        </div>
+                        <div className="permit-field">
+                          <label>Reason for Overweight:</label>
+                          <input type="text" className="permit-input" placeholder="Additional fuel for weather diversion" />
                         </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="training-complete">
-                      <h3>Training Complete!</h3>
-                      <p>Final Score: {atcScore}/{atcTrainingQuestions[trainingScenario].length}</p>
-                      <button
-                        className="restart-training"
-                        onClick={() => {
-                          setAtcCurrentQuestion(0);
-                          setAtcScore(0);
-                        }}
+                    )}
+
+                    {activePermitForm === "diplomatic" && (
+                      <div className="permit-fields">
+                        <div className="permit-field">
+                          <label>Diplomatic Mission:</label>
+                          <input type="text" className="permit-input" placeholder="Embassy of..." />
+                        </div>
+                        <div className="permit-field">
+                          <label>Official Purpose:</label>
+                          <input type="text" className="permit-input" placeholder="State visit" />
+                        </div>
+                        <div className="permit-field">
+                          <label>VIP Level:</label>
+                          <select className="permit-input">
+                            <option>Head of State</option>
+                            <option>Government Minister</option>
+                            <option>Ambassador</option>
+                            <option>Diplomatic Staff</option>
+                          </select>
+                        </div>
+                      </div>
+                    )}
+
+                    {activePermitForm === "special" && (
+                      <div className="permit-fields">
+                        <div className="permit-field">
+                          <label>Special Request Type:</label>
+                          <select className="permit-input">
+                            <option>Medical Emergency</option>
+                            <option>Hazardous Cargo</option>
+                            <option>Oversized Cargo</option>
+                            <option>Military Flight</option>
+                            <option>Search and Rescue</option>
+                          </select>
+                        </div>
+                        <div className="permit-field">
+                          <label>Details:</label>
+                          <input type="text" className="permit-input" placeholder="Describe special requirements" />
+                        </div>
+                        <div className="permit-field">
+                          <label>Authority Contact:</label>
+                          <input type="text" className="permit-input" placeholder="Contact person/department" />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="permit-actions">
+                      <button 
+                        className="submit-permit"
+                        onClick={() => submitPermit(activePermitForm, {})}
                       >
-                        RESTART
+                        SUBMIT PERMIT
                       </button>
-                      <button
-                        className="exit-training"
-                        onClick={() => setTrainingMode(false)}
+                      <button 
+                        className="cancel-permit"
+                        onClick={() => setActivePermitForm(null)}
                       >
-                        EXIT TRAINING
+                        CANCEL
                       </button>
                     </div>
-                  )}
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <div className="permits-section">
+                    <h3>PERMIT APPLICATIONS</h3>
+                    <div className="permit-buttons">
+                      <button className="permit-btn" onClick={() => setActivePermitForm("overweight")}>
+                        <span className="permit-icon">⚖️</span>
+                        <span>OVERWEIGHT PERMIT</span>
+                      </button>
+                      <button className="permit-btn" onClick={() => setActivePermitForm("diplomatic")}>
+                        <span className="permit-icon">🏛️</span>
+                        <span>DIPLOMATIC CLEARANCE</span>
+                      </button>
+                      <button className="permit-btn" onClick={() => setActivePermitForm("special")}>
+                        <span className="permit-icon">🚨</span>
+                        <span>SPECIAL OPERATIONS</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="documents-section">
+                    <h3>FLIGHT DOCUMENTATION</h3>
+                    <div className="docs-grid">
+                      <div className={`doc-item ${flightDocuments.flightPlan.filed ? 'completed' : 'pending'}`}>
+                        <div className="doc-icon">📋</div>
+                        <div className="doc-info">
+                          <div className="doc-title">Flight Plan</div>
+                          <div className="doc-status">{flightDocuments.flightPlan.filed ? 'FILED' : 'PENDING'}</div>
+                        </div>
+                        <button 
+                          className="doc-action"
+                          onClick={() => updateFlightDocument('flightPlan', { filed: !flightDocuments.flightPlan.filed })}
+                        >
+                          {flightDocuments.flightPlan.filed ? 'AMEND' : 'FILE'}
+                        </button>
+                      </div>
+
+                      <div className={`doc-item ${flightDocuments.weightBalance.completed ? 'completed' : 'pending'}`}>
+                        <div className="doc-icon">⚖️</div>
+                        <div className="doc-info">
+                          <div className="doc-title">Weight & Balance</div>
+                          <div className="doc-status">{flightDocuments.weightBalance.completed ? 'COMPLETED' : 'PENDING'}</div>
+                        </div>
+                        <button 
+                          className="doc-action"
+                          onClick={() => updateFlightDocument('weightBalance', { completed: !flightDocuments.weightBalance.completed })}
+                        >
+                          {flightDocuments.weightBalance.completed ? 'REVIEW' : 'CALCULATE'}
+                        </button>
+                      </div>
+
+                      <div className={`doc-item ${flightDocuments.weatherBrief.obtained ? 'completed' : 'pending'}`}>
+                        <div className="doc-icon">🌤️</div>
+                        <div className="doc-info">
+                          <div className="doc-title">Weather Brief</div>
+                          <div className="doc-status">{flightDocuments.weatherBrief.obtained ? 'OBTAINED' : 'PENDING'}</div>
+                        </div>
+                        <button 
+                          className="doc-action"
+                          onClick={() => updateFlightDocument('weatherBrief', { obtained: !flightDocuments.weatherBrief.obtained })}
+                        >
+                          {flightDocuments.weatherBrief.obtained ? 'UPDATE' : 'GET BRIEF'}
+                        </button>
+                      </div>
+
+                      <div className={`doc-item ${flightDocuments.notams.reviewed ? 'completed' : 'pending'}`}>
+                        <div className="doc-icon">📢</div>
+                        <div className="doc-info">
+                          <div className="doc-title">NOTAMs</div>
+                          <div className="doc-status">{flightDocuments.notams.reviewed ? 'REVIEWED' : 'PENDING'}</div>
+                        </div>
+                        <button 
+                          className="doc-action"
+                          onClick={() => updateFlightDocument('notams', { reviewed: !flightDocuments.notams.reviewed })}
+                        >
+                          {flightDocuments.notams.reviewed ? 'REFRESH' : 'REVIEW'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="permits-list">
+                    <h3>SUBMITTED PERMITS</h3>
+                    {permits.length === 0 ? (
+                      <div className="no-permits">No permits submitted</div>
+                    ) : (
+                      permits.map(permit => (
+                        <div key={permit.id} className="permit-item">
+                          <div className="permit-header">
+                            <span className="permit-type">{permit.type.toUpperCase()}</span>
+                            <span className="permit-status">{permit.status}</span>
+                          </div>
+                          <div className="permit-details">
+                            <span>Submitted: {permit.submittedAt}</span>
+                            <span>Callsign: {permit.callsign}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
               )}
             </div>
           );
@@ -1477,11 +1640,14 @@ export default function App() {
                       className="modern-select"
                     >
                       <option value="">SELECT STAND</option>
-                      {getCurrentAirportStands().map(stand => {
+                      {getCurrentAirportStands()
+                        .filter(stand => !aircraft || isStandCompatible(stand.type, aircraft))
+                        .map(stand => {
                         const isOccupied = stands[stand.id];
+                        const compatible = !aircraft || isStandCompatible(stand.type, aircraft);
                         return (
-                          <option key={stand.id} value={stand.id} disabled={isOccupied}>
-                            {stand.id} ({stand.type.toUpperCase()}) {isOccupied ? `- ${isOccupied.flight}` : '- AVAILABLE'}
+                          <option key={stand.id} value={stand.id} disabled={isOccupied || !compatible}>
+                            {stand.id} ({stand.type.toUpperCase()}) {isOccupied ? `- ${isOccupied.flight}` : compatible ? '- AVAILABLE' : '- INCOMPATIBLE'}
                           </option>
                         );
                       })}
@@ -1958,11 +2124,11 @@ export default function App() {
               <span>CHECKLISTS</span>
             </button>
             <button
-              className={`nav-btn ${activeTab === 'training' ? 'active' : ''}`}
-              onClick={() => setActiveTab('training')}
+              className={`nav-btn ${activeTab === 'permits' ? 'active' : ''}`}
+              onClick={() => setActiveTab('permits')}
             >
-              <span className="nav-icon">🎓</span>
-              <span>TRAINING</span>
+              <span className="nav-icon">📋</span>
+              <span>PERMITS</span>
             </button>
             <button
               className={`nav-btn ${activeTab === 'manifest' ? 'active' : ''}`}
