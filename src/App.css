@@ -15,11 +15,6 @@ body {
   min-height: 100vh;
   width: 100vw;
   min-width: 320px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
 /* Loading Screen */
@@ -301,24 +296,17 @@ body {
   width: 100vw;
   background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2a2f3e 100%);
   overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
 .tablet-header {
   background: rgba(15, 20, 25, 0.95);
   border-bottom: 1px solid rgba(255, 149, 0, 0.3);
-  padding: 15px 25px;
+  padding: 20px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   backdrop-filter: blur(20px);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-  flex-shrink: 0;
-  min-height: 60px;
 }
 
 .header-left .app-title {
@@ -1749,53 +1737,49 @@ body {
 
 /* Communication Panel Responsive */
 .comm-panel {
-  width: 350px;
-  min-width: 300px;
-  max-width: 450px;
+  width: 400px;
+  min-width: 350px;
+  max-width: 500px;
   background: rgba(15, 20, 25, 0.95);
   border-left: 1px solid rgba(255, 149, 0, 0.3);
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(20px);
   box-shadow: -2px 0 20px rgba(0, 0, 0, 0.3);
-  flex-shrink: 0;
 }
 
 /* Main Content Area Responsive */
 .main-area {
   flex: 1;
-  padding: 20px;
+  padding: 25px;
   overflow-y: auto;
   background: rgba(15, 20, 25, 0.7);
   min-width: 0;
-  height: 0;
-  min-height: 0;
 }
 
 /* Services Grid Responsive */
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
   max-width: 100%;
 }
 
 /* Priority Columns Responsive */
 .priority-columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
   flex: 1;
   min-height: 0;
   max-width: 100%;
-  height: 0;
 }
 
 /* Input Grid Responsive */
 .input-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
   align-items: end;
   max-width: 100%;
 }
@@ -1916,19 +1900,18 @@ body {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 968px) {
   .tablet-content {
     flex-direction: column;
   }
   
   .comm-panel {
     width: 100%;
-    height: 300px;
+    height: 350px;
     min-width: unset;
     max-width: unset;
     border-left: none;
     border-top: 1px solid rgba(255, 149, 0, 0.3);
-    flex-shrink: 0;
   }
   
   .main-area {
@@ -1978,31 +1961,18 @@ body {
 
 @media (max-width: 768px) {
   .tablet-header {
-    padding: 10px 15px;
-    flex-direction: row;
-    gap: 10px;
-    text-align: left;
-    min-height: 50px;
+    padding: 15px 20px;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
   }
   
-  .header-left .app-title {
-    font-size: 1.1rem;
-  }
-  
-  .location-info {
-    font-size: 0.8rem;
-  }
-  
-  .time-display {
-    font-size: 1.2rem;
-  }
-  
-  .username {
-    font-size: 0.9rem;
+  .header-left, .header-center, .header-right {
+    width: 100%;
   }
   
   .main-area {
-    padding: 12px;
+    padding: 15px;
   }
   
   .services-grid {
@@ -2041,59 +2011,36 @@ body {
 }
 
 @media (max-width: 480px) {
-  .tablet-header {
-    padding: 8px 12px;
-    min-height: 45px;
-  }
-  
-  .header-left .app-title {
-    font-size: 1rem;
-  }
-  
-  .time-display {
-    font-size: 1rem;
-  }
-  
   .main-area {
-    padding: 8px;
+    padding: 10px;
   }
   
   .services-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
   }
   
   .service-card {
-    padding: 12px;
+    padding: 15px;
   }
   
   .service-icon {
-    font-size: 1.8rem;
+    font-size: 2rem;
   }
   
   .service-name {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
   
   .airport-grid-modern {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  }
-  
-  .stands-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
   
+  .stands-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
   .phase-selector {
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  }
-  
-  .input-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .priority-columns {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   }
 }
