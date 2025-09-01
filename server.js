@@ -177,6 +177,39 @@ app.get('/api/user', (req, res) => {
   }
 });
 
+// Aircraft data API
+const aircraftDatabase = {
+  "A318": { type: "A318", manufacturer: "Airbus", maxSeats: 132, range: 3100, maxSpeed: 500, engines: 2, fuelCapacity: 24210 },
+  "A319": { type: "A319", manufacturer: "Airbus", maxSeats: 156, range: 3700, maxSpeed: 500, engines: 2, fuelCapacity: 24210 },
+  "A320": { type: "A320", manufacturer: "Airbus", maxSeats: 180, range: 3300, maxSpeed: 500, engines: 2, fuelCapacity: 26020 },
+  "A321": { type: "A321", manufacturer: "Airbus", maxSeats: 220, range: 3200, maxSpeed: 500, engines: 2, fuelCapacity: 32940 },
+  "A330": { type: "A330", manufacturer: "Airbus", maxSeats: 440, range: 7250, maxSpeed: 560, engines: 2, fuelCapacity: 139090 },
+  "A340": { type: "A340", manufacturer: "Airbus", maxSeats: 440, range: 9000, maxSpeed: 560, engines: 4, fuelCapacity: 195300 },
+  "A350": { type: "A350", manufacturer: "Airbus", maxSeats: 440, range: 8100, maxSpeed: 560, engines: 2, fuelCapacity: 138000 },
+  "A380": { type: "A380", manufacturer: "Airbus", maxSeats: 850, range: 8000, maxSpeed: 560, engines: 4, fuelCapacity: 84535 },
+  "B737-700": { type: "B737-700", manufacturer: "Boeing", maxSeats: 149, range: 3365, maxSpeed: 514, engines: 2, fuelCapacity: 26020 },
+  "B737-800": { type: "B737-800", manufacturer: "Boeing", maxSeats: 189, range: 2935, maxSpeed: 514, engines: 2, fuelCapacity: 26020 },
+  "B737-900": { type: "B737-900", manufacturer: "Boeing", maxSeats: 220, range: 2800, maxSpeed: 514, engines: 2, fuelCapacity: 26020 },
+  "B747-400": { type: "B747-400", manufacturer: "Boeing", maxSeats: 660, range: 7260, maxSpeed: 570, engines: 4, fuelCapacity: 216840 },
+  "B747-8": { type: "B747-8", manufacturer: "Boeing", maxSeats: 700, range: 7730, maxSpeed: 570, engines: 4, fuelCapacity: 238610 },
+  "B777-200": { type: "B777-200", manufacturer: "Boeing", maxSeats: 440, range: 5240, maxSpeed: 560, engines: 2, fuelCapacity: 117348 },
+  "B777-300": { type: "B777-300", manufacturer: "Boeing", maxSeats: 550, range: 5845, maxSpeed: 560, engines: 2, fuelCapacity: 181280 },
+  "B787-8": { type: "B787-8", manufacturer: "Boeing", maxSeats: 330, range: 7355, maxSpeed: 560, engines: 2, fuelCapacity: 126206 },
+  "B787-9": { type: "B787-9", manufacturer: "Boeing", maxSeats: 420, range: 7635, maxSpeed: 560, engines: 2, fuelCapacity: 126206 },
+  "B787-10": { type: "B787-10", manufacturer: "Boeing", maxSeats: 440, range: 6430, maxSpeed: 560, engines: 2, fuelCapacity: 126206 }
+};
+
+app.get('/api/aircraft/:type', (req, res) => {
+  const aircraftType = req.params.type;
+  const aircraftInfo = aircraftDatabase[aircraftType];
+  
+  if (aircraftInfo) {
+    res.json(aircraftInfo);
+  } else {
+    res.status(404).json({ error: 'Aircraft type not found' });
+  }
+});
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "dist", "index.html"));
 });

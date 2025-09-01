@@ -21,6 +21,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("main");
   const [activeChecklistPhase, setActiveChecklistPhase] = useState("preflight");
   const [aircraftSvg, setAircraftSvg] = useState("");
+  const [aircraftData, setAircraftData] = useState(null);
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
     wind: '270°/08KT',
@@ -136,9 +137,10 @@ export default function App() {
     return getAirportConfig(selectedAirport).stands;
   };
 
-  // Load aircraft SVG when aircraft type changes
+  // Load aircraft SVG and data when aircraft type changes
   useEffect(() => {
     if (aircraft) {
+      // Fetch aircraft SVG
       fetch(`/aircraft_svgs/${aircraft}.svg`)
         .then(response => {
           if (response.ok) {
@@ -152,8 +154,33 @@ export default function App() {
         .catch(() => {
           setAircraftSvg(""); // Use default if custom SVG not found
         });
+
+      // Fetch aircraft data from API
+      fetch(`/api/aircraft/${aircraft}`)
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error('Aircraft data not found');
+        })
+        .then(data => {
+          setAircraftData(data);
+        })
+        .catch(() => {
+          // Use default aircraft data
+          setAircraftData({
+            type: aircraft,
+            manufacturer: aircraft.startsWith('A') ? 'Airbus' : 'Boeing',
+            maxSeats: aircraft.includes('380') ? 850 : aircraft.includes('747') ? 660 : 180,
+            range: aircraft.includes('787') ? 15750 : 6500,
+            maxSpeed: 560,
+            engines: aircraft.includes('A380') || aircraft.includes('747') ? 4 : 2,
+            fuelCapacity: aircraft.includes('A380') ? 84535 : 26020
+          });
+        });
     } else {
       setAircraftSvg("");
+      setAircraftData(null);
     }
   }, [aircraft]);
 
@@ -161,6 +188,14 @@ export default function App() {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Auto-scroll messages to bottom
+  useEffect(() => {
+    const messagesArea = document.querySelector('.messages-area');
+    if (messagesArea) {
+      messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+  }, [messages]);
 
   useEffect(() => {
     fetch('/api/user')
@@ -226,17 +261,18 @@ export default function App() {
 
   const sendMessage = () => {
     if (input.trim() === "") return;
-    if (!selectedStand) {
+    if (userMode === "pilot" && !selectedStand) {
       alert("Please select a stand first to send messages");
       return;
     }
     const message = {
       text: input,
       sender: user?.username,
-      stand: selectedStand,
+      stand: userMode === "pilot" ? selectedStand : "GROUND",
       airport: selectedAirport,
       timestamp: new Date().toLocaleTimeString(),
-      mode: userMode
+      mode: userMode,
+      userId: user?.id
     };
     socket.emit("chatMessage", message);
     setInput("");
@@ -308,33 +344,59 @@ export default function App() {
 
   const renderAircraftDisplay = () => {
     if (aircraftSvg) {
-      return <div dangerouslySetInnerHTML={{ __html: aircraftSvg }} className="custom-aircraft-svg" />;
+      return (
+        <div className="aircraft-display-3d">
+          <div dangerouslySetInnerHTML={{ __html: aircraftSvg }} className="custom-aircraft-svg" />
+          {aircraftData && (
+            <div className="aircraft-label">
+              <div className="aircraft-type">{aircraftData.type}</div>
+              <div className="aircraft-manufacturer">{aircraftData.manufacturer}</div>
+            </div>
+          )}
+        </div>
+      );
     }
 
-    // Fallback to default SVG
+    // Enhanced fallback SVG with 3D-like effects
     return (
-      <svg viewBox="0 0 500 300" className="aircraft-svg">
-        <defs>
-          <linearGradient id="fuselage" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#e6f3ff" />
-            <stop offset="50%" stopColor="#b3d9ff" />
-            <stop offset="100%" stopColor="#80bfff" />
-          </linearGradient>
-        </defs>
+      <div className="aircraft-display-3d">
+        <svg viewBox="0 0 500 300" className="aircraft-svg">
+          <defs>
+            <linearGradient id="fuselage" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#e6f3ff" />
+              <stop offset="30%" stopColor="#b3d9ff" />
+              <stop offset="70%" stopColor="#80bfff" />
+              <stop offset="100%" stopColor="#4d9fff" />
+            </linearGradient>
+            <linearGradient id="wing" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#f0f0f0" />
+              <stop offset="50%" stopColor="#cccccc" />
+              <stop offset="100%" stopColor="#999999" />
+            </linearGradient>
+            <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="3" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.3"/>
+            </filter>
+          </defs>
 
-        <ellipse cx="250" cy="150" rx="200" ry="25" fill="url(#fuselage)" stroke="#0066cc" strokeWidth="2"/>
-        <path d="M150 150 L150 100 L200 90 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <path d="M150 150 L150 200 L200 210 L200 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <path d="M300 150 L300 120 L350 110 L350 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <path d="M300 150 L300 180 L350 190 L350 150 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <ellipse cx="175" cy="130" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
-        <ellipse cx="175" cy="170" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
-        <path d="M450 150 L480 145 L480 155 Z" fill="#b3d9ff" stroke="#0066cc" strokeWidth="2"/>
-        <path d="M50 150 L20 130 L30 150 L20 170 Z" fill="#cccccc" stroke="#666" strokeWidth="2"/>
-        <text x="250" y="280" textAnchor="middle" fill="#0066cc" fontSize="14" fontWeight="bold">
-          {aircraft || "SELECT AIRCRAFT"}
-        </text>
-      </svg>
+          <ellipse cx="250" cy="150" rx="200" ry="25" fill="url(#fuselage)" stroke="#0066cc" strokeWidth="2" filter="url(#shadow)"/>
+          <path d="M150 150 L150 100 L200 90 L200 150 Z" fill="url(#wing)" stroke="#666" strokeWidth="2" filter="url(#shadow)"/>
+          <path d="M150 150 L150 200 L200 210 L200 150 Z" fill="url(#wing)" stroke="#666" strokeWidth="2" filter="url(#shadow)"/>
+          <path d="M300 150 L300 120 L350 110 L350 150 Z" fill="url(#wing)" stroke="#666" strokeWidth="2" filter="url(#shadow)"/>
+          <path d="M300 150 L300 180 L350 190 L350 150 Z" fill="url(#wing)" stroke="#666" strokeWidth="2" filter="url(#shadow)"/>
+          <ellipse cx="175" cy="130" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
+          <ellipse cx="175" cy="170" rx="15" ry="8" fill="#333" stroke="#000" strokeWidth="1"/>
+          <circle cx="325" cy="135" r="12" fill="#2563eb" stroke="#1d4ed8" strokeWidth="2"/>
+          <circle cx="325" cy="165" r="12" fill="#2563eb" stroke="#1d4ed8" strokeWidth="2"/>
+          <path d="M450 150 L480 145 L480 155 Z" fill="url(#fuselage)" stroke="#0066cc" strokeWidth="2"/>
+          <path d="M50 150 L20 130 L30 150 L20 170 Z" fill="url(#wing)" stroke="#666" strokeWidth="2"/>
+        </svg>
+        <div className="aircraft-label">
+          <div className="aircraft-type">{aircraft || "SELECT AIRCRAFT"}</div>
+          <div className="aircraft-manufacturer">
+            {aircraftData ? aircraftData.manufacturer : "Select an aircraft type"}
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -645,7 +707,7 @@ export default function App() {
                     </div>
                     <div className="data-item">
                       <span className="data-label">PAX:</span>
-                      <span className="data-value">156/180</span>
+                      <span className="data-value">{aircraftData ? `156/${aircraftData.maxSeats}` : '156/180'}</span>
                     </div>
                     <div className="data-item">
                       <span className="data-label">CARGO:</span>
@@ -656,6 +718,28 @@ export default function App() {
                       <span className="data-value status-ready">READY</span>
                     </div>
                   </div>
+                  {aircraftData && (
+                    <div className="aircraft-specs">
+                      <div className="spec-row">
+                        <div className="spec-item">
+                          <span className="spec-label">MANUFACTURER:</span>
+                          <span className="spec-value">{aircraftData.manufacturer}</span>
+                        </div>
+                        <div className="spec-item">
+                          <span className="spec-label">RANGE:</span>
+                          <span className="spec-value">{aircraftData.range} NM</span>
+                        </div>
+                        <div className="spec-item">
+                          <span className="spec-label">ENGINES:</span>
+                          <span className="spec-value">{aircraftData.engines}</span>
+                        </div>
+                        <div className="spec-item">
+                          <span className="spec-label">MAX SPEED:</span>
+                          <span className="spec-value">{aircraftData.maxSpeed} KT</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -894,10 +978,12 @@ export default function App() {
               .filter(m => {
                 // Only show messages from the current airport
                 if (m.airport && m.airport !== selectedAirport) return false;
-                // Show system messages and messages for the selected stand
-                return m.mode === 'system' || !selectedStand || m.stand === selectedStand;
+                // For pilots: show system messages and messages for the selected stand
+                // For ground crew: show all messages at the airport
+                if (userMode === "groundcrew") return true;
+                return m.mode === 'system' || m.mode === 'checklist' || !selectedStand || m.stand === selectedStand || m.stand === "GROUND";
               })
-              .slice(-15)
+              .slice(-20)
               .map((msg, i) => (
                 <div key={i} className={`message ${msg.mode || 'system'}`}>
                   <div className="message-header">
@@ -914,11 +1000,21 @@ export default function App() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-              placeholder={selectedStand ? `Message ${selectedStand}...` : "Select stand first..."}
+              placeholder={
+                userMode === "groundcrew" 
+                  ? "Message ground frequency..." 
+                  : selectedStand 
+                    ? `Message ${selectedStand}...` 
+                    : "Select stand first..."
+              }
               className="message-input"
-              disabled={!selectedStand}
+              disabled={userMode === "pilot" && !selectedStand}
             />
-            <button onClick={sendMessage} className="send-btn" disabled={!selectedStand}>
+            <button 
+              onClick={sendMessage} 
+              className="send-btn" 
+              disabled={userMode === "pilot" && !selectedStand}
+            >
               SEND
             </button>
           </div>
