@@ -35,6 +35,23 @@ export default function App() {
   const [callsignCounter, setCallsignCounter] = useState(1);
   const [assignedCallsign, setAssignedCallsign] = useState("");
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
+  const [mcduDisplay, setMcduDisplay] = useState({
+    title: "MCDU",
+    lines: [
+      "MCDU MENU",
+      "",
+      "<FMGC     REQUEST>",
+      "",
+      "<ACARS    ATSU>",
+      "",
+      "<AIDS     CFDS>",
+      "",
+      "________________",
+      "",
+      "SELECT FUNCTION"
+    ],
+    activeFunction: "MENU"
+  });
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
     wind: '270°/08KT',
@@ -1498,6 +1515,217 @@ export default function App() {
             </div>
           );
 
+        case "mcdu":
+          return (
+            <div className="mcdu-container">
+              <div className="mcdu-unit">
+                <div className="mcdu-screen">
+                  <div className="mcdu-header">
+                    <div className="mcdu-title">{mcduDisplay.title}</div>
+                    <div className="mcdu-page">1/1</div>
+                  </div>
+                  <div className="mcdu-content">
+                    {mcduDisplay.lines.map((line, index) => (
+                      <div key={index} className="mcdu-line">
+                        {line}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mcdu-keypad">
+                  <div className="mcdu-function-keys">
+                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
+                      title: "FMGC",
+                      lines: [
+                        "FLIGHT MANAGEMENT",
+                        "GUIDANCE COMPUTER",
+                        "",
+                        "<DIR TO    PROG>",
+                        "",
+                        "<PERF     INIT>",
+                        "",
+                        "<DATA     FUEL PRED>",
+                        "",
+                        "________________",
+                        "FMGC ACTIVE"
+                      ],
+                      activeFunction: "FMGC"
+                    })}>DIR</button>
+                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
+                      title: "PROG",
+                      lines: [
+                        "PROGRESS PAGE",
+                        "",
+                        "TO DEST    245NM",
+                        "ETA        1435Z",
+                        "",
+                        "FUEL PRED  2.4T",
+                        "",
+                        "WIND       270/15",
+                        "",
+                        "________________",
+                        "PROGRESS DATA"
+                      ],
+                      activeFunction: "PROG"
+                    })}>PROG</button>
+                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
+                      title: "PERF",
+                      lines: [
+                        "PERFORMANCE PAGE",
+                        "",
+                        "V1         145KT",
+                        "VR         148KT",
+                        "V2         155KT",
+                        "",
+                        "FLAPS      1+F",
+                        "THR RED    1500FT",
+                        "",
+                        "________________",
+                        "TAKEOFF SPEEDS"
+                      ],
+                      activeFunction: "PERF"
+                    })}>PERF</button>
+                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
+                      title: "INIT",
+                      lines: [
+                        "INITIALIZATION",
+                        "",
+                        "FROM/TO",
+                        selectedAirport + "/----",
+                        "",
+                        "FLT NBR",
+                        flightNumber || "----",
+                        "",
+                        "COST INDEX  25",
+                        "________________",
+                        "FLIGHT INIT"
+                      ],
+                      activeFunction: "INIT"
+                    })}>INIT</button>
+                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
+                      title: "DATA",
+                      lines: [
+                        "STATUS/DATA",
+                        "",
+                        "GPS PRIMARY",
+                        "IRS ALIGNED",
+                        "",
+                        "NAV ACCURACY",
+                        "HIGH",
+                        "",
+                        "________________",
+                        "SYSTEM STATUS"
+                      ],
+                      activeFunction: "DATA"
+                    })}>DATA</button>
+                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
+                      title: "FPLN",
+                      lines: [
+                        "FLIGHT PLAN",
+                        "",
+                        selectedAirport,
+                        "DCT",
+                        "----",
+                        "DCT", 
+                        "DEST",
+                        "",
+                        "________________",
+                        "F-PLN ACTIVE"
+                      ],
+                      activeFunction: "FPLN"
+                    })}>F-PLN</button>
+                  </div>
+                  <div className="mcdu-line-select-keys">
+                    <div className="mcdu-left-keys">
+                      <button className="mcdu-key line-select">L1</button>
+                      <button className="mcdu-key line-select">L2</button>
+                      <button className="mcdu-key line-select">L3</button>
+                      <button className="mcdu-key line-select">L4</button>
+                      <button className="mcdu-key line-select">L5</button>
+                      <button className="mcdu-key line-select">L6</button>
+                    </div>
+                    <div className="mcdu-right-keys">
+                      <button className="mcdu-key line-select">R1</button>
+                      <button className="mcdu-key line-select">R2</button>
+                      <button className="mcdu-key line-select">R3</button>
+                      <button className="mcdu-key line-select">R4</button>
+                      <button className="mcdu-key line-select">R5</button>
+                      <button className="mcdu-key line-select">R6</button>
+                    </div>
+                  </div>
+                  <div className="mcdu-alpha-keys">
+                    <div className="mcdu-number-row">
+                      <button className="mcdu-key">1</button>
+                      <button className="mcdu-key">2</button>
+                      <button className="mcdu-key">3</button>
+                      <button className="mcdu-key">4</button>
+                      <button className="mcdu-key">5</button>
+                      <button className="mcdu-key">6</button>
+                      <button className="mcdu-key">7</button>
+                      <button className="mcdu-key">8</button>
+                      <button className="mcdu-key">9</button>
+                      <button className="mcdu-key">0</button>
+                    </div>
+                    <div className="mcdu-letter-row">
+                      <button className="mcdu-key">A</button>
+                      <button className="mcdu-key">B</button>
+                      <button className="mcdu-key">C</button>
+                      <button className="mcdu-key">D</button>
+                      <button className="mcdu-key">E</button>
+                      <button className="mcdu-key">F</button>
+                      <button className="mcdu-key">G</button>
+                      <button className="mcdu-key">H</button>
+                      <button className="mcdu-key">I</button>
+                    </div>
+                    <div className="mcdu-letter-row">
+                      <button className="mcdu-key">J</button>
+                      <button className="mcdu-key">K</button>
+                      <button className="mcdu-key">L</button>
+                      <button className="mcdu-key">M</button>
+                      <button className="mcdu-key">N</button>
+                      <button className="mcdu-key">O</button>
+                      <button className="mcdu-key">P</button>
+                      <button className="mcdu-key">Q</button>
+                      <button className="mcdu-key">R</button>
+                    </div>
+                    <div className="mcdu-letter-row">
+                      <button className="mcdu-key">S</button>
+                      <button className="mcdu-key">T</button>
+                      <button className="mcdu-key">U</button>
+                      <button className="mcdu-key">V</button>
+                      <button className="mcdu-key">W</button>
+                      <button className="mcdu-key">X</button>
+                      <button className="mcdu-key">Y</button>
+                      <button className="mcdu-key">Z</button>
+                      <button className="mcdu-key">.</button>
+                    </div>
+                  </div>
+                  <div className="mcdu-control-keys">
+                    <button className="mcdu-key control">CLR</button>
+                    <button className="mcdu-key control" onClick={() => setMcduDisplay({
+                      title: "MCDU",
+                      lines: [
+                        "MCDU MENU",
+                        "",
+                        "<FMGC     REQUEST>",
+                        "",
+                        "<ACARS    ATSU>",
+                        "",
+                        "<AIDS     CFDS>",
+                        "",
+                        "________________",
+                        "",
+                        "SELECT FUNCTION"
+                      ],
+                      activeFunction: "MENU"
+                    })}>MENU</button>
+                    <button className="mcdu-key control">→</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+
         case "manifest":
           return (
             <div className="manifest-container">
@@ -2136,6 +2364,13 @@ export default function App() {
             >
               <span className="nav-icon">👥</span>
               <span>MANIFEST</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'mcdu' ? 'active' : ''}`}
+              onClick={() => setActiveTab('mcdu')}
+            >
+              <span className="nav-icon">🖥️</span>
+              <span>MCDU</span>
             </button>
 
           </>
