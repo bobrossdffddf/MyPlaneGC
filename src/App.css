@@ -1383,9 +1383,11 @@ body {
 }
 
 .stat-label {
+  font-size: 0.8rem;
   color: #a0a8b0;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .supervisor-sections {
@@ -3045,7 +3047,7 @@ body {
 /* Priority Columns Responsive */
 .priority-columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
   flex: 1;
   min-height: 0;

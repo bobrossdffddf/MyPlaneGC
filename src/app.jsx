@@ -146,223 +146,479 @@ export default function App() {
   const atcTrainingQuestions = {
     basic_atc: [
       {
-        scenario: "You're approaching IRFD airport and need to contact ground control.",
-        atcMessage: "November Charlie Bravo Whiskey, taxi via Alpha Kilo, hold short runway 27.",
+        scenario: "You're a Boeing 737-800 approaching IRFD and need to contact ground control after landing.",
+        atcMessage: "American 1234, contact ground 121.9, good day.",
         question: "What's your correct response?",
         options: [
-          "November Charlie Bravo Whiskey, taxi via Alpha Kilo, hold short runway 27",
-          "Roger, taxi Alpha Kilo, hold short 27, November Charlie Bravo Whiskey",
-          "Copy that, heading to runway 27",
-          "Affirmative, proceeding to Alpha Kilo"
+          "Ground 121.9, American 1234, good day",
+          "American 1234, switching to ground",
+          "Roger, American 1234",
+          "Copy, 121.9"
         ],
-        correct: 1,
-        explanation: "Always read back taxi instructions and your callsign for confirmation."
+        correct: 0,
+        explanation: "Always read back the frequency, state your callsign, and acknowledge the controller."
       },
       {
-        scenario: "Ground control gives you pushback clearance.",
-        atcMessage: "November Charlie Bravo Whiskey, pushback approved, face east.",
+        scenario: "You've contacted ground control after landing and need taxi instructions.",
+        atcMessage: "American 1234, taxi to gate B12 via taxiway Charlie, hold short of runway 09.",
+        question: "What's your correct readback?",
+        options: [
+          "Taxi to gate B12 via Charlie, hold short runway 09, American 1234",
+          "Roger, going to B12",
+          "Copy Charlie to gate B12",
+          "American 1234, taxi via Charlie"
+        ],
+        correct: 0,
+        explanation: "Read back ALL taxi instructions including gate, taxiway route, and hold short instructions."
+      },
+      {
+        scenario: "You're ready for pushback from gate A5.",
+        atcMessage: "American 1234, pushback approved, face south, contact ground when ready to taxi.",
         question: "What's your response?",
         options: [
-          "Pushback approved, November Charlie Bravo Whiskey",
-          "Pushback approved, face east, November Charlie Bravo Whiskey",
+          "Pushback approved, American 1234",
+          "Pushback approved, face south, will contact ground for taxi, American 1234",
           "Roger, pushing back",
-          "Copy pushback"
+          "Copy pushback, facing south"
         ],
         correct: 1,
-        explanation: "Read back pushback clearance including direction and your callsign."
+        explanation: "Read back the pushback clearance, direction, and acknowledge the instruction to contact ground."
       },
       {
-        scenario: "You're ready for takeoff.",
-        atcMessage: "November Charlie Bravo Whiskey, runway 27, cleared for takeoff.",
+        scenario: "You're holding short of runway 27 and ready for takeoff.",
+        atcMessage: "American 1234, runway 27, wind 270 at 8, cleared for takeoff.",
         question: "What's your response?",
         options: [
-          "Cleared for takeoff runway 27, November Charlie Bravo Whiskey",
+          "Cleared for takeoff runway 27, American 1234",
+          "American 1234, cleared for takeoff",
           "Roger, taking off",
-          "Copy that, departing",
-          "Affirmative, runway 27"
+          "Runway 27, cleared for takeoff, American 1234"
         ],
-        correct: 0,
-        explanation: "Always read back takeoff clearance with runway number and callsign."
+        correct: 3,
+        explanation: "Always read back runway number first, then the clearance, followed by your callsign."
       },
       {
-        scenario: "Tower asks you to contact departure.",
-        atcMessage: "November Charlie Bravo Whiskey, contact departure 124.8, good day.",
-        question: "What's your response?",
-        options: [
-          "Good day, November Charlie Bravo Whiskey",
-          "124.8, November Charlie Bravo Whiskey, good day",
-          "Roger, switching to departure",
-          "Copy, going to 124.8"
-        ],
-        correct: 1,
-        explanation: "Read back the frequency and include your callsign when switching."
-      },
-      {
-        scenario: "You need to request taxi to the gate after landing.",
-        atcMessage: "November Charlie Bravo Whiskey, turn left Bravo 3, contact ground 121.9.",
+        scenario: "Tower is transferring you to departure control.",
+        atcMessage: "American 1234, contact departure 124.35, good day.",
         question: "What's your correct response?",
         options: [
-          "Left Bravo 3, ground 121.9, November Charlie Bravo Whiskey",
-          "Roger, turning left",
-          "Copy ground frequency",
-          "Switching to ground"
+          "124.35, American 1234, good day",
+          "American 1234, switching to departure",
+          "Roger, 124.35",
+          "Contact departure, American 1234"
         ],
         correct: 0,
-        explanation: "Read back taxi instructions and frequency change with your callsign."
+        explanation: "Read back the frequency, state your callsign, and acknowledge courteously."
+      },
+      {
+        scenario: "You need to request a different gate due to ground equipment at your assigned gate.",
+        atcMessage: "Ground, American 1234, requesting gate change from A5, equipment blocking assigned gate.",
+        question: "How should ground control respond and what should you do?",
+        options: [
+          "Wait for new gate assignment and taxi instructions",
+          "Proceed to any available gate",
+          "Return to the ramp and park anywhere",
+          "Contact operations directly"
+        ],
+        correct: 0,
+        explanation: "Always wait for ground control to assign a new gate and provide taxi instructions."
       }
     ],
     emergency_atc: [
       {
-        scenario: "You have a medical emergency on board.",
-        atcMessage: "All stations, all stations, November Charlie Bravo Whiskey declaring medical emergency.",
-        question: "What information should you provide next?",
+        scenario: "You have an engine failure during climb out.",
+        atcMessage: "MAYDAY MAYDAY MAYDAY, American 1234, engine failure, requesting immediate return to field.",
+        question: "What information should ATC request from you?",
         options: [
-          "Request immediate landing",
-          "Souls on board, fuel remaining, nature of emergency",
-          "Just the location",
-          "Aircraft type only"
+          "Only your intentions",
+          "Aircraft type, souls on board, fuel remaining, assistance required",
+          "Just your position",
+          "Engine number that failed"
         ],
         correct: 1,
-        explanation: "Always provide souls on board, fuel remaining, and nature of emergency."
+        explanation: "ATC needs aircraft type, souls on board, fuel in hours/minutes, and what assistance you need."
       },
       {
-        scenario: "Tower responds to your emergency.",
-        atcMessage: "November Charlie Bravo Whiskey, emergency services alerted, runway 27 available, report souls and fuel.",
+        scenario: "ATC responds to your engine failure emergency.",
+        atcMessage: "American 1234, roger your MAYDAY, turn left heading 090, descend and maintain 3000, report souls and fuel.",
         question: "How do you respond?",
         options: [
-          "November Charlie Bravo Whiskey, 156 souls, 2 hours fuel, requesting medical assistance on arrival",
-          "We have emergency",
-          "Landing runway 27",
-          "Medical emergency confirmed"
+          "American 1234, left 090, descend 3000, 142 souls, 1 hour 45 minutes fuel",
+          "Roger, turning left",
+          "Emergency descent to 3000",
+          "American 1234, emergency acknowledged"
         ],
         correct: 0,
-        explanation: "Provide exact numbers and specific assistance needed."
+        explanation: "Read back heading and altitude, then immediately provide souls and fuel information."
+      },
+      {
+        scenario: "You have a cabin pressurization problem at FL350.",
+        atcMessage: "American 1234, requesting emergency descent due to cabin pressurization failure.",
+        question: "What should you declare and request?",
+        options: [
+          "PAN PAN and request descent to 10,000 feet",
+          "MAYDAY and request immediate descent to 10,000 feet or below",
+          "Just request lower altitude",
+          "Declare minimum fuel emergency"
+        ],
+        correct: 1,
+        explanation: "Pressurization failure is life-threatening - declare MAYDAY and request immediate descent below 10,000 feet."
+      },
+      {
+        scenario: "You have a medical emergency passenger requiring immediate landing.",
+        atcMessage: "PAN PAN PAN PAN, American 1234, medical emergency on board, requesting priority handling and medical assistance on arrival.",
+        question: "What should ATC provide you?",
+        options: [
+          "Just medical assistance",
+          "Priority vectors to nearest suitable airport and medical coordination",
+          "Only frequency changes",
+          "Weather information"
+        ],
+        correct: 1,
+        explanation: "ATC should provide priority handling, vectors to appropriate airport, and coordinate medical assistance."
       }
     ],
     ground_coordination: [
       {
-        scenario: "You're at the gate and need ground power.",
-        atcMessage: "Ground, November Charlie Bravo Whiskey at gate A12, requesting ground power.",
+        scenario: "You're at the gate and your ground power unit has failed.",
+        atcMessage: "Ramp, American 1234 at gate B12, ground power unit failed, requesting replacement GPU.",
         question: "What's the appropriate way to make this request?",
         options: [
-          "Ground power please",
-          "November Charlie Bravo Whiskey, gate A12, requesting ground power connection",
-          "We need power",
-          "Connect ground power"
+          "American 1234, gate B12, GPU failed, need replacement",
+          "Need new ground power",
+          "GPU not working at B12",
+          "Request maintenance"
         ],
-        correct: 1,
-        explanation: "Use your callsign, state your position, and make specific requests."
+        correct: 0,
+        explanation: "State your callsign, position, problem, and specific request clearly and concisely."
       },
       {
-        scenario: "Ground crew asks for passenger count.",
-        atcMessage: "November Charlie Bravo Whiskey, ground crew requests passenger count for catering.",
-        question: "How do you respond?",
+        scenario: "Ground operations asks for your passenger count for catering verification.",
+        atcMessage: "American 1234, ops, confirm passenger count for catering verification.",
+        question: "How do you respond professionally?",
         options: [
-          "November Charlie Bravo Whiskey, 156 passengers on board",
-          "Full load",
-          "Normal capacity",
+          "American 1234, confirming 142 passengers on board for catering",
+          "Full load today",
+          "142 passengers",
           "Check the manifest"
         ],
         correct: 0,
-        explanation: "Provide exact passenger count for catering and ground services."
+        explanation: "Always include your callsign and be specific with numbers for operational coordination."
+      },
+      {
+        scenario: "You need pushback but there's another aircraft taxiing behind you.",
+        atcMessage: "Ground, American 1234 at gate A5, ready for pushback, advise when clear of traffic.",
+        question: "What should ground control coordinate?",
+        options: [
+          "Immediate pushback clearance",
+          "Hold for traffic, then coordinate pushback when area is clear",
+          "Taxi forward instead",
+          "Change gates"
+        ],
+        correct: 1,
+        explanation: "Ground control must ensure area is clear of conflicting traffic before approving pushback."
+      },
+      {
+        scenario: "You need to coordinate a fuel truck for additional fuel.",
+        atcMessage: "Ops, American 1234 at gate C8, requesting fuel truck for additional 2000 pounds fuel.",
+        question: "What information should operations confirm?",
+        options: [
+          "Just the fuel amount",
+          "Aircraft position, fuel amount, and estimated time for fueling",
+          "Only the gate number",
+          "Flight number only"
+        ],
+        correct: 1,
+        explanation: "Operations needs to confirm location, exact fuel amount, and coordinate timing with other ground services."
       }
     ]
   };
 
   const groundCrewGuides = {
-    fueling: {
-      title: "Aircraft Fueling Procedures",
+    marshalling: {
+      title: "Aircraft Marshalling & Ground Signals",
       sections: [
         {
-          title: "Safety First",
-          image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400&h=200&fit=crop",
+          title: "Standard Marshalling Positions",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NQVJTSEFSSU5HIFBPU0lUSU9OUzwvdGV4dD4KPHN2ZyB4PSI1MCIgeT0iNzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTUwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIgc3Ryb2tlPSIjZmY5NTAwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI1MCIgeT0iNTUiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFJUkNSQUZUPC90ZXh0PgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iMTMwIiByPSI4IiBmaWxsPSIjZmY5NTAwIi8+CiAgPHRleHQgeD0iNTAiIHk9IjE1NSIgZmlsbD0iI2ZmOTUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiI+TUFSU0hBTExFUjwvdGV4dD4KPC9zdmc+CjxzdmcgeD0iMjAwIiB5PSI3MCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiPgogIDxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMzMzMzMzIiBzdHJva2U9IiNmZjk1MDAiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjUwIiB5PSI1NSIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QUlSQ1JBRlQ8L3RleHQ+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIxMzAiIHI9IjgiIGZpbGw9IiNmZjk1MDAiLz4KICA8dGV4dCB4PSIyMCIgeT0iMTU1IiBmaWxsPSIjZmY5NTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIj5MSUVSPC90ZXh0Pgo8L3N2Zz4KPHN2ZyB4PSI1MCIgeT0iMjQwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjUwIj4KICA8dGV4dCB4PSIwIiB5PSIyMCIgZmlsbD0iI2EwYThiMCIgZm9udC1zaXplPSIxMiI+TWFyc2hhbGxlcjogRGlyZWN0bHkgaW4gZnJvbnQgb2YgYWlyY3JhZnQ8L3RleHQ+CiAgPHRleHQgeD0iMCIgeT0iNDAiIGZpbGw9IiNhMGE4YjAiIGZvbnQtc2l6ZT0iMTIiPldpbmcgV2Fsa2VyOiBPbiB3aW5nIHRpcCBzaWRlPC90ZXh0Pgo8L3N2Zz4KPC9zdmc+",
           steps: [
-            "Ensure aircraft engines are shut down",
-            "Check for proper grounding equipment",
-            "Verify no smoking signs are posted",
-            "Confirm fire extinguisher is available",
-            "Check fuel truck positioning"
+            "Marshaller positions directly in front of aircraft nose",
+            "Wing walkers position at wingtips during taxi operations", 
+            "Maintain visual contact with pilot at all times",
+            "Use standard ICAO hand signals only",
+            "Wear high-visibility reflective vest and have backup lighting",
+            "Ensure clear escape route in case of emergency",
+            "Position ground crew vehicles outside aircraft movement area"
           ]
         },
         {
-          title: "Fuel Connection",
-          image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop",
+          title: "Hand Signals - Movement Control",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5IQU5EIFNJR05BTFMgLSBNT1ZFTUVOVDWVC3RleHQ+Cjxzdmcg
+",
           steps: [
-            "Connect static grounding wire first",
-            "Remove fuel cap carefully",
-            "Insert fuel nozzle properly",
-            "Secure all connections",
-            "Begin fuel flow slowly"
+            "COME FORWARD: Both arms above head, palms facing forward, wave toward body",
+            "MOVE BACK: Both arms above head, palms facing outward, wave away from body", 
+            "TURN LEFT: Right arm down, left arm extended pointing left direction",
+            "TURN RIGHT: Left arm down, right arm extended pointing right direction",
+            "NORMAL STOP: Arms crossed above head in X formation",
+            "EMERGENCY STOP: Arms crossed above head with rapid waving motion",
+            "SLOW DOWN: Arms extended downward, palms down, gentle up/down motion"
           ]
         },
         {
-          title: "Monitoring Process",
-          image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=200&fit=crop",
+          title: "Engine and System Signals",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5FTkdJTkUgJiBTWVNURU0gU0lHTkFMUzwvdGV4dD4KPC9zdmc+",
           steps: [
-            "Monitor fuel quantity gauges",
-            "Check for any leaks or spills",
-            "Communicate with flight crew",
-            "Watch for proper fuel distribution",
-            "Stop at required quantity"
+            "START ENGINES: Circular motion with right hand above head",
+            "SHUT DOWN ENGINES: Hand across throat in cutting motion",
+            "CHOCKS IN: Hands moving toward each other at ground level",
+            "CHOCKS OUT: Hands moving away from each other at ground level",
+            "CONNECT GROUND POWER: Point to ground power receptacle, then thumbs up",
+            "DISCONNECT GROUND POWER: Point to ground power, then slashing motion",
+            "ALL CLEAR: Both arms extended outward horizontally, then lowered"
+          ]
+        },
+        {
+          title: "Gate Positioning Signals",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5HQVRFIFBPU0lUSU9OSU5HPC90ZXh0Pgo8L3N2Zz4=",
+          steps: [
+            "Use precise hand movements for final positioning",
+            "Monitor wingtip clearance continuously during approach",
+            "Signal 'STOP' when aircraft reaches parking line marker",
+            "Verify nose gear is on centerline before final stop signal",
+            "Check jetbridge alignment before giving final positioning",
+            "Give 'SET PARKING BRAKE' signal after complete stop",
+            "Wait for pilot confirmation before approaching aircraft"
+          ]
+        }
+      ]
+    },
+    fueling: {
+      title: "Aircraft Fueling Procedures by Type",
+      sections: [
+        {
+          title: "Pre-Fueling Safety Protocol",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5GVUVMIFNBRkVUWSBQUk9UT0NPTDWVC3RleHQ+PC9zdmc+",
+          steps: [
+            "Verify aircraft engines completely shut down and cooled (minimum 15 minutes)",
+            "Establish proper grounding bond between fuel truck and aircraft",
+            "Check wind conditions - maximum 25 knots for safe fueling operations",
+            "Post 'NO SMOKING' signs and establish 50-foot safety perimeter",
+            "Confirm fire extinguisher (minimum 150lb CO2 or equivalent) is present",
+            "Test all fuel equipment for leaks and proper operation",
+            "Verify fuel truck positioning allows safe escape routes",
+            "Check for any hot work or sources of ignition in area"
+          ]
+        },
+        {
+          title: "Narrow Body Aircraft (A320, B737) Fueling",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5OQVJST1cgQk9EWSBGVUVMSU5HPC90ZXh0Pgo8L3N2Zz4=",
+          steps: [
+            "Locate fuel panel on right side of fuselage (typically behind wing)",
+            "Open fuel panel and identify fuel connections (overwing or pressure)",
+            "Connect grounding cable first, then fuel line to appropriate connection",
+            "Set fuel flow rate to maximum 300 gallons per minute for narrow body",
+            "Monitor fuel gauges - typical capacity: A320 (6,400 gal), B737 (6,875 gal)",
+            "Check for fuel distribution between left and right wing tanks",
+            "Maintain communication with flight crew throughout fueling process",
+            "Stop fueling at required amount minus 50 gallons, then top off slowly"
+          ]
+        },
+        {
+          title: "Wide Body Aircraft (A330, B777, B747) Fueling",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5XSURFIEJPRE7SBGVUVMSUSUcKIGZadGV4dD4KPC9zdmc+",
+          steps: [
+            "Position multiple fuel trucks for larger aircraft (up to 3 trucks for B747)",
+            "Locate fuel panels on both sides of aircraft - typically 2-3 connections per side",
+            "Connect fuel lines to underwing pressure refueling connections",
+            "Set flow rate up to 600 gallons per minute for wide body aircraft",
+            "Monitor multiple tank systems: Main tanks, center tank, trim tank (if equipped)",
+            "Fuel capacity examples: A330 (25,000 gal), B777 (45,000 gal), B747 (57,000 gal)",
+            "Coordinate fuel distribution to maintain proper aircraft balance",
+            "Monitor fuel temperature - must be between -40°C and +50°C"
+          ]
+        },
+        {
+          title: "Fuel Quality Control & Documentation",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5GVUVMIFFVQU5JVFKS19PT05UGSxPTDEzVGV4dD4KPC9zdmc+",
+          steps: [
+            "Take fuel sample from each fuel truck before connecting",
+            "Test fuel for water contamination using water detection paste",
+            "Verify fuel type matches aircraft requirements (Jet A, Jet A-1)",
+            "Check fuel color and clarity - should be clear to straw colored",
+            "Record fuel batch numbers and quality test results",
+            "Document exact fuel quantity added and final fuel load",
+            "Obtain pilot signature on fuel slip confirming quantity",
+            "Report any fuel quality issues immediately to operations"
           ]
         }
       ]
     },
     pushback: {
-      title: "Pushback Operations",
+      title: "Pushback and Towing Operations",
       sections: [
         {
-          title: "Pre-Pushback Checks",
-          image: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=400&h=200&fit=crop",
+          title: "Equipment Selection by Aircraft Type",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5QVVNIQkFDSdBRS0VJIGSUPRU3RTUjQuTdGV4dD4KPC9zdmc+",
           steps: [
-            "Verify pushback clearance from ATC",
-            "Check area is clear of obstacles",
-            "Ensure tow bar is properly connected",
-            "Test communication with cockpit",
-            "Position safety cones if needed"
+            "Light aircraft (up to 50,000 lbs): Standard tow bar pushback tractor",
+            "Medium aircraft (50,000-200,000 lbs): Heavy duty tow bar or towbarless tractor",
+            "Heavy aircraft (200,000+ lbs): Towbarless pushback tractor required",
+            "Verify tractor capacity exceeds aircraft weight by minimum 25%",
+            "Check tow bar compatibility with aircraft nose gear type",
+            "For towbarless: Verify cradle fits aircraft tire size and gear configuration",
+            "Inspect all hydraulic systems and emergency release mechanisms",
+            "Test radio communication equipment before operation"
           ]
         },
         {
-          title: "Pushback Execution",
-          image: "https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=400&h=200&fit=crop",
+          title: "Pre-Pushback Safety Checklist",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5TQUZFVFkgQ0hFQ0tMSVNUPC90ZXh0Pgo8L3N2Zz4=",
           steps: [
-            "Begin pushback slowly and smoothly",
-            "Monitor aircraft nose wheel steering",
-            "Communicate direction changes to pilots",
-            "Watch for other aircraft and vehicles",
-            "Stop at designated position"
+            "Obtain ATC pushback clearance and confirm pushback direction",
+            "Verify aircraft parking brake is SET and engines are shut down",
+            "Check area clear of ground equipment, personnel, and other aircraft",
+            "Position wing walkers at wingtips if required by airport procedures",
+            "Establish positive radio contact with flight crew on intercom",
+            "Verify ground power is connected if engines not running",
+            "Check weather conditions - wind limits and visibility minimums",
+            "Ensure emergency stops and disconnect procedures are understood"
+          ]
+        },
+        {
+          title: "Pushback Execution Procedures",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5QVVNIQkFDS71NP3VOQREYxVFUNSFPTpVJFR0YkZZ4dD4KPC9zdmc+",
+          steps: [
+            "Begin pushback slowly - maximum 5 mph initial movement",
+            "Announce 'Pushback commencing' to flight crew",
+            "Monitor nose wheel steering - pilot maintains directional control",
+            "Call out obstacles, other aircraft, or hazards immediately",
+            "For straight pushback: maintain constant slow speed throughout",
+            "For turn during pushback: announce direction and pause before turning",
+            "Stop smoothly when reaching designated position or ATC instruction",
+            "Announce 'Pushback complete, set parking brake' to flight crew"
+          ]
+        },
+        {
+          title: "Post-Pushback Disconnect Procedures", 
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5ESVNDT05ORUNUIFBst09DNEVSREVSU3wvdGV4dD4KPC9zdmc+",
+          steps: [
+            "Verify aircraft parking brake is set before disconnecting",
+            "Announce 'Disconnecting tow bar, remain on brakes' to flight crew",
+            "For tow bar: Remove safety pins, disconnect from nose gear",
+            "For towbarless: Lower aircraft, retract cradle arms slowly",
+            "Perform final visual inspection of nose gear area for damage",
+            "Remove any ground equipment from aircraft path",
+            "Signal 'All clear' to flight crew when area is clear",
+            "Monitor aircraft taxi until clear of gate area"
           ]
         }
       ]
     },
     baggage: {
-      title: "Baggage Handling",
+      title: "Baggage and Cargo Operations",
       sections: [
         {
-          title: "Loading Procedures",
-          image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop",
+          title: "Weight and Balance Calculations",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5XZUAVSIQ5VCAmIJBISExBTI2UIESdGV4dD4KPC9zdmc+",
           steps: [
-            "Check baggage compartment is clear",
-            "Load heavy items first",
-            "Distribute weight evenly",
-            "Secure all containers properly",
-            "Close and lock compartment doors"
+            "Verify total baggage weight does not exceed aircraft cargo limits",
+            "Calculate center of gravity based on baggage compartment loading",
+            "Front compartment (forward of wing): affects nose-down moment",
+            "Aft compartment (behind wing): affects nose-up moment",
+            "Distribute heavy items evenly between compartments",
+            "Consider passenger loading - heavy baggage in rear if passengers in front",
+            "Maximum baggage per compartment: varies by aircraft type",
+            "Document final weight distribution on load sheet"
+          ]
+        },
+        {
+          title: "Baggage Compartment Configuration",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5DT01QQVJUTUVOVENDQUFDU7sZdxLCU5PSdGV4dD4KPC9zdmc+",
+          steps: [
+            "Load heavy items first - place against compartment walls",
+            "Use cargo nets and tie-down straps to secure all items",
+            "Pack items tightly to prevent shifting during flight",
+            "Separate fragile items and mark clearly",
+            "Load connecting flight baggage in accessible areas",
+            "Place priority/first-class baggage for easy identification",
+            "Ensure emergency equipment access is not blocked",
+            "Check compartment door seals and locking mechanisms"
+          ]
+        },
+        {
+          title: "Special Cargo Handling Procedures",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5TUEVOSUFMENBSEO2IEZBTkRMSU5HPC90ZXh0Pgo8L3N2Zz4=",
+          steps: [
+            "Live animals: Load last, unload first, maintain temperature control",
+            "Hazardous materials: Follow IATA dangerous goods regulations",
+            "Medical supplies: Maintain cold chain for temperature-sensitive items",
+            "Valuable cargo: Security escort required, locked compartments",
+            "Oversized items: May require special loading equipment",
+            "Diplomatic pouches: Chain of custody documentation required",
+            "Human remains: Specific handling protocols and documentation",
+            "Sports equipment: Secure properly to prevent damage"
           ]
         }
       ]
     },
     catering: {
-      title: "Catering Services",
+      title: "Catering and Cabin Services",
       sections: [
         {
-          title: "Catering Setup",
-          image: "https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400&h=200&fit=crop",
+          title: "Catering Truck Positioning and Setup",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5kaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5DQVRFSU5HIFNFVFVQICYgUU9TSVRJQ1OS4dGV4dD4KPC9zdmc+",
           steps: [
-            "Position catering truck at correct door",
-            "Raise platform to door level",
-            "Open aircraft catering doors",
-            "Remove old catering supplies",
-            "Load new catering items systematically"
+            "Position catering truck at designated catering door (typically forward left)",
+            "Extend truck platform to match aircraft door sill height exactly",
+            "Test platform stability and weight capacity before loading",
+            "Establish communication with cabin crew before opening doors",
+            "Check catering door operation - verify hydraulic pressure if applicable",
+            "Position bridge between truck and aircraft doorway",
+            "Set up safety barriers around elevated work area",
+            "Verify electrical power for refrigeration units during service"
+          ]
+        },
+        {
+          title: "Service Flow by Aircraft Configuration",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5TRVJNSUNFRFcZ1IMEkUXURVJJVy5IIO5HIGZGeFRZdDYaXQ+PC9zdmc+",
+          steps: [
+            "Single-aisle aircraft: Service through forward galley door only",
+            "Wide-body aircraft: Multiple service doors - coordinate timing",
+            "Remove used catering equipment first - trolleys, ovens, coffee makers",
+            "Clean galley areas and dispose of waste properly", 
+            "Load fresh catering supplies by class of service (First, Business, Economy)",
+            "Verify meal counts match passenger manifest numbers",
+            "Check special meals are properly labeled and positioned",
+            "Reload galley equipment and test operation before departure"
+          ]
+        },
+        {
+          title: "Water and Waste Service Procedures",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5XQVRFU2BTJgV0Q1NBYJBJdKFUOS5IIO2V4dD4KPC9zdmc+",
+          steps: [
+            "Locate potable water service panel (typically right side of aircraft)",
+            "Connect waste service truck to lavatory waste drain valve first",
+            "Pump out all waste tanks completely - verify tank empty indicators",
+            "Flush waste system with fresh water and biocide solution",
+            "Connect potable water truck to aircraft water fill connection",
+            "Fill water tanks slowly to prevent air locks in system",
+            "Test water system pressure and verify proper flow to lavatories",
+            "Check water tank quantity indicators show proper fill levels"
+          ]
+        },
+        {
+          title: "Cabin Cleaning and Preparation",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5DQUJJTYBN5BAFHFJaNOOhYIO5GMIRQXJCNVwB0ZXh0Pgo8L3N2Zz4=",
+          steps: [
+            "Remove all trash and debris from seat pockets and floor areas",
+            "Vacuum all carpeted areas including aisles and seat rows",
+            "Clean and disinfect tray tables, armrests, and seat surfaces",
+            "Replace headrest covers and seat pocket materials as required",
+            "Clean and stock lavatories with supplies (soap, towels, tissue)",
+            "Check emergency equipment placement and expiration dates",
+            "Verify cabin lighting, air conditioning, and entertainment systems",
+            "Final inspection with cabin crew before passenger boarding"
           ]
         }
       ]
@@ -1125,51 +1381,7 @@ export default function App() {
             </div>
           );
 
-        case "guides":
-          return (
-            <div className="guides-container">
-              <div className="guides-header">
-                <h2>GROUND CREW OPERATIONS GUIDES</h2>
-                <div className="guide-tabs">
-                  {Object.keys(groundCrewGuides).map(category => (
-                    <button
-                      key={category}
-                      className={`guide-tab ${activeGuideCategory === category ? 'active' : ''}`}
-                      onClick={() => setActiveGuideCategory(category)}
-                    >
-                      {groundCrewGuides[category].title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="guide-content">
-                <h3>{groundCrewGuides[activeGuideCategory].title}</h3>
-                {groundCrewGuides[activeGuideCategory].sections.map((section, index) => (
-                  <div key={index} className="guide-section">
-                    <div className="guide-item">
-                      <img 
-                        src={section.image} 
-                        alt={section.title}
-                        className="guide-image"
-                        onError={(e) => {
-                          e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+R3JvdW5kIE9wZXJhdGlvbnM8L3RleHQ+Cjwvc3ZnPgo=';
-                        }}
-                      />
-                      <div className="guide-text">
-                        <h4>{section.title}</h4>
-                        <ol>
-                          {section.steps.map((step, stepIndex) => (
-                            <li key={stepIndex}>{step}</li>
-                          ))}
-                        </ol>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
+        
 
         default:
           return (
@@ -1425,6 +1637,227 @@ export default function App() {
                   ))}
                 </div>
               </div>
+
+              <div className="roleplay-section">
+                <h2>FLIGHT OPERATIONS</h2>
+                <div className="rp-categories">
+                  <div className="rp-category">
+                    <h3>PRE-FLIGHT COORDINATION</h3>
+                    <div className="rp-actions">
+                      <button className="rp-btn coordination" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🎯 Requesting weather update and NOTAM briefing for departure",
+                          sender: "FLIGHT OPERATIONS",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Weather & NOTAM Request</button>
+                      <button className="rp-btn coordination" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "📋 Requesting final passenger count and weight/balance calculations",
+                          sender: "FLIGHT OPERATIONS", 
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Final Load Sheet</button>
+                      <button className="rp-btn coordination" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🔧 Requesting pre-flight inspection completion confirmation",
+                          sender: "FLIGHT OPERATIONS",
+                          stand: selectedStand, 
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Pre-flight Inspection</button>
+                    </div>
+                  </div>
+
+                  <div className="rp-category">
+                    <h3>FLIGHT PLAN & DISPATCH</h3>
+                    <div className="rp-actions">
+                      <button className="rp-btn dispatch" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "📍 Flight plan filed: ${flightNumber} ${selectedAirport} to destination, requesting route clearance",
+                          sender: "DISPATCH",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>File Flight Plan</button>
+                      <button className="rp-btn dispatch" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "⚠️ Requesting alternate airport briefing due to weather concerns at destination",
+                          sender: "DISPATCH",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Alternate Airport Brief</button>
+                      <button className="rp-btn dispatch" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "⏱️ Requesting updated departure slot time due to operational delays",
+                          sender: "DISPATCH",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Slot Time Coordination</button>
+                    </div>
+                  </div>
+
+                  <div className="rp-category">
+                    <h3>CARGO OPERATIONS</h3>
+                    <div className="rp-actions">
+                      <button className="rp-btn cargo" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "📦 Confirming cargo manifest: 15 pallets, 8.5 tons total, all dangerous goods properly declared",
+                          sender: "CARGO OPS",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Cargo Manifest Review</button>
+                      <button className="rp-btn cargo" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🌡️ Temperature-sensitive cargo requires refrigeration unit monitoring during flight",
+                          sender: "CARGO OPS",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Special Handling Cargo</button>
+                      <button className="rp-btn cargo" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "📋 Live animal cargo on board - confirming veterinary certificates and IATA LAR compliance",
+                          sender: "CARGO OPS",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Live Animal Handling</button>
+                    </div>
+                  </div>
+
+                  <div className="rp-category">
+                    <h3>PASSENGER SERVICES</h3>
+                    <div className="rp-actions">
+                      <button className="rp-btn passenger" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "👥 Boarding complete: ${passengerManifest.length} passengers, 15 unaccompanied minors, 3 wheelchair assists",
+                          sender: "PASSENGER SERVICES",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Boarding Completion</button>
+                      <button className="rp-btn passenger" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🏃‍♂️ Standby passengers available: 12 confirmed, requesting boarding priority list",
+                          sender: "PASSENGER SERVICES",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Standby Passenger List</button>
+                      <button className="rp-btn passenger" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🚨 Medical passenger requires oxygen during flight - confirming portable oxygen supply",
+                          sender: "PASSENGER SERVICES",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Medical Passenger</button>
+                    </div>
+                  </div>
+
+                  <div className="rp-category">
+                    <h3>MAINTENANCE & SAFETY</h3>
+                    <div className="rp-actions">
+                      <button className="rp-btn maintenance" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🔧 Aircraft maintenance log review complete - no outstanding write-ups, aircraft airworthy",
+                          sender: "MAINTENANCE",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Maintenance Sign-off</button>
+                      <button className="rp-btn maintenance" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "⚠️ MEL item: Passenger entertainment system inoperative seat 12A - flight approved per MEL",
+                          sender: "MAINTENANCE",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>MEL Deferral</button>
+                      <button className="rp-btn maintenance" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🛡️ Security search complete - aircraft secured, no suspicious items found",
+                          sender: "SECURITY",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Security Clearance</button>
+                    </div>
+                  </div>
+
+                  <div className="rp-category">
+                    <h3>CABIN CREW COORDINATION</h3>
+                    <div className="rp-actions">
+                      <button className="rp-btn cabin" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "✈️ Cabin crew briefing complete - safety demo ready, cabin secured for departure",
+                          sender: "CABIN CREW",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Cabin Ready Report</button>
+                      <button className="rp-btn cabin" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🍽️ Special meal distribution confirmed - 8 kosher, 4 vegetarian, 2 diabetic meals loaded",
+                          sender: "CABIN CREW",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Special Meals Confirmed</button>
+                      <button className="rp-btn cabin" onClick={() => {
+                        socket.emit("chatMessage", {
+                          text: "🚨 Cabin crew reports disruptive passenger - requesting ground security assistance",
+                          sender: "CABIN CREW",
+                          stand: selectedStand,
+                          airport: selectedAirport,
+                          timestamp: new Date().toLocaleTimeString(),
+                          mode: "pilot"
+                        });
+                      }}>Passenger Issue</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           );
       }
@@ -1436,7 +1869,54 @@ export default function App() {
       const lowPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Cleaning", "Water Service", "Lavatory Service"].includes(r.service));
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
-      // Removed supervisor mode rendering as per instructions
+      // Ground crew interface with operations guides
+      if (activeTab === "guides") {
+        return (
+          <div className="guides-container">
+            <div className="guides-header">
+              <h2>GROUND CREW OPERATIONS GUIDES</h2>
+              <div className="guide-tabs">
+                {Object.keys(groundCrewGuides).map(category => (
+                  <button
+                    key={category}
+                    className={`guide-tab ${activeGuideCategory === category ? 'active' : ''}`}
+                    onClick={() => setActiveGuideCategory(category)}
+                  >
+                    {groundCrewGuides[category].title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="guide-content">
+              <h3>{groundCrewGuides[activeGuideCategory].title}</h3>
+              {groundCrewGuides[activeGuideCategory].sections.map((section, index) => (
+                <div key={index} className="guide-section">
+                  <div className="guide-item">
+                    <img 
+                      src={section.image} 
+                      alt={section.title}
+                      className="guide-image"
+                      onError={(e) => {
+                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+R3JvdW5kIE9wZXJhdGlvbnM8L3RleHQ+Cjwvc3ZnPgo=';
+                      }}
+                    />
+                    <div className="guide-text">
+                      <h4>{section.title}</h4>
+                      <ol>
+                        {section.steps.map((step, stepIndex) => (
+                          <li key={stepIndex}>{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="groundcrew-main">
           <div className="queue-header">
@@ -1668,45 +2148,58 @@ export default function App() {
         </div>
       </div>
 
-      {userMode === "pilot" && (
-        <div className="bottom-nav">
-          <button
-            className={`nav-btn ${activeTab === 'main' ? 'active' : ''}`}
-            onClick={() => setActiveTab('main')}
-          >
-            <span className="nav-icon">🏠</span>
-            <span>MAIN</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'checklists' ? 'active' : ''}`}
-            onClick={() => setActiveTab('checklists')}
-          >
-            <span className="nav-icon">✅</span>
-            <span>CHECKLISTS</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'training' ? 'active' : ''}`}
-            onClick={() => setActiveTab('training')}
-          >
-            <span className="nav-icon">🎓</span>
-            <span>TRAINING</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'manifest' ? 'active' : ''}`}
-            onClick={() => setActiveTab('manifest')}
-          >
-            <span className="nav-icon">👥</span>
-            <span>MANIFEST</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'guides' ? 'active' : ''}`}
-            onClick={() => setActiveTab('guides')}
-          >
-            <span className="nav-icon">📖</span>
-            <span>GUIDES</span>
-          </button>
-        </div>
-      )}
+      <div className="bottom-nav">
+        {userMode === "pilot" && (
+          <>
+            <button
+              className={`nav-btn ${activeTab === 'main' ? 'active' : ''}`}
+              onClick={() => setActiveTab('main')}
+            >
+              <span className="nav-icon">🏠</span>
+              <span>MAIN</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'checklists' ? 'active' : ''}`}
+              onClick={() => setActiveTab('checklists')}
+            >
+              <span className="nav-icon">✅</span>
+              <span>CHECKLISTS</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'training' ? 'active' : ''}`}
+              onClick={() => setActiveTab('training')}
+            >
+              <span className="nav-icon">🎓</span>
+              <span>TRAINING</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'manifest' ? 'active' : ''}`}
+              onClick={() => setActiveTab('manifest')}
+            >
+              <span className="nav-icon">👥</span>
+              <span>MANIFEST</span>
+            </button>
+          </>
+        )}
+        {userMode === "groundcrew" && (
+          <>
+            <button
+              className={`nav-btn ${activeTab === 'main' ? 'active' : ''}`}
+              onClick={() => setActiveTab('main')}
+            >
+              <span className="nav-icon">🏠</span>
+              <span>OPERATIONS</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'guides' ? 'active' : ''}`}
+              onClick={() => setActiveTab('guides')}
+            >
+              <span className="nav-icon">📖</span>
+              <span>GUIDES</span>
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
