@@ -340,10 +340,10 @@ export default function App() {
       sections: [
         {
           title: "Standard Marshalling Positions",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NQVJTSEFSSU5HIFBPU0lUSU9OUzwvdGV4dD4KPHN2ZyB4PSI1MCIgeT0iNzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTUwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIgc3Ryb2tlPSIjZmY5NTAwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI1MCIgeT0iNTUiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFJUkNSQUZUPC90ZXh0PgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iMTMwIiByPSI4IiBmaWxsPSIjZmY5NTAwIi8+CiAgPHRleHQgeD0iNTAiIHk9IjE1NSIgZmlsbD0iI2ZmOTUwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiI+TUFSU0hBTExFUjwvdGV4dD4KPC9zdmc+CjxzdmcgeD0iMjAwIiB5PSI3MCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiPgogIDxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMzMzMzMzIiBzdHJva2U9IiNmZjk1MDAiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjUwIiB5PSI1NSIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QUlSQ1JBRlQ8L3RleHQ+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIxMzAiIHI9IjgiIGZpbGw9IiNmZjk1MDAiLz4KICA8dGV4dCB4PSIyMCIgeT0iMTU1IiBmaWxsPSIjZmY5NTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIj5MSUVSPC90ZXh0Pgo8L3N2Zz4KPHN2ZyB4PSI1MCIgeT0iMjQwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjUwIj4KICA8dGV4dCB4PSIwIiB5PSIyMCIgZmlsbD0iI2EwYThiMCIgZm9udC1zaXplPSIxMiI+TWFyc2hhbGxlcjogRGlyZWN0bHkgaW4gZnJvbnQgb2YgYWlyY3JhZnQ8L3RleHQ+CiAgPHRleHQgeD0iMCIgeT0iNDAiIGZpbGw9IiNhMGE4YjAiIGZvbnQtc2l6ZT0iMTIiPldpbmcgV2Fsa2VyOiBPbiB3aW5nIHRpcCBzaWRlPC90ZXh0Pgo8L3N2Zz4KPC9zdmc+",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iN0YiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NQVJTSEFSSU5HIFBPU0lUSU9OUzwvdGV4dD4KPHN2ZyB4PSI1MCIgeT0iNzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTUwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIgc3Ryb2tlPSIjZmY5NTAwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI1MCIgeT0iNTUiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFJUkNSQUZUPC90ZXh0PgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iMTMwIiByPSI4IiBmaWxsPSIjZmY5NTAwIi8+CiAgPHRleHQgeD0iNTAiIHk9IjE1NSIgZmlsbD0iI2Y5NTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5NQVJTSGFMT0xFUjwvdGV4dD4KPC9zdmc+CjxzdmcgeD0iMjAwIiB5PSI3MCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiPgogIDxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMzMzMzMzIiBzdHJva2U9IiNmZjk1MDAiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjUwIiB5PSI1NSIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QUlSQ1JBRlQ8L3RleHQ+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIxMzAiIHI9IjgiIGZpbGw9IiNmZjk1MDAiLz4KICA8dGV4dCB4PSIyMCIgeT0iMTU1IiBmaWxsPSIjZmY5NTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIj5MSUVSPC90ZXh0Pgo8L3N2Zz4KPHN2ZyB4PSI1MCIgeT0iMjQwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjUwIj4KICA8dGV4dCB4PSIwIiB5PSIyMCIgZmlsbD0iI2EwYThiMCIgZm9udC1zaXplPSIxMiI+TWFyc2hhbGxlcjogRGlyZWN0bHkgaW4gZnJvbnQgb2YgYWlyY3JhZnQ8L3RleHQ+CiAgPHRleHQgeD0iMCIgeT0iNDAiIGZpbGw9IiNhMGE4YjAiIGZvbnQtc2l6ZT0iMTIiPldpbmcgV2Fsa2VyOiBPbiB3aW5nIHRpcCBzaWRlPC90ZXh0Pgo8L3N2Zz4KPC9zdmc+",
           steps: [
             "Marshaller positions directly in front of aircraft nose",
-            "Wing walkers position at wingtips during taxi operations", 
+            "Wing walkers position at wingtips during taxi operations",
             "Maintain visual contact with pilot at all times",
             "Use standard ICAO hand signals only",
             "Wear high-visibility reflective vest and have backup lighting",
@@ -353,11 +353,10 @@ export default function App() {
         },
         {
           title: "Hand Signals - Movement Control",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5IQU5EIFNJR05BTFMgLSBNT1ZFTUVOVDWVC3RleHQ+Cjxzdmcg
-",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5IQU5EIFNJR05BTFMgLSBNT1ZFTUVOVDWVC3RleHQ+PC9zdmc+",
           steps: [
             "COME FORWARD: Both arms above head, palms facing forward, wave toward body",
-            "MOVE BACK: Both arms above head, palms facing outward, wave away from body", 
+            "MOVE BACK: Both arms above head, palms facing outward, wave away from body",
             "TURN LEFT: Right arm down, left arm extended pointing left direction",
             "TURN RIGHT: Left arm down, right arm extended pointing right direction",
             "NORMAL STOP: Arms crossed above head in X formation",
@@ -500,7 +499,7 @@ export default function App() {
           ]
         },
         {
-          title: "Post-Pushback Disconnect Procedures", 
+          title: "Post-Pushback Disconnect Procedures",
           image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5ESVNDT05ORUNUIFBst09DNEVSREVSU3wvdGV4dD4KPC9zdmc+",
           steps: [
             "Verify aircraft parking brake is set before disconnecting",
@@ -520,7 +519,7 @@ export default function App() {
       sections: [
         {
           title: "Weight and Balance Calculations",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5XZUAVSIQ5VCAmIJBISExBTI2UIESdGV4dD4KPC9zdmc+",
+          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5XZUAVSIQ5VCAmIJBISExBTI2UIESdGV4dD4KPC9zdmc+",
           steps: [
             "Verify total baggage weight does not exceed aircraft cargo limits",
             "Calculate center of gravity based on baggage compartment loading",
@@ -586,7 +585,7 @@ export default function App() {
             "Single-aisle aircraft: Service through forward galley door only",
             "Wide-body aircraft: Multiple service doors - coordinate timing",
             "Remove used catering equipment first - trolleys, ovens, coffee makers",
-            "Clean galley areas and dispose of waste properly", 
+            "Clean galley areas and dispose of waste properly",
             "Load fresh catering supplies by class of service (First, Business, Economy)",
             "Verify meal counts match passenger manifest numbers",
             "Check special meals are properly labeled and positioned",
@@ -710,7 +709,19 @@ export default function App() {
             range: aircraft.includes('787') ? 15750 : 6500,
             maxSpeed: 560,
             engines: aircraft.includes('A380') || aircraft.includes('747') ? 4 : 2,
-            fuelCapacity: aircraft.includes('A380') ? 84535 : 26020
+            fuelCapacity: aircraft.includes('A380') ? 84535 : 26020,
+            engineType: "Turbofan",
+            firstFlight: "N/A",
+            maxTakeoffWeight: 75000,
+            maxLandingWeight: 68000,
+            cargoCapacity: 8.2,
+            climbRate: 3000,
+            length: 37.5,
+            wingspan: 34.1,
+            height: 12.5,
+            serviceCeiling: 41000,
+            cruiseSpeed: 470,
+            variants: ["-700", "-800"]
           };
           setAircraftData(defaultData);
           const manifest = generatePassengerManifest(aircraft);
@@ -826,7 +837,7 @@ export default function App() {
     if (service === "Full Service") {
       // Request multiple services at once
       const fullServices = [
-        "Ground Power", "Fuel Service", "Catering", "Passenger Stairs", 
+        "Ground Power", "Fuel Service", "Catering", "Passenger Stairs",
         "Cleaning", "Baggage", "Water Service", "Lavatory Service"
       ];
 
@@ -881,9 +892,9 @@ export default function App() {
     }
   };
 
-  
 
-  
+
+
 
   const renderAircraftDisplay = () => {
     if (aircraftModel) {
@@ -1144,8 +1155,8 @@ export default function App() {
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '30px' }}>
-            <button 
-              onClick={() => setSelectedAirport("")} 
+            <button
+              onClick={() => setSelectedAirport("")}
               style={{
                 background: 'rgba(239, 68, 68, 0.2)',
                 border: '1px solid rgba(239, 68, 68, 0.3)',
@@ -1222,25 +1233,25 @@ export default function App() {
               {!trainingMode ? (
                 <div className="scenario-modules">
                   <h3>Choose Training Module</h3>
-                  <button 
+                  <button
                     className={`module-btn ${trainingScenario === 'basic_atc' ? 'active' : ''}`}
                     onClick={() => setTrainingScenario('basic_atc')}
                   >
                     Basic ATC Communications
                   </button>
-                  <button 
+                  <button
                     className={`module-btn ${trainingScenario === 'emergency_atc' ? 'active' : ''}`}
                     onClick={() => setTrainingScenario('emergency_atc')}
                   >
                     Emergency Procedures
                   </button>
-                  <button 
+                  <button
                     className={`module-btn ${trainingScenario === 'ground_coordination' ? 'active' : ''}`}
                     onClick={() => setTrainingScenario('ground_coordination')}
                   >
                     Ground Coordination
                   </button>
-                  <button 
+                  <button
                     className="start-training"
                     onClick={() => {
                       setTrainingMode(true);
@@ -1259,7 +1270,7 @@ export default function App() {
                         <h4>Situation</h4>
                         <p>{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].scenario}</p>
                       </div>
-                      
+
                       <div className="atc-message">
                         <div className="atc-speaker">ATC:</div>
                         <div className="atc-text">"{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].atcMessage}"</div>
@@ -1269,15 +1280,15 @@ export default function App() {
                         <h4>{atcTrainingQuestions[trainingScenario][atcCurrentQuestion].question}</h4>
                         <div className="multiple-choice">
                           {atcTrainingQuestions[trainingScenario][atcCurrentQuestion].options.map((option, index) => (
-                            <button 
+                            <button
                               key={index}
                               className="choice-btn"
                               onClick={() => {
                                 const isCorrect = index === atcTrainingQuestions[trainingScenario][atcCurrentQuestion].correct;
                                 if (isCorrect) setAtcScore(atcScore + 1);
-                                
+
                                 socket.emit("chatMessage", {
-                                  text: isCorrect ? 
+                                  text: isCorrect ?
                                     `✅ Correct! ${atcTrainingQuestions[trainingScenario][atcCurrentQuestion].explanation}` :
                                     `❌ Incorrect. ${atcTrainingQuestions[trainingScenario][atcCurrentQuestion].explanation}`,
                                   sender: "ATC TRAINING",
@@ -1286,7 +1297,7 @@ export default function App() {
                                   timestamp: new Date().toLocaleTimeString(),
                                   mode: "system"
                                 });
-                                
+
                                 setTimeout(() => {
                                   setAtcCurrentQuestion(atcCurrentQuestion + 1);
                                 }, 2000);
@@ -1302,7 +1313,7 @@ export default function App() {
                     <div className="training-complete">
                       <h3>Training Complete!</h3>
                       <p>Final Score: {atcScore}/{atcTrainingQuestions[trainingScenario].length}</p>
-                      <button 
+                      <button
                         className="restart-training"
                         onClick={() => {
                           setAtcCurrentQuestion(0);
@@ -1311,7 +1322,7 @@ export default function App() {
                       >
                         RESTART
                       </button>
-                      <button 
+                      <button
                         className="exit-training"
                         onClick={() => setTrainingMode(false)}
                       >
@@ -1381,7 +1392,7 @@ export default function App() {
             </div>
           );
 
-        
+
 
         default:
           return (
@@ -1657,7 +1668,7 @@ export default function App() {
                       <button className="rp-btn coordination" onClick={() => {
                         socket.emit("chatMessage", {
                           text: "📋 Requesting final passenger count and weight/balance calculations",
-                          sender: "FLIGHT OPERATIONS", 
+                          sender: "FLIGHT OPERATIONS",
                           stand: selectedStand,
                           airport: selectedAirport,
                           timestamp: new Date().toLocaleTimeString(),
@@ -1668,7 +1679,7 @@ export default function App() {
                         socket.emit("chatMessage", {
                           text: "🔧 Requesting pre-flight inspection completion confirmation",
                           sender: "FLIGHT OPERATIONS",
-                          stand: selectedStand, 
+                          stand: selectedStand,
                           airport: selectedAirport,
                           timestamp: new Date().toLocaleTimeString(),
                           mode: "pilot"
@@ -1893,12 +1904,12 @@ export default function App() {
               {groundCrewGuides[activeGuideCategory].sections.map((section, index) => (
                 <div key={index} className="guide-section">
                   <div className="guide-item">
-                    <img 
-                      src={section.image} 
+                    <img
+                      src={section.image}
                       alt={section.title}
                       className="guide-image"
                       onError={(e) => {
-                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+R3JvdW5kIE9wZXJhdGlvbnM8L3RleHQ+Cjwvc3ZnPgo=';
+                        e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIi 6R3JvdW5kIE9wZXJhdGlvbnM8L3RleHQ+Cjwvc3ZnPgo=';
                       }}
                     />
                     <div className="guide-text">
@@ -2072,7 +2083,7 @@ export default function App() {
       <div className="tablet-header">
         <div className="header-left">
           <div className="app-title">PTFS GROUND CONTROL</div>
-          <div className="location-info">{selectedAirport} - {userMode.toUpperCase()}</div>
+          <div className="location-info">{selectedAirport} - {userMode?.toUpperCase()}</div>
         </div>
         <div className="header-center">
           <div className="time-display">{currentTime.toLocaleTimeString()}</div>
@@ -2081,7 +2092,7 @@ export default function App() {
         <div className="header-right">
           <div className="user-info">
             <div className="username">{user.username}</div>
-            <div className="user-role">{userMode.toUpperCase()}</div>
+            <div className="user-role">{userMode?.toUpperCase()}</div>
           </div>
           <button onClick={() => { setUserMode(null); setSelectedAirport(""); }} className="logout-btn">
             SWITCH ROLE
@@ -2128,18 +2139,18 @@ export default function App() {
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && sendMessage()}
               placeholder={
-                userMode === "groundcrew" 
-                  ? "Message ground frequency..." 
-                  : selectedStand 
-                    ? `Message ${selectedStand}...` 
+                userMode === "groundcrew"
+                  ? "Message ground frequency..."
+                  : selectedStand
+                    ? `Message ${selectedStand}...`
                     : "Select stand first..."
               }
               className="message-input"
               disabled={userMode === "pilot" && !selectedStand}
             />
-            <button 
-              onClick={sendMessage} 
-              className="send-btn" 
+            <button
+              onClick={sendMessage}
+              className="send-btn"
               disabled={userMode === "pilot" && !selectedStand}
             >
               SEND
