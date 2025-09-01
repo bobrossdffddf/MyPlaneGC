@@ -56,13 +56,13 @@ let ptfsAtisData = {}; // Store real ATIS data from PTFS
 const parseAtisContent = (atisInfo) => {
   const lines = atisInfo.lines || [];
   const content = atisInfo.content || '';
-  
+
   let wind = 'CALM';
   let qnh = '1013';
   let runway = 'UNKNOWN';
   let conditions = 'CAVOK';
   let temperature = 'N/A';
-  
+
   // Parse wind information (format: 094/12)
   const windMatch = content.match(/(\d{3})\/(\d{2,3})/);
   if (windMatch) {
@@ -70,25 +70,25 @@ const parseAtisContent = (atisInfo) => {
     const windSpeed = windMatch[2];
     wind = `${windDir}°/${windSpeed}KT`;
   }
-  
+
   // Parse QNH (format: Q1013)
   const qnhMatch = content.match(/Q(\d{4})/);
   if (qnhMatch) {
     qnh = qnhMatch[1];
   }
-  
+
   // Parse runway information
   const runwayMatch = content.match(/(?:DEP RWY|ARR RWY|RWY)\s+(\d{2}[LRC]?)/);
   if (runwayMatch) {
     runway = `${runwayMatch[1]} ACTIVE`;
   }
-  
+
   // Parse temperature (format: 13/11 where first is temp, second is dewpoint)
   const tempMatch = content.match(/(\d{2})\/\d{2}/);
   if (tempMatch) {
     temperature = `${tempMatch[1]}°C`;
   }
-  
+
   return {
     airport: atisInfo.airport,
     info: `INFO ${atisInfo.letter}`,
@@ -105,45 +105,45 @@ const parseAtisContent = (atisInfo) => {
 // Connect to PTFS WebSocket for real ATIS data
 const connectToPTFSWebSocket = () => {
   console.log('🔌 Connecting to PTFS WebSocket...');
-  
+
   const ws = new WebSocket('wss://24data.ptfs.app/wss', {
     headers: {
       'Origin': '' // Empty origin as required by PTFS API
     }
   });
-  
+
   ws.on('open', () => {
     console.log('✅ Connected to PTFS WebSocket');
   });
-  
+
   ws.on('message', (data) => {
     try {
       const message = JSON.parse(data.toString());
-      
+
       if (message.t === 'ATIS') {
         const atisInfo = message.d;
         const parsedAtis = parseAtisContent(atisInfo);
-        
+
         // Store the ATIS data
         ptfsAtisData[atisInfo.airport] = parsedAtis;
-        
+
         // Update connected users at this airport
         if (airportData[atisInfo.airport]) {
           airportData[atisInfo.airport].atis = parsedAtis;
           io.to(atisInfo.airport).emit("atisUpdate", parsedAtis);
         }
-        
+
         console.log(`📡 ATIS update for ${atisInfo.airport}: INFO ${atisInfo.letter}`);
       }
     } catch (error) {
       console.error('Error parsing PTFS WebSocket message:', error);
     }
   });
-  
+
   ws.on('error', (error) => {
     console.error('❌ PTFS WebSocket error:', error);
   });
-  
+
   ws.on('close', () => {
     console.log('🔌 PTFS WebSocket closed, attempting to reconnect in 10 seconds...');
     setTimeout(connectToPTFSWebSocket, 10000);
@@ -178,117 +178,6 @@ app.get('/api/user', (req, res) => {
 });
 
 // Aircraft data API with comprehensive realistic data
-const aircraftDatabase = {
-  "A318": { 
-    type: "A318", manufacturer: "Airbus", maxSeats: 132, range: 3100, maxSpeed: 500, cruiseSpeed: 447, 
-    engines: 2, fuelCapacity: 24210, maxTakeoffWeight: 68000, maxLandingWeight: 57500, 
-    wingspan: 34.1, length: 31.4, height: 12.6, serviceCeiling: 39100, engineType: "V2500/CFM56",
-    category: "narrow-body", firstFlight: "2002", variants: ["A318-100"]
-  },
-  "A319": { 
-    type: "A319", manufacturer: "Airbus", maxSeats: 156, range: 3700, maxSpeed: 500, cruiseSpeed: 447,
-    engines: 2, fuelCapacity: 24210, maxTakeoffWeight: 75500, maxLandingWeight: 62500,
-    wingspan: 35.8, length: 33.8, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
-    category: "narrow-body", firstFlight: "1995", variants: ["A319-100", "A319neo"]
-  },
-  "A320": { 
-    type: "A320", manufacturer: "Airbus", maxSeats: 180, range: 3300, maxSpeed: 500, cruiseSpeed: 447,
-    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 78000, maxLandingWeight: 66000,
-    wingspan: 35.8, length: 37.6, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
-    category: "narrow-body", firstFlight: "1987", variants: ["A320-200", "A320neo"]
-  },
-  "A321": { 
-    type: "A321", manufacturer: "Airbus", maxSeats: 220, range: 3200, maxSpeed: 500, cruiseSpeed: 447,
-    engines: 2, fuelCapacity: 32940, maxTakeoffWeight: 93500, maxLandingWeight: 77800,
-    wingspan: 35.8, length: 44.5, height: 11.8, serviceCeiling: 39100, engineType: "V2500/CFM56",
-    category: "narrow-body", firstFlight: "1993", variants: ["A321-200", "A321neo", "A321XLR"]
-  },
-  "A330": { 
-    type: "A330", manufacturer: "Airbus", maxSeats: 440, range: 7250, maxSpeed: 560, cruiseSpeed: 520,
-    engines: 2, fuelCapacity: 139090, maxTakeoffWeight: 242000, maxLandingWeight: 187000,
-    wingspan: 60.3, length: 63.7, height: 16.9, serviceCeiling: 41000, engineType: "Trent 700/CF6-80E",
-    category: "wide-body", firstFlight: "1992", variants: ["A330-200", "A330-300", "A330-900neo"]
-  },
-  "A340": { 
-    type: "A340", manufacturer: "Airbus", maxSeats: 440, range: 9000, maxSpeed: 560, cruiseSpeed: 520,
-    engines: 4, fuelCapacity: 195300, maxTakeoffWeight: 380000, maxLandingWeight: 265000,
-    wingspan: 63.5, length: 75.4, height: 17.1, serviceCeiling: 41000, engineType: "Trent 500/CFM56",
-    category: "wide-body", firstFlight: "1991", variants: ["A340-200", "A340-300", "A340-500", "A340-600"]
-  },
-  "A350": { 
-    type: "A350", manufacturer: "Airbus", maxSeats: 440, range: 8100, maxSpeed: 560, cruiseSpeed: 520,
-    engines: 2, fuelCapacity: 138000, maxTakeoffWeight: 316000, maxLandingWeight: 213000,
-    wingspan: 64.8, length: 66.8, height: 17.1, serviceCeiling: 43000, engineType: "Trent XWB",
-    category: "wide-body", firstFlight: "2013", variants: ["A350-900", "A350-1000"]
-  },
-  "A380": { 
-    type: "A380", manufacturer: "Airbus", maxSeats: 850, range: 8000, maxSpeed: 560, cruiseSpeed: 520,
-    engines: 4, fuelCapacity: 84535, maxTakeoffWeight: 575000, maxLandingWeight: 394000,
-    wingspan: 79.8, length: 72.7, height: 24.1, serviceCeiling: 43000, engineType: "Trent 900/GP7200",
-    category: "double-decker", firstFlight: "2005", variants: ["A380-800"]
-  },
-  "B737-700": { 
-    type: "B737-700", manufacturer: "Boeing", maxSeats: 149, range: 3365, maxSpeed: 514, cruiseSpeed: 453,
-    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 70080, maxLandingWeight: 58060,
-    wingspan: 35.8, length: 33.6, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
-    category: "narrow-body", firstFlight: "1997", variants: ["B737-700", "B737-700ER"]
-  },
-  "B737-800": { 
-    type: "B737-800", manufacturer: "Boeing", maxSeats: 189, range: 2935, maxSpeed: 514, cruiseSpeed: 453,
-    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 79010, maxLandingWeight: 66360,
-    wingspan: 35.8, length: 39.5, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
-    category: "narrow-body", firstFlight: "1997", variants: ["B737-800", "B737-800BCF"]
-  },
-  "B737-900": { 
-    type: "B737-900", manufacturer: "Boeing", maxSeats: 220, range: 2800, maxSpeed: 514, cruiseSpeed: 453,
-    engines: 2, fuelCapacity: 26020, maxTakeoffWeight: 85130, maxLandingWeight: 71210,
-    wingspan: 35.8, length: 42.1, height: 12.5, serviceCeiling: 41000, engineType: "CFM56-7B",
-    category: "narrow-body", firstFlight: "2000", variants: ["B737-900", "B737-900ER"]
-  },
-  "B747-400": { 
-    type: "B747-400", manufacturer: "Boeing", maxSeats: 660, range: 7260, maxSpeed: 570, cruiseSpeed: 533,
-    engines: 4, fuelCapacity: 216840, maxTakeoffWeight: 412775, maxLandingWeight: 295745,
-    wingspan: 64.4, length: 70.7, height: 19.4, serviceCeiling: 43000, engineType: "CF6-80C2/PW4000",
-    category: "wide-body", firstFlight: "1988", variants: ["B747-400", "B747-400ER", "B747-400F"]
-  },
-  "B747-8": { 
-    type: "B747-8", manufacturer: "Boeing", maxSeats: 700, range: 7730, maxSpeed: 570, cruiseSpeed: 533,
-    engines: 4, fuelCapacity: 238610, maxTakeoffWeight: 447700, maxLandingWeight: 346091,
-    wingspan: 68.4, length: 76.3, height: 19.4, serviceCeiling: 43000, engineType: "GEnx-2B67",
-    category: "wide-body", firstFlight: "2010", variants: ["B747-8I", "B747-8F"]
-  },
-  "B777-200": { 
-    type: "B777-200", manufacturer: "Boeing", maxSeats: 440, range: 5240, maxSpeed: 560, cruiseSpeed: 493,
-    engines: 2, fuelCapacity: 117348, maxTakeoffWeight: 297550, maxLandingWeight: 201840,
-    wingspan: 60.9, length: 63.7, height: 18.5, serviceCeiling: 43100, engineType: "GE90/PW4000/Trent 800",
-    category: "wide-body", firstFlight: "1994", variants: ["B777-200", "B777-200ER", "B777-200LR"]
-  },
-  "B777-300": { 
-    type: "B777-300", manufacturer: "Boeing", maxSeats: 550, range: 5845, maxSpeed: 560, cruiseSpeed: 493,
-    engines: 2, fuelCapacity: 181280, maxTakeoffWeight: 351500, maxLandingWeight: 251290,
-    wingspan: 64.8, length: 73.9, height: 18.5, serviceCeiling: 43100, engineType: "GE90-115B/Trent 800",
-    category: "wide-body", firstFlight: "1997", variants: ["B777-300", "B777-300ER"]
-  },
-  "B787-8": { 
-    type: "B787-8", manufacturer: "Boeing", maxSeats: 330, range: 7355, maxSpeed: 560, cruiseSpeed: 488,
-    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 227930, maxLandingWeight: 172365,
-    wingspan: 60.1, length: 56.7, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
-    category: "wide-body", firstFlight: "2009", variants: ["B787-8"]
-  },
-  "B787-9": { 
-    type: "B787-9", manufacturer: "Boeing", maxSeats: 420, range: 7635, maxSpeed: 560, cruiseSpeed: 488,
-    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 254011, maxLandingWeight: 192776,
-    wingspan: 60.1, length: 62.8, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
-    category: "wide-body", firstFlight: "2013", variants: ["B787-9"]
-  },
-  "B787-10": { 
-    type: "B787-10", manufacturer: "Boeing", maxSeats: 440, range: 6430, maxSpeed: 560, cruiseSpeed: 488,
-    engines: 2, fuelCapacity: 126206, maxTakeoffWeight: 254011, maxLandingWeight: 192776,
-    wingspan: 60.1, length: 68.3, height: 16.9, serviceCeiling: 43000, engineType: "GEnx-1B/Trent 1000",
-    category: "wide-body", firstFlight: "2017", variants: ["B787-10"]
-  }
-};</old_str>
-<new_str>// Aircraft data API with comprehensive realistic data
 const aircraftDatabase = {
   "A318": { 
     type: "A318", manufacturer: "Airbus", maxSeats: 132, range: 3100, maxSpeed: 500, cruiseSpeed: 447, 
@@ -491,7 +380,7 @@ const aircraftDatabase = {
 app.get('/api/aircraft/:type', (req, res) => {
   const aircraftType = req.params.type;
   const aircraftInfo = aircraftDatabase[aircraftType];
-  
+
   if (aircraftInfo) {
     res.json(aircraftInfo);
   } else {
@@ -605,7 +494,7 @@ io.on("connection", (socket) => {
     if (msg.airport && airportData[msg.airport]) {
       msg.airport = msg.airport; // Ensure airport is preserved in message
       io.to(msg.airport).emit("chatUpdate", msg);
-      
+
       // Log chat messages to console
       console.log(`💬 [${msg.airport}] ${msg.sender} (${msg.stand || 'GROUND'}): ${msg.text}`);
     }
@@ -673,7 +562,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     const userInfo = connectedUsers.get(socket.id);
-    
+
     if (userInfo && userInfo.userId) {
       console.log(`❌ User disconnected: ${userInfo.userId} (Discord ID) from ${userInfo.airport || 'unknown airport'} - was ${userInfo.mode || 'unknown role'}`);
     } else {
@@ -695,11 +584,11 @@ io.on("connection", (socket) => {
             timestamp: new Date().toLocaleTimeString(),
             mode: "system"
           });
-          
+
           console.log(`🏢 Stand released: ${stand} at ${userInfo.airport} (was ${info.pilot})`);
         }
       }
-      
+
       // Remove user from airport data
       airportData[userInfo.airport].users.delete(socket.id);
     }
