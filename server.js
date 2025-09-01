@@ -51,6 +51,7 @@ passport.deserializeUser((user, done) => {
 let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {} } }
 let connectedUsers = new Map();
 let ptfsAtisData = {}; // Store real ATIS data from PTFS
+const claimedCallsigns = {}; // Store callsign data
 
 // Parse ATIS content to extract useful information
 const parseAtisContent = (atisInfo) => {
