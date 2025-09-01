@@ -446,42 +446,31 @@ export default function App() {
             </div>
           </div>
 
-          {selectedAirport && (
-            <div className="role-selector">
-              <div className="airport-confirmation">
-                <h3>Airport Selected: {selectedAirport}</h3>
-                <div className="confirmation-details">
-                  <span>Stands Available: {getAirportConfig(selectedAirport).stands.length}</span>
-                  <span>Status: OPERATIONAL</span>
-                </div>
-              </div>
-              <h2>SELECT ROLE</h2>
-              <div className="role-cards">
-                <button 
-                  onClick={() => {
-                    console.log('Pilot role clicked for airport:', selectedAirport);
-                    selectMode("pilot", selectedAirport);
-                  }} 
-                  className="role-card pilot"
-                >
-                  <div className="role-icon">👨‍✈️</div>
-                  <div className="role-title">FLIGHT CREW</div>
-                  <div className="role-description">Request ground services & manage flight operations</div>
-                </button>
-                <button 
-                  onClick={() => {
-                    console.log('Ground crew role clicked for airport:', selectedAirport);
-                    selectMode("groundcrew", selectedAirport);
-                  }} 
-                  className="role-card groundcrew"
-                >
-                  <div className="role-icon">👷‍♂️</div>
-                  <div className="role-title">GROUND OPERATIONS</div>
-                  <div className="role-description">Handle service requests & manage ground operations</div>
-                </button>
-              </div>
+          <div className="role-selector">
+            <h2>SELECT ROLE</h2>
+            <div className="role-cards">
+              <button
+                onClick={() => selectMode("pilot", selectedAirport)}
+                className="role-card pilot"
+                disabled={!selectedAirport}
+              >
+                <div className="role-icon">👨‍✈️</div>
+                <div className="role-title">FLIGHT CREW</div>
+                <div className="role-description">Request ground services & manage flight operations</div>
+                {!selectedAirport && <div className="role-overlay">SELECT AIRPORT FIRST</div>}
+              </button>
+              <button
+                onClick={() => selectMode("groundcrew", selectedAirport)}
+                className="role-card groundcrew"
+                disabled={!selectedAirport}
+              >
+                <div className="role-icon">👷‍♂️</div>
+                <div className="role-title">GROUND OPERATIONS</div>
+                <div className="role-description">Handle service requests & manage ground operations</div>
+                {!selectedAirport && <div className="role-overlay">SELECT AIRPORT FIRST</div>}
+              </button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     );

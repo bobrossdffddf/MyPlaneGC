@@ -465,6 +465,36 @@ body {
   border-color: #ff9500;
 }
 
+.role-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.role-card:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.role-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ff9500;
+  border-radius: 20px;
+  pointer-events: none;
+}
+
 .role-icon {
   font-size: 3rem;
   margin-bottom: 20px;
