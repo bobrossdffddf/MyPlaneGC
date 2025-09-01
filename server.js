@@ -156,8 +156,9 @@ connectToPTFSWebSocket();
 // Serve frontend build
 app.use(express.static(path.join(__dirname, "dist")));
 
-// Serve aircraft SVGs
+// Serve aircraft SVGs and 3D models
 app.use('/aircraft_svgs', express.static(path.join(__dirname, 'aircraft_svgs')));
+app.use('/aircraft_models', express.static(path.join(__dirname, 'aircraft_models')));
 
 // Auth routes
 app.get('/auth/discord', passport.authenticate('discord'));

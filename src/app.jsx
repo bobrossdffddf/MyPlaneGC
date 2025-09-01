@@ -20,7 +20,7 @@ export default function App() {
   const [selectedAirport, setSelectedAirport] = useState("");
   const [activeTab, setActiveTab] = useState("main");
   const [activeChecklistPhase, setActiveChecklistPhase] = useState("preflight");
-  const [aircraftSvg, setAircraftSvg] = useState("");
+  const [aircraftModel, setAircraftModel] = useState("");
   const [aircraftData, setAircraftData] = useState(null);
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
@@ -29,23 +29,6 @@ export default function App() {
     runway: '27 ACTIVE',
     conditions: 'CAVOK',
     temperature: '15°C'
-  });
-  
-  const [weatherRadar, setWeatherRadar] = useState({
-    visibility: '10+',
-    clouds: 'FEW025 SCT080',
-    precipitation: 'NONE',
-    turbulence: 'LIGHT',
-    windShear: 'NIL'
-  });
-  
-  const [flightTracking, setFlightTracking] = useState({
-    departure: null,
-    arrival: null,
-    route: 'DIRECT',
-    estimatedTime: null,
-    actualTime: null,
-    delay: 0
   });
   const [checklists, setChecklists] = useState({
     preflight: [
@@ -154,23 +137,33 @@ export default function App() {
     return getAirportConfig(selectedAirport).stands;
   };
 
-  // Load aircraft SVG and data when aircraft type changes
+  // Load aircraft 3D model and data when aircraft type changes
   useEffect(() => {
     if (aircraft) {
-      // Fetch aircraft SVG
-      fetch(`/aircraft_svgs/${aircraft}.svg`)
-        .then(response => {
-          if (response.ok) {
-            return response.text();
+      // Check for 3D model files (GLB, GLTF, or OBJ)
+      const modelFormats = ['glb', 'gltf', 'obj'];
+      let modelFound = false;
+
+      const tryLoadModel = async () => {
+        for (const format of modelFormats) {
+          try {
+            const response = await fetch(`/aircraft_models/${aircraft}.${format}`);
+            if (response.ok) {
+              setAircraftModel(`/aircraft_models/${aircraft}.${format}`);
+              modelFound = true;
+              break;
+            }
+          } catch (error) {
+            // Continue to next format
           }
-          throw new Error('SVG not found');
-        })
-        .then(svgText => {
-          setAircraftSvg(svgText);
-        })
-        .catch(() => {
-          setAircraftSvg(""); // Use default if custom SVG not found
-        });
+        }
+        
+        if (!modelFound) {
+          setAircraftModel(""); // Use default if no 3D model found
+        }
+      };
+
+      tryLoadModel();
 
       // Fetch aircraft data from API
       fetch(`/api/aircraft/${aircraft}`)
@@ -196,7 +189,7 @@ export default function App() {
           });
         });
     } else {
-      setAircraftSvg("");
+      setAircraftModel("");
       setAircraftData(null);
     }
   }, [aircraft]);
@@ -360,11 +353,25 @@ export default function App() {
   };
 
   const renderAircraftDisplay = () => {
-    if (aircraftSvg) {
+    if (aircraftModel) {
       return (
         <div className="aircraft-display-3d">
           <div className="aircraft-3d-container">
-            <div dangerouslySetInnerHTML={{ __html: aircraftSvg }} className="custom-aircraft-svg rotating-3d" />
+            <div className="aircraft-3d-viewer">
+              <model-viewer
+                src={aircraftModel}
+                alt={`${aircraft} 3D model`}
+                auto-rotate
+                camera-controls
+                environment-image="neutral"
+                shadow-intensity="1"
+                style={{
+                  width: '100%',
+                  height: '400px',
+                  background: 'transparent'
+                }}
+              ></model-viewer>
+            </div>
             <div className="aircraft-shadow"></div>
           </div>
           {aircraftData && (
@@ -663,139 +670,6 @@ export default function App() {
                       </label>
                     </div>
                   ))}
-                </div>
-              </div>
-            </div>
-          );
-
-        case "weather":
-          return (
-            <div className="weather-container">
-              <div className="weather-section">
-                <h2>WEATHER RADAR & CONDITIONS</h2>
-                <div className="weather-grid">
-                  <div className="weather-card">
-                    <h3>CURRENT CONDITIONS</h3>
-                    <div className="weather-data">
-                      <div className="weather-item">
-                        <span className="weather-label">VISIBILITY:</span>
-                        <span className="weather-value">{weatherRadar.visibility} km</span>
-                      </div>
-                      <div className="weather-item">
-                        <span className="weather-label">CLOUDS:</span>
-                        <span className="weather-value">{weatherRadar.clouds}</span>
-                      </div>
-                      <div className="weather-item">
-                        <span className="weather-label">PRECIPITATION:</span>
-                        <span className="weather-value">{weatherRadar.precipitation}</span>
-                      </div>
-                      <div className="weather-item">
-                        <span className="weather-label">TURBULENCE:</span>
-                        <span className="weather-value">{weatherRadar.turbulence}</span>
-                      </div>
-                      <div className="weather-item">
-                        <span className="weather-label">WIND SHEAR:</span>
-                        <span className="weather-value">{weatherRadar.windShear}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="weather-card">
-                    <h3>ATIS INFORMATION</h3>
-                    <div className="atis-display">
-                      <div className="atis-code">{atisData.info}</div>
-                      <div className="atis-details">
-                        <div>Wind: {atisData.wind}</div>
-                        <div>QNH: {atisData.qnh}</div>
-                        <div>Runway: {atisData.runway}</div>
-                        <div>Temp: {atisData.temperature}</div>
-                        <div>Conditions: {atisData.conditions}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="weather-card">
-                    <h3>RADAR DISPLAY</h3>
-                    <div className="radar-screen">
-                      <div className="radar-sweep"></div>
-                      <div className="radar-grid">
-                        <div className="radar-ring"></div>
-                        <div className="radar-ring"></div>
-                        <div className="radar-ring"></div>
-                      </div>
-                      <div className="weather-echo green" style={{top: '30%', left: '40%'}}></div>
-                      <div className="weather-echo yellow" style={{top: '60%', left: '70%'}}></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-
-        case "tracking":
-          return (
-            <div className="tracking-container">
-              <div className="tracking-section">
-                <h2>FLIGHT TRACKING & PERFORMANCE</h2>
-                <div className="tracking-grid">
-                  <div className="tracking-card">
-                    <h3>FLIGHT PLAN</h3>
-                    <div className="flight-plan-data">
-                      <div className="route-display">
-                        <div className="route-point">
-                          <span className="point-label">DEPARTURE:</span>
-                          <span className="point-value">{selectedAirport}</span>
-                        </div>
-                        <div className="route-line"></div>
-                        <div className="route-point">
-                          <span className="point-label">ARRIVAL:</span>
-                          <span className="point-value">{flightTracking.arrival || 'NOT SET'}</span>
-                        </div>
-                      </div>
-                      <div className="route-info">
-                        <div>Route: {flightTracking.route}</div>
-                        <div>Est. Time: {flightTracking.estimatedTime || 'CALCULATING'}</div>
-                        <div>Delay: {flightTracking.delay} min</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="tracking-card">
-                    <h3>PERFORMANCE DATA</h3>
-                    {aircraftData && (
-                      <div className="performance-data">
-                        <div className="perf-item">
-                          <span className="perf-label">OPTIMAL CRUISE FL:</span>
-                          <span className="perf-value">FL{Math.floor(aircraftData.serviceCeiling / 100)}</span>
-                        </div>
-                        <div className="perf-item">
-                          <span className="perf-label">FUEL CONSUMPTION:</span>
-                          <span className="perf-value">{Math.round(aircraftData.fuelCapacity / aircraftData.range * 100)} L/100NM</span>
-                        </div>
-                        <div className="perf-item">
-                          <span className="perf-label">CLIMB PERFORMANCE:</span>
-                          <span className="perf-value">{aircraftData.climbRate} ft/min</span>
-                        </div>
-                        <div className="perf-item">
-                          <span className="perf-label">WEIGHT RATIO:</span>
-                          <span className="perf-value">{Math.round((aircraftData.operatingEmptyWeight / aircraftData.maxTakeoffWeight) * 100)}%</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="tracking-card">
-                    <h3>LIVE TRACKING</h3>
-                    <div className="tracking-map">
-                      <div className="map-display">
-                        <div className="aircraft-position">
-                          <div className="aircraft-icon">✈️</div>
-                          <div className="position-info">
-                            <div>ALT: FL000</div>
-                            <div>SPD: 0 kt</div>
-                            <div>HDG: 000°</div>
-                          </div>
-                        </div>
-                        <div className="waypoint origin">{selectedAirport}</div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -1310,20 +1184,6 @@ export default function App() {
           >
             <span className="nav-icon">✅</span>
             <span>CHECKLISTS</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'weather' ? 'active' : ''}`}
-            onClick={() => setActiveTab('weather')}
-          >
-            <span className="nav-icon">🌦️</span>
-            <span>WEATHER</span>
-          </button>
-          <button
-            className={`nav-btn ${activeTab === 'tracking' ? 'active' : ''}`}
-            onClick={() => setActiveTab('tracking')}
-          >
-            <span className="nav-icon">📡</span>
-            <span>TRACKING</span>
           </button>
         </div>
       )}
