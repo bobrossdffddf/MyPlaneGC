@@ -378,21 +378,20 @@ export default function App() {
     );
   }
 
-  if (!userMode || !selectedAirport) {
-    console.log('Mode selection screen - userMode:', userMode, 'selectedAirport:', selectedAirport);
+  if (!selectedAirport) {
     return (
       <div className="tablet-mode-select">
         <div className="mode-select-content">
           <div className="welcome-header">
-            <h1>ROLE & AIRPORT SELECTION</h1>
-            <div className="user-welcome">Welcome, {user.username}</div>
+            <h1>AIRPORT SELECTION</h1>
+            <div className="user-welcome">Welcome, {user.username} - Select your airport</div>
           </div>
 
           <div className="airport-selector">
             <div className="airport-header">
               <div className="airport-header-icon">🛩️</div>
-              <h2>AIRPORT SELECTION TERMINAL</h2>
-              <div className="airport-header-subtitle">PTFS GLOBAL OPERATIONS NETWORK</div>
+              <h2>PTFS AIRPORT NETWORK</h2>
+              <div className="airport-header-subtitle">Select an airport to begin operations</div>
             </div>
             
             <div className="airport-status-bar">
@@ -401,48 +400,43 @@ export default function App() {
               <div className="network-status">24 AIRPORTS ONLINE</div>
             </div>
 
-            <div className="airport-grid-industrial">
+            <div className="airport-grid-modern">
               {ptfsAirports.map((airport) => (
-                <div
+                <button
                   key={airport}
-                  className={`airport-terminal ${selectedAirport === airport ? 'selected' : ''}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Airport clicked:', airport);
-                    setSelectedAirport(airport);
-                  }}
+                  className="airport-card"
+                  onClick={() => setSelectedAirport(airport)}
                 >
-                  <div className="terminal-header">
-                    <div className="terminal-indicator"></div>
-                    <div className="terminal-code" style={{pointerEvents: 'none'}}>{airport}</div>
-                    <div className="terminal-status">
-                      <div className="status-light active"></div>
-                      <span>ACTIVE</span>
-                    </div>
+                  <div className="airport-code">{airport}</div>
+                  <div className="airport-info">
+                    <div className="stands-count">{getAirportConfig(airport).stands.length} Stands</div>
+                    <div className="frequency">121.{(Math.random() * 900 + 100).toFixed(0)}</div>
                   </div>
-                  
-                  <div className="terminal-info">
-                    <div className="info-row">
-                      <span className="info-label">STANDS:</span>
-                      <span className="info-value">{getAirportConfig(airport).stands.length}</span>
-                    </div>
-                    <div className="info-row">
-                      <span className="info-label">FREQ:</span>
-                      <span className="info-value">121.{(Math.random() * 900 + 100).toFixed(0)}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="terminal-selection">
-                    {selectedAirport === airport && (
-                      <div className="selection-indicator">
-                        <div className="selection-pulse"></div>
-                        <span>SELECTED</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  <div className="status-indicator active"></div>
+                </button>
               ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userMode) {
+    return (
+      <div className="tablet-mode-select">
+        <div className="mode-select-content">
+          <div className="welcome-header">
+            <h1>ROLE SELECTION</h1>
+            <div className="user-welcome">Airport: {selectedAirport} - Select your role</div>
+          </div>
+
+          <div className="airport-confirmation">
+            <h3>AIRPORT CONFIRMED: {selectedAirport}</h3>
+            <div className="confirmation-details">
+              <span>Stands Available</span>
+              <span>Ground Frequency Active</span>
+              <span>Systems Operational</span>
             </div>
           </div>
 
@@ -452,24 +446,36 @@ export default function App() {
               <button
                 onClick={() => selectMode("pilot", selectedAirport)}
                 className="role-card pilot"
-                disabled={!selectedAirport}
               >
                 <div className="role-icon">👨‍✈️</div>
                 <div className="role-title">FLIGHT CREW</div>
                 <div className="role-description">Request ground services & manage flight operations</div>
-                {!selectedAirport && <div className="role-overlay">SELECT AIRPORT FIRST</div>}
               </button>
               <button
                 onClick={() => selectMode("groundcrew", selectedAirport)}
                 className="role-card groundcrew"
-                disabled={!selectedAirport}
               >
                 <div className="role-icon">👷‍♂️</div>
                 <div className="role-title">GROUND OPERATIONS</div>
                 <div className="role-description">Handle service requests & manage ground operations</div>
-                {!selectedAirport && <div className="role-overlay">SELECT AIRPORT FIRST</div>}
               </button>
             </div>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '30px' }}>
+            <button 
+              onClick={() => setSelectedAirport("")} 
+              style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '12px',
+                padding: '10px 20px',
+                color: '#ef4444',
+                cursor: 'pointer'
+              }}
+            >
+              CHANGE AIRPORT
+            </button>
           </div>
         </div>
       </div>

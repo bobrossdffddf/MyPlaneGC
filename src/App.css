@@ -2021,13 +2021,88 @@ body {
   max-width: 100%;
 }
 
-/* Airport Grid Responsive */
+/* Modern Airport Selection */
 .airport-grid-modern {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
   margin-bottom: 50px;
   max-width: 100%;
+}
+
+.airport-card {
+  background: linear-gradient(135deg, rgba(26, 31, 46, 0.95), rgba(34, 39, 54, 0.95));
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 25px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  text-align: center;
+  color: white;
+  font-family: inherit;
+  outline: none;
+}
+
+.airport-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.airport-card:hover::before {
+  left: 100%;
+}
+
+.airport-card:hover {
+  border-color: rgba(255, 149, 0, 0.6);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(255, 149, 0, 0.2);
+}
+
+.airport-card:active {
+  transform: translateY(-2px);
+  border-color: #ff9500;
+}
+
+.airport-code {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ff9500;
+  margin-bottom: 15px;
+  font-family: 'SF Mono', monospace;
+  letter-spacing: 0.1em;
+}
+
+.airport-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.stands-count {
+  font-size: 0.9rem;
+  color: #a0a8b0;
+  font-weight: 500;
+}
+
+.frequency {
+  font-size: 0.8rem;
+  color: #ffffff;
+  font-family: 'SF Mono', monospace;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 149, 0, 0.2);
 }
 
 /* Stands Grid Responsive */
