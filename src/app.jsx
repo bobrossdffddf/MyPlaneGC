@@ -659,38 +659,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="flight-planning-section">
-                <h2>FLIGHT PLANNING</h2>
-                <div className="planning-grid">
-                  <div className="planning-item">
-                    <label>DEPARTURE TIME</label>
-                    <input type="time" className="planning-input" defaultValue="14:30" />
-                  </div>
-                  <div className="planning-item">
-                    <label>DESTINATION</label>
-                    <select className="planning-select">
-                      <option value="">SELECT DESTINATION</option>
-                      {ptfsAirports.filter(apt => apt !== selectedAirport).map(airport => (
-                        <option key={airport} value={airport}>{airport}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="planning-item">
-                    <label>FLIGHT LEVEL</label>
-                    <select className="planning-select">
-                      <option value="FL100">FL100</option>
-                      <option value="FL200">FL200</option>
-                      <option value="FL300">FL300</option>
-                      <option value="FL350">FL350</option>
-                      <option value="FL390">FL390</option>
-                    </select>
-                  </div>
-                  <div className="planning-item">
-                    <label>ROUTE</label>
-                    <input type="text" className="planning-input" placeholder="DIRECT" />
-                  </div>
-                </div>
-              </div>
+              
 
               <div className="services-section">
                 <h2>GROUND SERVICES</h2>
