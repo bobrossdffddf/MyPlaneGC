@@ -340,64 +340,64 @@ export default function App() {
       sections: [
         {
           title: "Standard Marshalling Positions",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iN0YiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5NQVJTSEFSSU5HIFBPU0lUSU9OUzwvdGV4dD4KPHN2ZyB4PSI1MCIgeT0iNzAiIHdpZHRoPSIxMDAiIGhlaWdodD0iMTUwIj4KICA8cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMzMzMyIgc3Ryb2tlPSIjZmY5NTAwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI1MCIgeT0iNTUiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkFJUkNSQUZUPC90ZXh0PgogIDxjaXJjbGUgY3g9IjUwIiBjeT0iMTMwIiByPSI4IiBmaWxsPSIjZmY5NTAwIi8+CiAgPHRleHQgeD0iNTAiIHk9IjE1NSIgZmlsbD0iI2Y5NTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEyIj5NQVJTSGFMT0xFUjwvdGV4dD4KPC9zdmc+CjxzdmcgeD0iMjAwIiB5PSI3MCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxNTAiPgogIDxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMzMzMzMzIiBzdHJva2U9IiNmZjk1MDAiIHN0cm9rZS13aWR0aD0iMiIvPgogIDx0ZXh0IHg9IjUwIiB5PSI1NSIgZmlsbD0iI2ZmZmZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QUlSQ1JBRlQ8L3RleHQ+CiAgPGNpcmNsZSBjeD0iMjAiIGN5PSIxMzAiIHI9IjgiIGZpbGw9IiNmZjk1MDAiLz4KICA8dGV4dCB4PSIyMCIgeT0iMTU1IiBmaWxsPSIjZmY5NTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjEwIj5MSUVSPC90ZXh0Pgo8L3N2Zz4KPHN2ZyB4PSI1MCIgeT0iMjQwIiB3aWR0aD0iMzAwIiBoZWlnaHQ9IjUwIj4KICA8dGV4dCB4PSIwIiB5PSIyMCIgZmlsbD0iI2EwYThiMCIgZm9udC1zaXplPSIxMiI+TWFyc2hhbGxlcjogRGlyZWN0bHkgaW4gZnJvbnQgb2YgYWlyY3JhZnQ8L3RleHQ+CiAgPHRleHQgeD0iMCIgeT0iNDAiIGZpbGw9IiNhMGE4YjAiIGZvbnQtc2l6ZT0iMTIiPldpbmcgV2Fsa2VyOiBPbiB3aW5nIHRpcCBzaWRlPC90ZXh0Pgo8L3N2Zz4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop",
           steps: [
-            "Marshaller positions directly in front of aircraft nose",
-            "Wing walkers position at wingtips during taxi operations",
-            "Maintain visual contact with pilot at all times",
-            "Use standard ICAO hand signals only",
-            "Wear high-visibility reflective vest and have backup lighting",
-            "Ensure clear escape route in case of emergency",
-            "Position ground crew vehicles outside aircraft movement area"
+            "Marshaller positions directly in front of aircraft nose, minimum 15 feet",
+            "Wing walkers position at wingtips during taxi operations in congested areas", 
+            "Maintain constant visual contact with pilot throughout operation",
+            "Use only standardized ICAO hand signals - no improvisation",
+            "Wear high-visibility reflective vest and carry backup lighting equipment",
+            "Always plan and maintain clear escape route in case of emergency",
+            "Ensure all ground crew vehicles remain outside aircraft movement envelope"
           ]
         },
         {
           title: "Hand Signals - Movement Control",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5IQU5EIFNJR05BTFMgLSBNT1ZFTUVOVDWVC3RleHQ+PC9zdmc+",
+          image: "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=400&h=300&fit=crop",
           steps: [
-            "COME FORWARD: Both arms above head, palms facing forward, wave toward body",
-            "MOVE BACK: Both arms above head, palms facing outward, wave away from body",
-            "TURN LEFT: Right arm down, left arm extended pointing left direction",
-            "TURN RIGHT: Left arm down, right arm extended pointing right direction",
-            "NORMAL STOP: Arms crossed above head in X formation",
-            "EMERGENCY STOP: Arms crossed above head with rapid waving motion",
-            "SLOW DOWN: Arms extended downward, palms down, gentle up/down motion"
+            "COME FORWARD: Both arms raised above head, palms facing forward, wave toward your body with deliberate motion",
+            "MOVE BACK: Both arms raised above head, palms facing outward, wave aircraft away from you",
+            "TURN LEFT (aircraft's left): Right arm down at side, left arm extended horizontally pointing left",
+            "TURN RIGHT (aircraft's right): Left arm down at side, right arm extended horizontally pointing right", 
+            "NORMAL STOP: Arms crossed above head forming clear X formation, hold steady",
+            "EMERGENCY STOP: Arms crossed above head with rapid, urgent waving motion",
+            "SLOW DOWN: Arms extended downward at 45°, palms down, gentle rhythmic up/down motion"
           ]
         },
         {
-          title: "Engine and System Signals",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5FTkdJTkUgJiBTWVNURU0gU0lHTkFMUzwvdGV4dD4KPC9zdmc+",
+          title: "Engine and System Signals", 
+          image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop",
           steps: [
-            "START ENGINES: Circular motion with right hand above head",
-            "SHUT DOWN ENGINES: Hand across throat in cutting motion",
-            "CHOCKS IN: Hands moving toward each other at ground level",
-            "CHOCKS OUT: Hands moving away from each other at ground level",
-            "CONNECT GROUND POWER: Point to ground power receptacle, then thumbs up",
-            "DISCONNECT GROUND POWER: Point to ground power, then slashing motion",
-            "ALL CLEAR: Both arms extended outward horizontally, then lowered"
+            "START ENGINES: Circular motion with right hand above head, pointing to specific engine",
+            "SHUT DOWN ENGINES: Hand drawn across throat in decisive cutting motion", 
+            "CHOCKS IN: Both hands at waist level moving toward each other",
+            "CHOCKS OUT: Both hands at waist level moving away from each other",
+            "CONNECT GROUND POWER: Point to ground power receptacle, then clear thumbs up",
+            "DISCONNECT GROUND POWER: Point to ground power unit, then slashing motion across body",
+            "ALL CLEAR: Both arms extended outward horizontally, then swept downward"
           ]
         },
         {
-          title: "Gate Positioning Signals",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5HQVRFIFBPU0lUSU9OSU5HPC90ZXh0Pgo8L3N2Zz4=",
+          title: "Gate Positioning and Final Parking",
+          image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=300&fit=crop", 
           steps: [
-            "Use precise hand movements for final positioning",
-            "Monitor wingtip clearance continuously during approach",
-            "Signal 'STOP' when aircraft reaches parking line marker",
-            "Verify nose gear is on centerline before final stop signal",
-            "Check jetbridge alignment before giving final positioning",
-            "Give 'SET PARKING BRAKE' signal after complete stop",
-            "Wait for pilot confirmation before approaching aircraft"
+            "Use precise, deliberate hand movements during final 50 feet of approach",
+            "Continuously monitor wingtip clearance and jetbridge alignment",
+            "Give clear STOP signal when aircraft nose gear reaches parking position marker",
+            "Verify nose gear is precisely on gate centerline before final stop",
+            "Check jetbridge can be safely positioned before final parking approval",
+            "Signal SET PARKING BRAKE with both hands pushing down motion", 
+            "Wait for pilot acknowledgment before approaching aircraft or signaling ground crew"
           ]
         }
       ]
     },
     fueling: {
-      title: "Aircraft Fueling Procedures by Type",
+      title: "Aircraft Fueling Procedures",
       sections: [
         {
-          title: "Pre-Fueling Safety Protocol",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5GVUVMIFNBRkVUWSBQUk9UT0NPTDWVC3RleHQ+PC9zdmc+",
+          title: "Pre-Fueling Safety Protocol", 
+          image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
           steps: [
             "Verify aircraft engines completely shut down and cooled (minimum 15 minutes)",
             "Establish proper grounding bond between fuel truck and aircraft",
@@ -405,13 +405,13 @@ export default function App() {
             "Post 'NO SMOKING' signs and establish 50-foot safety perimeter",
             "Confirm fire extinguisher (minimum 150lb CO2 or equivalent) is present",
             "Test all fuel equipment for leaks and proper operation",
-            "Verify fuel truck positioning allows safe escape routes",
+            "Check fuel truck positioning allows safe escape routes",
             "Check for any hot work or sources of ignition in area"
           ]
         },
         {
           title: "Narrow Body Aircraft (A320, B737) Fueling",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5OQVJST1cgQk9EWSBGVUVMSU5HPC90ZXh0Pgo8L3N2Zz4=",
+          image: "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=400&h=300&fit=crop",
           steps: [
             "Locate fuel panel on right side of fuselage (typically behind wing)",
             "Open fuel panel and identify fuel connections (overwing or pressure)",
@@ -424,8 +424,8 @@ export default function App() {
           ]
         },
         {
-          title: "Wide Body Aircraft (A330, B777, B747) Fueling",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjAiIGZvbnQtd2VpZ2h0PSJib2xkIj5XSURFIEJPRE7SBGVUVMSUSUcKIGZadGV4dD4KPC9zdmc+",
+          title: "Wide Body Aircraft (A330, B777, B747) Fueling", 
+          image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
           steps: [
             "Position multiple fuel trucks for larger aircraft (up to 3 trucks for B747)",
             "Locate fuel panels on both sides of aircraft - typically 2-3 connections per side",
@@ -439,7 +439,7 @@ export default function App() {
         },
         {
           title: "Fuel Quality Control & Documentation",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5GVUVMIFFVQU5JVFKS19PT05UGSxPTDEzVGV4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=300&fit=crop",
           steps: [
             "Take fuel sample from each fuel truck before connecting",
             "Test fuel for water contamination using water detection paste",
@@ -458,7 +458,7 @@ export default function App() {
       sections: [
         {
           title: "Equipment Selection by Aircraft Type",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5QVVNIQkFDSdBRS0VJIGSUPRU3RTUjQuTdGV4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
           steps: [
             "Light aircraft (up to 50,000 lbs): Standard tow bar pushback tractor",
             "Medium aircraft (50,000-200,000 lbs): Heavy duty tow bar or towbarless tractor",
@@ -472,7 +472,7 @@ export default function App() {
         },
         {
           title: "Pre-Pushback Safety Checklist",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5TQUZFVFkgQ0hFQ0tMSVNUPC90ZXh0Pgo8L3N2Zz4=",
+          image: "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=400&h=300&fit=crop",
           steps: [
             "Obtain ATC pushback clearance and confirm pushback direction",
             "Verify aircraft parking brake is SET and engines are shut down",
@@ -486,7 +486,7 @@ export default function App() {
         },
         {
           title: "Pushback Execution Procedures",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtd2VpZ2h0PSJib2xkIj5QVVNIQkFDS71NP3VOQREYxVFUNSFPTpVJFR0YkZZ4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400&h=300&fit=crop",
           steps: [
             "Begin pushback slowly - maximum 5 mph initial movement",
             "Announce 'Pushback commencing' to flight crew",
@@ -500,7 +500,7 @@ export default function App() {
         },
         {
           title: "Post-Pushback Disconnect Procedures",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5ESVNDT05ORUNUIFBst09DNEVSREVSU3wvdGV4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
           steps: [
             "Verify aircraft parking brake is set before disconnecting",
             "Announce 'Disconnecting tow bar, remain on brakes' to flight crew",
@@ -519,7 +519,7 @@ export default function App() {
       sections: [
         {
           title: "Weight and Balance Calculations",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5XZUAVSIQ5VCAmIJBISExBTI2UIESdGV4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop",
           steps: [
             "Verify total baggage weight does not exceed aircraft cargo limits",
             "Calculate center of gravity based on baggage compartment loading",
@@ -533,7 +533,7 @@ export default function App() {
         },
         {
           title: "Baggage Compartment Configuration",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5DT01QQVJUTUVOVENDQUFDU7sZdxLCU5PSdGV4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=400&h=300&fit=crop",
           steps: [
             "Load heavy items first - place against compartment walls",
             "Use cargo nets and tie-down straps to secure all items",
@@ -547,7 +547,7 @@ export default function App() {
         },
         {
           title: "Special Cargo Handling Procedures",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5TUEVOSUFMENBSEO2IEZBTkRMSU5HPC90ZXh0Pgo8L3N2Zz4=",
+          image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
           steps: [
             "Live animals: Load last, unload first, maintain temperature control",
             "Hazardous materials: Follow IATA dangerous goods regulations",
@@ -566,7 +566,7 @@ export default function App() {
       sections: [
         {
           title: "Catering Truck Positioning and Setup",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5kaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5DQVRFSU5HIFNFVFVQICYgUU9TSVRJQ1OS4dGV4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=400&h=300&fit=crop",
           steps: [
             "Position catering truck at designated catering door (typically forward left)",
             "Extend truck platform to match aircraft door sill height exactly",
@@ -580,7 +580,7 @@ export default function App() {
         },
         {
           title: "Service Flow by Aircraft Configuration",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5TRVJNSUNFRFcZ1IMEkUXURVJJVy5IIO5HIGZGeFRZdDYaXQ+PC9zdmc+",
+          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop",
           steps: [
             "Single-aisle aircraft: Service through forward galley door only",
             "Wide-body aircraft: Multiple service doors - coordinate timing",
@@ -594,7 +594,7 @@ export default function App() {
         },
         {
           title: "Water and Waste Service Procedures",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5XQVRFU2BTJgV0Q1NBYJBJdKFUOS5IIO2V4dD4KPC9zdmc+",
+          image: "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=400&h=300&fit=crop",
           steps: [
             "Locate potable water service panel (typically right side of aircraft)",
             "Connect waste service truck to lavatory waste drain valve first",
@@ -608,7 +608,7 @@ export default function App() {
         },
         {
           title: "Cabin Cleaning and Preparation",
-          image: "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjMTgxODI4Ci8+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAiIGZpbGw9IiNmZjk1MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSJib2xkIj5DQUJJTYBN5BAFHFJaNOOhYIO5GMIRQXJCNVwB0ZXh0Pgo8L3N2Zz4=",
+          image: "https://images.unsplash.com/photo-1540979388789-6cee28a1cdc9?w=400&h=300&fit=crop",
           steps: [
             "Remove all trash and debris from seat pockets and floor areas",
             "Vacuum all carpeted areas including aisles and seat rows",
@@ -623,6 +623,11 @@ export default function App() {
       ]
     }
   };
+
+  const [showPermitForm, setShowPermitForm] = useState(false);
+  const [permitType, setPermitType] = useState(null);
+  const [permitData, setPermitData] = useState({});
+
 
   const generatePassengerManifest = (aircraftType) => {
     const maxSeats = aircraftData?.maxSeats || 180;
@@ -892,9 +897,10 @@ export default function App() {
     }
   };
 
-
-
-
+  const openPermitForm = (type) => {
+    setPermitType(type);
+    setShowPermitForm(true);
+  };
 
   const renderAircraftDisplay = () => {
     if (aircraftModel) {
@@ -1101,10 +1107,9 @@ export default function App() {
                 >
                   <div className="airport-code">{airport}</div>
                   <div className="airport-info">
-                    <div className="stands-count">{getAirportConfig(airport).stands.length} Stands</div>
-                    <div className="frequency">121.{(Math.random() * 900 + 100).toFixed(0)}</div>
-                  </div>
-                  <div className="status-indicator active"></div>
+                      <div className="stands-count">{getAirportConfig(airport).stands.length} Stands</div>
+                      <div className="status-text">OPERATIONAL</div>
+                    </div>
                 </button>
               ))}
             </div>
@@ -2190,6 +2195,10 @@ export default function App() {
               <span className="nav-icon">👥</span>
               <span>MANIFEST</span>
             </button>
+            <button className="nav-btn" onClick={() => openPermitForm("flightplan")}>
+              <span className="nav-icon">📄</span>
+              <span>PERMITS</span>
+            </button>
           </>
         )}
         {userMode === "groundcrew" && (
@@ -2211,6 +2220,7 @@ export default function App() {
           </>
         )}
       </div>
+      {renderPermitForm()}
     </div>
   );
 }
