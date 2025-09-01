@@ -175,17 +175,17 @@ export default function App() {
     const maxSeats = aircraftData?.maxSeats || 180;
     const passengerCount = Math.floor(maxSeats * (0.7 + Math.random() * 0.25));
     const manifest = [];
-    
+
     const firstNames = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "Robert", "Anna", "James", "Maria"];
     const lastNames = ["Smith", "Johnson", "Brown", "Davis", "Wilson", "Miller", "Moore", "Taylor", "Anderson", "Thomas"];
     const seatClasses = ["Economy", "Premium Economy", "Business", "First"];
-    
+
     for (let i = 0; i < passengerCount; i++) {
       const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
       const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
       const seatRow = Math.floor(Math.random() * 40) + 1;
       const seatLetter = String.fromCharCode(65 + Math.floor(Math.random() * 6));
-      
+
       manifest.push({
         id: i + 1,
         name: `${firstName} ${lastName}`,
@@ -196,7 +196,7 @@ export default function App() {
         frequent: Math.random() > 0.7
       });
     }
-    
+
     return manifest;
   };
 
@@ -225,7 +225,7 @@ export default function App() {
             // Continue to next format
           }
         }
-        
+
         if (!modelFound) {
           setAircraftModel(""); // Use default if no 3D model found
         }
@@ -368,14 +368,14 @@ export default function App() {
       alert("Please select and claim a stand first to request services");
       return;
     }
-    
+
     if (service === "Full Service") {
       // Request multiple services at once
       const fullServices = [
         "Ground Power", "Fuel Service", "Catering", "Passenger Stairs", 
         "Cleaning", "Baggage", "Water Service", "Lavatory Service"
       ];
-      
+
       fullServices.forEach(individualService => {
         socket.emit("serviceRequest", {
           service: individualService,
@@ -412,7 +412,7 @@ export default function App() {
         i === index ? { ...item, checked: !item.checked } : item
       )
     }));
-    
+
     // Send system message when checklist item is completed
     const item = checklists[category][index];
     if (!item.checked && selectedStand) {
@@ -538,28 +538,28 @@ export default function App() {
             {/* Main Fuselage with 3D perspective */}
             <ellipse cx="300" cy="175" rx="180" ry="30" fill="url(#fuselage3d)" stroke="#0066cc" strokeWidth="2" filter="url(#shadow3d)"/>
             <ellipse cx="300" cy="170" rx="175" ry="25" fill="url(#fuselage3d)" stroke="#0088ff" strokeWidth="1"/>
-            
+
             {/* Wings with 3D depth */}
             <path d="M180 175 L180 125 L250 115 L250 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
             <path d="M180 175 L180 225 L250 235 L250 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
             <path d="M350 175 L350 140 L420 130 L420 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
             <path d="M350 175 L350 210 L420 220 L420 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-            
+
             {/* Wing tips */}
             <path d="M250 115 L250 100 L260 102 L260 117 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="1"/>
             <path d="M250 235 L250 250 L260 248 L260 233 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="1"/>
-            
+
             {/* Engines with 3D effects */}
             <ellipse cx="200" cy="145" rx="20" ry="12" fill="url(#engine3d)" stroke="#000" strokeWidth="2" filter="url(#shadow3d)"/>
             <ellipse cx="200" cy="205" rx="20" ry="12" fill="url(#engine3d)" stroke="#000" strokeWidth="2" filter="url(#shadow3d)"/>
             <circle cx="200" cy="145" r="8" fill="#1e40af" stroke="#1d4ed8" strokeWidth="1"/>
             <circle cx="200" cy="205" r="8" fill="#1e40af" stroke="#1d4ed8" strokeWidth="1"/>
-            
+
             {/* Cockpit windows */}
             <ellipse cx="480" cy="175" rx="15" ry="10" fill="#000080" stroke="#0066cc" strokeWidth="2" opacity="0.8"/>
             <ellipse cx="465" cy="170" rx="8" ry="6" fill="#000080" stroke="#0066cc" strokeWidth="1" opacity="0.6"/>
             <ellipse cx="465" cy="180" rx="8" ry="6" fill="#000080" stroke="#0066cc" strokeWidth="1" opacity="0.6"/>
-            
+
             {/* Passenger windows */}
             <circle cx="420" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
             <circle cx="400" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
@@ -571,17 +571,17 @@ export default function App() {
             <circle cx="260" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
             <circle cx="240" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
             <circle cx="220" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            
+
             {/* Tail */}
             <path d="M120 175 L80 155 L85 175 L80 195 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
             <path d="M110 175 L90 145 L100 175 L90 140 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-            
+
             {/* Landing gear (if applicable) */}
             <rect x="280" y="200" width="8" height="15" fill="#333" stroke="#000" strokeWidth="1"/>
             <rect x="320" y="200" width="8" height="15" fill="#333" stroke="#000" strokeWidth="1"/>
             <circle cx="284" cy="220" r="6" fill="#222" stroke="#000" strokeWidth="1"/>
             <circle cx="324" cy="220" r="6" fill="#222" stroke="#000" strokeWidth="1"/>
-            
+
             {/* Navigation lights */}
             <circle cx="250" cy="115" r="3" fill="#ff0000" filter="url(#glow)"/>
             <circle cx="250" cy="235" r="3" fill="#00ff00" filter="url(#glow)"/>
@@ -628,7 +628,7 @@ export default function App() {
           <div className="brand-header">
             <div className="brand-icon">✈️</div>
             <h1>PTFS GROUND CONTROL</h1>
-            <div className="brand-subtitle">Professional Aviation Ground Operations Management</div>
+            <div className="brand-subtitle">Professional Aviation Ground Operations</div>
             <div className="system-version">Version 3.1.0 | Build 2024</div>
           </div>
           <div className="auth-section">
@@ -658,7 +658,7 @@ export default function App() {
               <h2>PTFS AIRPORT NETWORK</h2>
               <div className="airport-header-subtitle">Select an airport to begin operations</div>
             </div>
-            
+
             <div className="airport-status-bar">
               <div className="status-indicator online"></div>
               <span>ALL SYSTEMS OPERATIONAL</span>
@@ -815,7 +815,7 @@ export default function App() {
                       Step {currentTrainingStep + 1} of {trainingScenarios[trainingScenario].steps.length}
                     </div>
                   </div>
-                  
+
                   <div className="training-step">
                     <div className="step-content">
                       <h4>{trainingScenarios[trainingScenario].steps[currentTrainingStep].title}</h4>
@@ -1191,7 +1191,7 @@ export default function App() {
                 </div>
               </div>
 
-              
+
 
               <div className="services-section">
                 <h2>GROUND SERVICES</h2>
@@ -1240,91 +1240,14 @@ export default function App() {
       const lowPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Cleaning", "Water Service", "Lavatory Service"].includes(r.service));
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
-      if (supervisorMode) {
-        return (
-          <div className="supervisor-main">
-            <div className="supervisor-header">
-              <h2>SUPERVISOR CONTROL - {selectedAirport}</h2>
-              <div className="supervisor-controls">
-                <button onClick={toggleSupervisorMode} className="exit-supervisor">
-                  EXIT SUPERVISOR MODE
-                </button>
-              </div>
-            </div>
-
-            <div className="supervisor-overview">
-              <div className="overview-stats">
-                <div className="stat-card">
-                  <span className="stat-number">{getCurrentAirportStands().filter(s => stands[s.id]).length}</span>
-                  <span className="stat-label">OCCUPIED STANDS</span>
-                </div>
-                <div className="stat-card">
-                  <span className="stat-number">{requests.length}</span>
-                  <span className="stat-label">TOTAL REQUESTS</span>
-                </div>
-                <div className="stat-card">
-                  <span className="stat-number">{Object.values(stands).length}</span>
-                  <span className="stat-label">ACTIVE FLIGHTS</span>
-                </div>
-              </div>
-
-              <div className="supervisor-sections">
-                <div className="stands-overview">
-                  <h3>STAND OCCUPANCY</h3>
-                  <div className="stands-grid">
-                    {getCurrentAirportStands().map(stand => {
-                      const occupant = stands[stand.id];
-                      return (
-                        <div key={stand.id} className={`stand-item ${occupant ? 'occupied' : 'available'}`}>
-                          <div className="stand-id">{stand.id}</div>
-                          <div className="stand-info">
-                            {occupant ? (
-                              <>
-                                <div className="flight">{occupant.flight}</div>
-                                <div className="aircraft">{occupant.aircraft}</div>
-                                <div className="pilot">{occupant.pilot}</div>
-                              </>
-                            ) : (
-                              <div className="status">AVAILABLE</div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="crew-allocation">
-                  <h3>CREW ALLOCATION</h3>
-                  <div className="crew-status">
-                    <div className="crew-metric">
-                      <span>Available Crew:</span>
-                      <span className="crew-count">12</span>
-                    </div>
-                    <div className="crew-metric">
-                      <span>Busy Crew:</span>
-                      <span className="crew-count">{inProgressRequests.length}</span>
-                    </div>
-                    <div className="crew-metric">
-                      <span>Efficiency:</span>
-                      <span className="efficiency">94%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }
-
+      // Removed supervisor mode rendering as per instructions
       return (
         <div className="groundcrew-main">
           <div className="queue-header">
-            <h2>SERVICE QUEUE - {selectedAirport}</h2>
-            <div className="queue-controls">
-              <button onClick={toggleSupervisorMode} className="supervisor-btn">
-                SUPERVISOR MODE
-              </button>
+            <h2>GROUND OPERATIONS - {selectedAirport}</h2>
+            <div className="operational-status">
+              <div className="status-indicator active"></div>
+              <span>ALL SYSTEMS OPERATIONAL</span>
             </div>
             <div className="queue-stats">
               <div className="stat">
@@ -1463,8 +1386,6 @@ export default function App() {
               </div>
             </div>
           </div>
-
-          
         </div>
       );
     }

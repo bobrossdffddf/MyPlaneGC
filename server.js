@@ -77,10 +77,18 @@ const parseAtisContent = (atisInfo) => {
     qnh = qnhMatch[1];
   }
 
-  // Parse runway information
-  const runwayMatch = content.match(/(?:DEP RWY|ARR RWY|RWY)\s+(\d{2}[LRC]?)/);
+  // Parse runway information (multiple patterns)
+  const runwayMatch = content.match(/(?:DEP RWY|ARR RWY|RWY|RUNWAY)\s+(\d{2}[LRC]?)/i) ||
+                     content.match(/(\d{2}[LRC]?)\s+(?:IN USE|ACTIVE)/i) ||
+                     content.match(/LAND\s+RWY\s+(\d{2}[LRC]?)/i);
   if (runwayMatch) {
     runway = `${runwayMatch[1]} ACTIVE`;
+  } else {
+    // Try to extract any two-digit runway number
+    const anyRunway = content.match(/\b(\d{2}[LRC]?)\b/);
+    if (anyRunway) {
+      runway = `${anyRunway[1]} ACTIVE`;
+    }
   }
 
   // Parse temperature (format: 13/11 where first is temp, second is dewpoint)
