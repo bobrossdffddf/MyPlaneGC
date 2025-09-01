@@ -864,14 +864,19 @@ export default function App() {
     console.log('Selecting mode:', mode, 'for airport:', airport);
     setUserMode(mode);
     setSelectedAirport(airport);
+    
+    // Reset callsign when switching modes
+    setAssignedCallsign("");
+    setGroundCallsignCounter(1);
+    
     socket.emit("userMode", { mode, airport, userId: user?.id });
   };
 
   const claimStand = () => {
     if (selectedStand && flightNumber && aircraft && selectedAirport) {
+      let callsign = assignedCallsign;
       if (!assignedCallsign) {
-        const newCallsign = assignPilotCallsign();
-        setAssignedCallsign(newCallsign);
+        callsign = assignPilotCallsign();
       }
       
       socket.emit("claimStand", {
@@ -882,7 +887,7 @@ export default function App() {
         userId: user?.id,
         airport: selectedAirport,
         allowSwitch: true,
-        callsign: assignedCallsign || assignPilotCallsign()
+        callsign: callsign
       });
     }
   };
@@ -895,24 +900,16 @@ export default function App() {
     }
     
     let senderName = user?.username;
-    let callsign = "";
+    let callsign = assignedCallsign;
     
     if (userMode === "pilot") {
       if (!assignedCallsign) {
-        const newCallsign = assignPilotCallsign();
-        setAssignedCallsign(newCallsign);
-        callsign = newCallsign;
-      } else {
-        callsign = assignedCallsign;
+        callsign = assignPilotCallsign();
       }
       senderName = `${callsign} (${user?.username})`;
     } else if (userMode === "groundcrew") {
       if (!assignedCallsign) {
-        const newCallsign = assignGroundCallsign();
-        setAssignedCallsign(newCallsign);
-        callsign = newCallsign;
-      } else {
-        callsign = assignedCallsign;
+        callsign = assignGroundCallsign();
       }
       senderName = `${callsign} (${user?.username})`;
     }
@@ -925,7 +922,7 @@ export default function App() {
       timestamp: new Date().toLocaleTimeString(),
       mode: userMode,
       userId: user?.id,
-      callsign: callsign || (userMode === "pilot" ? assignedCallsign : assignedCallsign)
+      callsign: callsign
     };
     socket.emit("chatMessage", message);
     setInput("");
