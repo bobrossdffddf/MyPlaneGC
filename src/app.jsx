@@ -21,6 +21,14 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("main");
   const [activeChecklistPhase, setActiveChecklistPhase] = useState("preflight");
   const [aircraftSvg, setAircraftSvg] = useState("");
+  const [atisData, setAtisData] = useState({
+    info: 'INFO BRAVO',
+    wind: '270°/08KT',
+    qnh: '1013',
+    runway: '27 ACTIVE',
+    conditions: 'CAVOK',
+    temperature: '15°C'
+  });
   const [checklists, setChecklists] = useState({
     preflight: [
       { item: "Aircraft Documents Review", checked: false, category: "Documentation" },
@@ -177,10 +185,17 @@ export default function App() {
       setStands(standData);
     });
 
+    socket.on("atisUpdate", (atis) => {
+      if (!selectedAirport || atis.airport === selectedAirport) {
+        setAtisData(atis);
+      }
+    });
+
     return () => {
       socket.off("chatUpdate");
       socket.off("serviceUpdate");
       socket.off("standUpdate");
+      socket.off("atisUpdate");
     };
   }, [selectedAirport]);
 
@@ -372,17 +387,54 @@ export default function App() {
           </div>
 
           <div className="airport-selector">
-            <h2>SELECT AIRPORT</h2>
-            <div className="airport-grid-modern">
+            <div className="airport-header">
+              <div className="airport-header-icon">🛩️</div>
+              <h2>AIRPORT SELECTION TERMINAL</h2>
+              <div className="airport-header-subtitle">PTFS GLOBAL OPERATIONS NETWORK</div>
+            </div>
+            
+            <div className="airport-status-bar">
+              <div className="status-indicator online"></div>
+              <span>ALL SYSTEMS OPERATIONAL</span>
+              <div className="network-status">24 AIRPORTS ONLINE</div>
+            </div>
+
+            <div className="airport-grid-industrial">
               {ptfsAirports.map((airport) => (
-                <button
+                <div
                   key={airport}
-                  className={`airport-card ${selectedAirport === airport ? 'selected' : ''}`}
+                  className={`airport-terminal ${selectedAirport === airport ? 'selected' : ''}`}
                   onClick={() => setSelectedAirport(airport)}
                 >
-                  <div className="airport-code">{airport}</div>
-                  <div className="airport-status">OPERATIONAL</div>
-                </button>
+                  <div className="terminal-header">
+                    <div className="terminal-indicator"></div>
+                    <div className="terminal-code">{airport}</div>
+                    <div className="terminal-status">
+                      <div className="status-light active"></div>
+                      <span>ACTIVE</span>
+                    </div>
+                  </div>
+                  
+                  <div className="terminal-info">
+                    <div className="info-row">
+                      <span className="info-label">STANDS:</span>
+                      <span className="info-value">{getAirportConfig(airport).stands.length}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">FREQ:</span>
+                      <span className="info-value">121.{(Math.random() * 900 + 100).toFixed(0)}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="terminal-selection">
+                    {selectedAirport === airport && (
+                      <div className="selection-indicator">
+                        <div className="selection-pulse"></div>
+                        <span>SELECTED</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -462,16 +514,20 @@ export default function App() {
                   <h2>{selectedAirport} TOWER CONTROL</h2>
                   <div className="weather-strip">
                     <div className="weather-item">
-                      <span className="weather-label">METAR:</span>
-                      <span className="weather-value">CAVOK 15°C QNH 1013</span>
+                      <span className="weather-label">ATIS:</span>
+                      <span className="weather-value">{atisData.info || 'INFO BRAVO'}</span>
                     </div>
                     <div className="weather-item">
                       <span className="weather-label">WIND:</span>
-                      <span className="weather-value">270°/08KT</span>
+                      <span className="weather-value">{atisData.wind || '270°/08KT'}</span>
+                    </div>
+                    <div className="weather-item">
+                      <span className="weather-label">QNH:</span>
+                      <span className="weather-value">{atisData.qnh || '1013'}</span>
                     </div>
                     <div className="weather-item">
                       <span className="weather-label">RWY:</span>
-                      <span className="weather-value">27 ACTIVE</span>
+                      <span className="weather-value">{atisData.runway || '27 ACTIVE'}</span>
                     </div>
                   </div>
                   <div className="airport-stats">
@@ -779,26 +835,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="terminal-overview">
-            <h3>TERMINAL STATUS</h3>
-            <div className="stands-grid">
-              {getCurrentAirportStands().map(stand => {
-                const standInfo = stands[stand.id];
-                return (
-                  <div key={stand.id} className={`stand-display ${standInfo ? 'occupied' : 'available'} ${stand.type}`}>
-                    <div className="stand-id">{stand.id}</div>
-                    <div className="stand-type">{stand.type.toUpperCase()}</div>
-                    {standInfo && (
-                      <div className="stand-info">
-                        <div className="flight">{standInfo.flight}</div>
-                        <div className="aircraft">{standInfo.aircraft}</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          
         </div>
       );
     }

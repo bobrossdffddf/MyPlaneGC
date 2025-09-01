@@ -47,8 +47,39 @@ passport.deserializeUser((user, done) => {
 });
 
 // In-memory storage for demo (use database in production)
-let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map() } }
+let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {} } }
 let connectedUsers = new Map();
+
+// Simulate ATIS updates every 5 minutes
+const generateAtisData = (airport) => {
+  const infoLetters = ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT'];
+  const windDirections = ['270', '280', '290', '260', '250'];
+  const windSpeeds = ['08', '12', '15', '06', '10'];
+  const qnhValues = ['1013', '1015', '1011', '1018', '1009'];
+  const runways = ['27', '09', '18', '36'];
+  
+  return {
+    airport: airport,
+    info: infoLetters[Math.floor(Math.random() * infoLetters.length)],
+    wind: `${windDirections[Math.floor(Math.random() * windDirections.length)]}°/${windSpeeds[Math.floor(Math.random() * windSpeeds.length)]}KT`,
+    qnh: qnhValues[Math.floor(Math.random() * qnhValues.length)],
+    runway: `${runways[Math.floor(Math.random() * runways.length)]} ACTIVE`,
+    conditions: 'CAVOK',
+    temperature: `${Math.floor(Math.random() * 10) + 10}°C`,
+    timestamp: new Date().toLocaleTimeString()
+  };
+};
+
+// Update ATIS every 5 minutes for all active airports
+setInterval(() => {
+  Object.keys(airportData).forEach(airport => {
+    if (airportData[airport].users.size > 0) {
+      const atisData = generateAtisData(airport);
+      airportData[airport].atis = atisData;
+      io.to(airport).emit("atisUpdate", atisData);
+    }
+  });
+}, 300000); // 5 minutes
 
 // Serve frontend build
 app.use(express.static(path.join(__dirname, "dist")));
@@ -90,7 +121,8 @@ io.on("connection", (socket) => {
       airportData[data.airport] = {
         stands: {},
         requests: [],
-        users: new Map()
+        users: new Map(),
+        atis: generateAtisData(data.airport)
       };
     }
 
@@ -102,6 +134,7 @@ io.on("connection", (socket) => {
       // Send airport-specific data
       socket.emit("standUpdate", airportData[data.airport].stands);
       socket.emit("serviceUpdate", airportData[data.airport].requests);
+      socket.emit("atisUpdate", airportData[data.airport].atis);
 
       console.log(`User ${data.userId} joined ${data.airport} as ${data.mode}`);
     }
