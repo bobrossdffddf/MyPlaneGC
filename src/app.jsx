@@ -36,21 +36,21 @@ export default function App() {
   const [assignedCallsign, setAssignedCallsign] = useState("");
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [mcduDisplay, setMcduDisplay] = useState({
-    title: "MCDU",
+    title: aircraft || "A320-200",
     lines: [
-      "MCDU MENU",
+      "ENG",
+      "LEAP-1A26",
+      "ACTIVE NAV DATA BASE",
+      "08SEP-05OCT       AIRAC",
+      "SECOND NAV DATA BASE",
+      "01AUG-07SEP",
       "",
-      "<FMGC     REQUEST>",
+      "CHG CODE",
       "",
-      "<ACARS    ATSU>",
-      "",
-      "<AIDS     CFDS>",
-      "",
-      "________________",
-      "",
-      "SELECT FUNCTION"
+      "IDLE/PERF       SOFTWARE",
+      "00.0/00.0       STATUS/XLOAD"
     ],
-    activeFunction: "MENU"
+    activeFunction: "STATUS"
   });
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
@@ -860,6 +860,11 @@ export default function App() {
 
   const claimStand = () => {
     if (selectedStand && flightNumber && aircraft && selectedAirport) {
+      if (!assignedCallsign) {
+        const newCallsign = assignCallsign();
+        setAssignedCallsign(newCallsign);
+      }
+      
       socket.emit("claimStand", {
         stand: selectedStand,
         flightNumber,
@@ -867,7 +872,8 @@ export default function App() {
         pilot: user?.username,
         userId: user?.id,
         airport: selectedAirport,
-        allowSwitch: true
+        allowSwitch: true,
+        callsign: assignedCallsign || `Ground ${callsignCounter}`
       });
     }
   };
@@ -878,14 +884,23 @@ export default function App() {
       alert("Please select a stand first to send messages");
       return;
     }
+    
+    let senderName = user?.username;
+    if (userMode === "pilot" && assignedCallsign) {
+      senderName = `${assignedCallsign} (${user?.username})`;
+    } else if (userMode === "groundcrew") {
+      senderName = `Ground Control (${user?.username})`;
+    }
+    
     const message = {
       text: input,
-      sender: user?.username,
+      sender: senderName,
       stand: userMode === "pilot" ? selectedStand : "GROUND",
       airport: selectedAirport,
       timestamp: new Date().toLocaleTimeString(),
       mode: userMode,
-      userId: user?.id
+      userId: user?.id,
+      callsign: userMode === "pilot" ? assignedCallsign : "GROUND"
     };
     socket.emit("chatMessage", message);
     setInput("");
@@ -954,6 +969,43 @@ export default function App() {
       timestamp: new Date().toLocaleTimeString(),
       mode: "system"
     });
+  };
+
+  const calculateWeightAndBalance = () => {
+    if (!aircraftData || passengerManifest.length === 0) return null;
+
+    const passengerWeight = passengerManifest.length * 84; // Average passenger weight in kg (84kg including carry-on)
+    const baggageWeight = passengerManifest.length * 23; // Average checked baggage weight
+    const fuelWeight = Math.round(aircraftData.fuelCapacity * 0.85 * 0.8); // 85% fuel load, 0.8 kg/L density
+    const cargoWeight = Math.round(Math.random() * aircraftData.cargoCapacity * 1000 * 0.6); // Random cargo up to 60% capacity
+    
+    const totalWeight = aircraftData.operatingEmptyWeight + passengerWeight + baggageWeight + fuelWeight + cargoWeight;
+    
+    // Calculate CG (simplified calculation)
+    const emptyWeightArm = aircraftData.length * 0.4; // Approximate empty weight CG position
+    const passengerArm = aircraftData.length * 0.45; // Passenger cabin CG
+    const cargoArm = aircraftData.length * 0.3; // Cargo compartment CG
+    const fuelArm = aircraftData.length * 0.4; // Fuel tank CG
+    
+    const totalMoment = 
+      (aircraftData.operatingEmptyWeight * emptyWeightArm) +
+      ((passengerWeight + baggageWeight) * passengerArm) +
+      (cargoWeight * cargoArm) +
+      (fuelWeight * fuelArm);
+    
+    const cgPosition = totalMoment / totalWeight;
+    const cgPercentMAC = ((cgPosition - (aircraftData.length * 0.25)) / (aircraftData.length * 0.25)) * 100;
+    
+    return {
+      passengerWeight,
+      baggageWeight,
+      fuelWeight,
+      cargoWeight,
+      totalWeight,
+      cgPosition: cgPosition.toFixed(1),
+      cgPercentMAC: cgPercentMAC.toFixed(1),
+      withinLimits: totalWeight <= aircraftData.maxTakeoffWeight && cgPercentMAC >= 10 && cgPercentMAC <= 35
+    };
   };
 
   const updateFlightDocument = (docType, updates) => {
@@ -1394,6 +1446,110 @@ export default function App() {
                       </div>
                     )}
 
+                    {activePermitForm === "weightBalance" && aircraftData && (
+                      <div className="weight-balance-document">
+                        <div className="wb-header">
+                          <h2>WEIGHT AND BALANCE MANIFEST</h2>
+                          <div className="wb-flight-info">
+                            <div>Flight: {flightNumber || 'N/A'}</div>
+                            <div>Aircraft: {aircraft}</div>
+                            <div>Registration: {aircraftData.type}-REG</div>
+                            <div>Date: {new Date().toLocaleDateString()}</div>
+                          </div>
+                        </div>
+                        
+                        {(() => {
+                          const wb = calculateWeightAndBalance();
+                          return wb ? (
+                            <div className="wb-content">
+                              <div className="wb-section">
+                                <h3>AIRCRAFT SPECIFICATIONS</h3>
+                                <div className="wb-grid">
+                                  <div className="wb-item">
+                                    <span>Operating Empty Weight:</span>
+                                    <span>{aircraftData.operatingEmptyWeight.toLocaleString()} kg</span>
+                                  </div>
+                                  <div className="wb-item">
+                                    <span>Maximum Takeoff Weight:</span>
+                                    <span>{aircraftData.maxTakeoffWeight.toLocaleString()} kg</span>
+                                  </div>
+                                  <div className="wb-item">
+                                    <span>Maximum Landing Weight:</span>
+                                    <span>{aircraftData.maxLandingWeight.toLocaleString()} kg</span>
+                                  </div>
+                                  <div className="wb-item">
+                                    <span>Maximum Zero Fuel Weight:</span>
+                                    <span>{aircraftData.maxZeroFuelWeight.toLocaleString()} kg</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="wb-section">
+                                <h3>LOAD MANIFEST</h3>
+                                <div className="wb-grid">
+                                  <div className="wb-item">
+                                    <span>Passengers ({passengerManifest.length}):</span>
+                                    <span>{wb.passengerWeight.toLocaleString()} kg</span>
+                                  </div>
+                                  <div className="wb-item">
+                                    <span>Baggage:</span>
+                                    <span>{wb.baggageWeight.toLocaleString()} kg</span>
+                                  </div>
+                                  <div className="wb-item">
+                                    <span>Cargo:</span>
+                                    <span>{wb.cargoWeight.toLocaleString()} kg</span>
+                                  </div>
+                                  <div className="wb-item">
+                                    <span>Fuel:</span>
+                                    <span>{wb.fuelWeight.toLocaleString()} kg</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="wb-section">
+                                <h3>WEIGHT SUMMARY</h3>
+                                <div className="wb-summary">
+                                  <div className="wb-total">
+                                    <span>TOTAL WEIGHT:</span>
+                                    <span className={wb.withinLimits ? 'wb-safe' : 'wb-warning'}>
+                                      {wb.totalWeight.toLocaleString()} kg
+                                    </span>
+                                  </div>
+                                  <div className="wb-cg">
+                                    <span>CENTER OF GRAVITY:</span>
+                                    <span className={wb.withinLimits ? 'wb-safe' : 'wb-warning'}>
+                                      {wb.cgPercentMAC}% MAC
+                                    </span>
+                                  </div>
+                                  <div className="wb-status">
+                                    <span>STATUS:</span>
+                                    <span className={wb.withinLimits ? 'wb-safe' : 'wb-warning'}>
+                                      {wb.withinLimits ? 'WITHIN LIMITS' : 'OUTSIDE LIMITS'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="wb-signatures">
+                                <div className="wb-signature">
+                                  <div className="signature-line"></div>
+                                  <div>Captain Signature</div>
+                                </div>
+                                <div className="wb-signature">
+                                  <div className="signature-line"></div>
+                                  <div>Load Master Signature</div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="wb-loading">
+                              Select aircraft and passengers to calculate weight and balance
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
+
                     <div className="permit-actions">
                       <button 
                         className="submit-permit"
@@ -1455,9 +1611,9 @@ export default function App() {
                         </div>
                         <button 
                           className="doc-action"
-                          onClick={() => updateFlightDocument('weightBalance', { completed: !flightDocuments.weightBalance.completed })}
+                          onClick={() => setActivePermitForm('weightBalance')}
                         >
-                          {flightDocuments.weightBalance.completed ? 'REVIEW' : 'CALCULATE'}
+                          VIEW MANIFEST
                         </button>
                       </div>
 
@@ -1535,21 +1691,21 @@ export default function App() {
                 <div className="mcdu-keypad">
                   <div className="mcdu-function-keys">
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: "FMGC",
+                      title: aircraft || "A320-200",
                       lines: [
-                        "FLIGHT MANAGEMENT",
-                        "GUIDANCE COMPUTER",
+                        "FROM       TO",
+                        selectedAirport + "      ----",
                         "",
-                        "<DIR TO    PROG>",
+                        "FLT NBR",
+                        flightNumber || "----",
                         "",
-                        "<PERF     INIT>",
+                        "ALTN/CO RTE",
+                        "NONE",
                         "",
-                        "<DATA     FUEL PRED>",
-                        "",
-                        "________________",
-                        "FMGC ACTIVE"
+                        "TROPO      36090",
+                        ""
                       ],
-                      activeFunction: "FMGC"
+                      activeFunction: "DIR"
                     })}>DIR</button>
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
                       title: "PROG",
