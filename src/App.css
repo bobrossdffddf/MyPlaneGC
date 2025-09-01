@@ -12,6 +12,9 @@ body {
   color: #ffffff;
   overflow: hidden;
   height: 100vh;
+  min-height: 100vh;
+  width: 100vw;
+  min-width: 320px;
 }
 
 /* Loading Screen */
@@ -289,7 +292,10 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  min-height: 100vh;
+  width: 100vw;
   background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2a2f3e 100%);
+  overflow: hidden;
 }
 
 .tablet-header {
@@ -1729,10 +1735,147 @@ body {
   }
 }
 
+/* Communication Panel Responsive */
+.comm-panel {
+  width: 400px;
+  min-width: 350px;
+  max-width: 500px;
+  background: rgba(15, 20, 25, 0.95);
+  border-left: 1px solid rgba(255, 149, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(20px);
+  box-shadow: -2px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Main Content Area Responsive */
+.main-area {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+  background: rgba(15, 20, 25, 0.7);
+  min-width: 0;
+}
+
+/* Services Grid Responsive */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  max-width: 100%;
+}
+
+/* Priority Columns Responsive */
+.priority-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  max-width: 100%;
+}
+
+/* Input Grid Responsive */
+.input-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  align-items: end;
+  max-width: 100%;
+}
+
+/* Planning Grid Responsive */
+.planning-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 100%;
+}
+
+/* Airport Grid Responsive */
+.airport-grid-modern {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 50px;
+  max-width: 100%;
+}
+
+/* Stands Grid Responsive */
+.stands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  max-width: 100%;
+}
+
+/* Weather Strip Responsive */
+.weather-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 149, 0, 0.2);
+}
+
+/* Airport Stats Responsive */
+.airport-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 20px;
+  max-width: 100%;
+}
+
+/* Phase Selector Responsive */
+.phase-selector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Role Cards Responsive */
+.role-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+  max-width: 100%;
+}
+
+/* Queue Stats Responsive */
+.queue-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 20px;
+}
+
 /* Responsive Design */
+@media (max-width: 1400px) {
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+  
+  .priority-columns {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  .comm-panel {
+    width: 350px;
+    min-width: 300px;
+  }
+  
+  .input-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
 @media (max-width: 1200px) {
   .services-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
   
   .priority-columns {
@@ -1740,34 +1883,164 @@ body {
   }
   
   .comm-panel {
-    width: 350px;
-  }
-}
-
-@media (max-width: 768px) {
-  .tablet-content {
-    flex-direction: column;
-  }
-  
-  .comm-panel {
-    width: 100%;
-    height: 300px;
+    width: 320px;
+    min-width: 280px;
   }
   
   .main-area {
     padding: 20px;
   }
   
+  .input-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .planning-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 968px) {
+  .tablet-content {
+    flex-direction: column;
+  }
+  
+  .comm-panel {
+    width: 100%;
+    height: 350px;
+    min-width: unset;
+    max-width: unset;
+    border-left: none;
+    border-top: 1px solid rgba(255, 149, 0, 0.3);
+  }
+  
+  .main-area {
+    padding: 15px;
+  }
+  
   .airport-grid-modern {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
   
   .priority-columns {
     grid-template-columns: 1fr;
   }
   
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  
+  .input-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .planning-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .phase-selector {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  
+  .role-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .airport-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
   .queue-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stands-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .tablet-header {
+    padding: 15px 20px;
     flex-direction: column;
     gap: 15px;
+    text-align: center;
+  }
+  
+  .header-left, .header-center, .header-right {
+    width: 100%;
+  }
+  
+  .main-area {
+    padding: 15px;
+  }
+  
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  
+  .airport-grid-modern {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  
+  .stands-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .airport-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .queue-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .weather-strip {
+    grid-template-columns: 1fr;
+  }
+  
+  .bottom-nav {
+    padding: 10px 15px;
+    gap: 8px;
+  }
+  
+  .nav-btn {
+    padding: 10px 15px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-area {
+    padding: 10px;
+  }
+  
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
+  }
+  
+  .service-card {
+    padding: 15px;
+  }
+  
+  .service-icon {
+    font-size: 2rem;
+  }
+  
+  .service-name {
+    font-size: 0.9rem;
+  }
+  
+  .airport-grid-modern {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .stands-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+  
+  .phase-selector {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   }
 }
