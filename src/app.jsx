@@ -32,7 +32,7 @@ export default function App() {
     notams: { reviewed: false, count: 0, critical: [] },
     permits: { special: [], diplomatic: [], overweight: [] }
   });
-  const [callsignCounter, setCallsignCounter] = useState(1);
+  const [groundCallsignCounter, setGroundCallsignCounter] = useState(1);
   const [assignedCallsign, setAssignedCallsign] = useState("");
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [mcduDisplay, setMcduDisplay] = useState({
@@ -680,10 +680,19 @@ export default function App() {
     }
   };
 
-  const assignCallsign = () => {
-    const newCallsign = `Ground ${callsignCounter}`;
+  const assignPilotCallsign = () => {
+    // Generate airline callsign for pilots
+    const airlines = ["American", "Delta", "United", "Southwest", "JetBlue", "Alaska", "Frontier", "Spirit"];
+    const randomAirline = airlines[Math.floor(Math.random() * airlines.length)];
+    const flightNum = Math.floor(Math.random() * 9000) + 1000;
+    const newCallsign = `${randomAirline} ${flightNum}`;
     setAssignedCallsign(newCallsign);
-    setCallsignCounter(prev => prev + 1);
+    return newCallsign;
+  };
+
+  const assignGroundCallsign = () => {
+    const newCallsign = `Ground ${groundCallsignCounter}`;
+    setGroundCallsignCounter(prev => prev + 1);
     return newCallsign;
   };
 
@@ -861,7 +870,7 @@ export default function App() {
   const claimStand = () => {
     if (selectedStand && flightNumber && aircraft && selectedAirport) {
       if (!assignedCallsign) {
-        const newCallsign = assignCallsign();
+        const newCallsign = assignPilotCallsign();
         setAssignedCallsign(newCallsign);
       }
       
@@ -873,7 +882,7 @@ export default function App() {
         userId: user?.id,
         airport: selectedAirport,
         allowSwitch: true,
-        callsign: assignedCallsign || `Ground ${callsignCounter}`
+        callsign: assignedCallsign || assignPilotCallsign()
       });
     }
   };
@@ -886,10 +895,26 @@ export default function App() {
     }
     
     let senderName = user?.username;
-    if (userMode === "pilot" && assignedCallsign) {
-      senderName = `${assignedCallsign} (${user?.username})`;
+    let callsign = "";
+    
+    if (userMode === "pilot") {
+      if (!assignedCallsign) {
+        const newCallsign = assignPilotCallsign();
+        setAssignedCallsign(newCallsign);
+        callsign = newCallsign;
+      } else {
+        callsign = assignedCallsign;
+      }
+      senderName = `${callsign} (${user?.username})`;
     } else if (userMode === "groundcrew") {
-      senderName = `Ground Control (${user?.username})`;
+      if (!assignedCallsign) {
+        const newCallsign = assignGroundCallsign();
+        setAssignedCallsign(newCallsign);
+        callsign = newCallsign;
+      } else {
+        callsign = assignedCallsign;
+      }
+      senderName = `${callsign} (${user?.username})`;
     }
     
     const message = {
@@ -900,7 +925,7 @@ export default function App() {
       timestamp: new Date().toLocaleTimeString(),
       mode: userMode,
       userId: user?.id,
-      callsign: userMode === "pilot" ? assignedCallsign : "GROUND"
+      callsign: callsign || (userMode === "pilot" ? assignedCallsign : assignedCallsign)
     };
     socket.emit("chatMessage", message);
     setInput("");
@@ -955,7 +980,7 @@ export default function App() {
       data: formData,
       status: "SUBMITTED",
       submittedAt: new Date().toLocaleTimeString(),
-      callsign: assignedCallsign || assignCallsign()
+      callsign: assignedCallsign || assignPilotCallsign()
     };
     
     setPermits(prev => [...prev, newPermit]);
@@ -1688,7 +1713,9 @@ export default function App() {
                     ))}
                   </div>
                 </div>
+                
                 <div className="mcdu-keypad">
+                  {/* Top Function Keys */}
                   <div className="mcdu-function-keys">
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
                       title: aircraft || "A320-200",
@@ -1774,23 +1801,9 @@ export default function App() {
                       ],
                       activeFunction: "DATA"
                     })}>DATA</button>
-                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: "FPLN",
-                      lines: [
-                        "FLIGHT PLAN",
-                        "",
-                        selectedAirport,
-                        "DCT",
-                        "----",
-                        "DCT", 
-                        "DEST",
-                        "",
-                        "________________",
-                        "F-PLN ACTIVE"
-                      ],
-                      activeFunction: "FPLN"
-                    })}>F-PLN</button>
                   </div>
+
+                  {/* Line Select Keys */}
                   <div className="mcdu-line-select-keys">
                     <div className="mcdu-left-keys">
                       <button className="mcdu-key line-select">L1</button>
@@ -1809,55 +1822,79 @@ export default function App() {
                       <button className="mcdu-key line-select">R6</button>
                     </div>
                   </div>
-                  <div className="mcdu-alpha-keys">
-                    <div className="mcdu-number-row">
-                      <button className="mcdu-key">1</button>
-                      <button className="mcdu-key">2</button>
-                      <button className="mcdu-key">3</button>
-                      <button className="mcdu-key">4</button>
-                      <button className="mcdu-key">5</button>
-                      <button className="mcdu-key">6</button>
-                      <button className="mcdu-key">7</button>
-                      <button className="mcdu-key">8</button>
-                      <button className="mcdu-key">9</button>
-                      <button className="mcdu-key">0</button>
-                    </div>
-                    <div className="mcdu-letter-row">
-                      <button className="mcdu-key">A</button>
-                      <button className="mcdu-key">B</button>
-                      <button className="mcdu-key">C</button>
-                      <button className="mcdu-key">D</button>
-                      <button className="mcdu-key">E</button>
-                      <button className="mcdu-key">F</button>
-                      <button className="mcdu-key">G</button>
-                      <button className="mcdu-key">H</button>
-                      <button className="mcdu-key">I</button>
-                    </div>
-                    <div className="mcdu-letter-row">
-                      <button className="mcdu-key">J</button>
-                      <button className="mcdu-key">K</button>
-                      <button className="mcdu-key">L</button>
-                      <button className="mcdu-key">M</button>
-                      <button className="mcdu-key">N</button>
-                      <button className="mcdu-key">O</button>
-                      <button className="mcdu-key">P</button>
-                      <button className="mcdu-key">Q</button>
-                      <button className="mcdu-key">R</button>
-                    </div>
-                    <div className="mcdu-letter-row">
-                      <button className="mcdu-key">S</button>
-                      <button className="mcdu-key">T</button>
-                      <button className="mcdu-key">U</button>
-                      <button className="mcdu-key">V</button>
-                      <button className="mcdu-key">W</button>
-                      <button className="mcdu-key">X</button>
-                      <button className="mcdu-key">Y</button>
-                      <button className="mcdu-key">Z</button>
-                      <button className="mcdu-key">.</button>
-                    </div>
+
+                  {/* Navigation Keys */}
+                  <div className="mcdu-nav-keys">
+                    <button className="mcdu-key nav">F-PLN</button>
+                    <button className="mcdu-key nav">RAD NAV</button>
+                    <button className="mcdu-key nav">FUEL PRED</button>
+                    <button className="mcdu-key nav">SEC F-PLN</button>
+                    <button className="mcdu-key nav">ATC COMM</button>
+                    <button className="mcdu-key nav">MCDU MENU</button>
                   </div>
+
+                  {/* Letter Grid (like your image) */}
+                  <div className="mcdu-letter-grid">
+                    <button className="mcdu-key letter">A</button>
+                    <button className="mcdu-key letter">B</button>
+                    <button className="mcdu-key letter">C</button>
+                    <button className="mcdu-key letter">D</button>
+                    <button className="mcdu-key letter">E</button>
+                    <button className="mcdu-key letter">F</button>
+                    <button className="mcdu-key letter">G</button>
+                    <button className="mcdu-key letter">H</button>
+                    <button className="mcdu-key letter">I</button>
+                    <button className="mcdu-key letter">J</button>
+                    <button className="mcdu-key letter">K</button>
+                    <button className="mcdu-key letter">L</button>
+                    <button className="mcdu-key letter">M</button>
+                    <button className="mcdu-key letter">N</button>
+                    <button className="mcdu-key letter">O</button>
+                    <button className="mcdu-key letter">P</button>
+                    <button className="mcdu-key letter">Q</button>
+                    <button className="mcdu-key letter">R</button>
+                    <button className="mcdu-key letter">S</button>
+                    <button className="mcdu-key letter">T</button>
+                    <button className="mcdu-key letter">U</button>
+                    <button className="mcdu-key letter">V</button>
+                    <button className="mcdu-key letter">W</button>
+                    <button className="mcdu-key letter">X</button>
+                    <button className="mcdu-key letter">Y</button>
+                  </div>
+
+                  {/* Number Row */}
+                  <div className="mcdu-number-row">
+                    <button className="mcdu-key number">1</button>
+                    <button className="mcdu-key number">2</button>
+                    <button className="mcdu-key number">3</button>
+                    <button className="mcdu-key number">4</button>
+                    <button className="mcdu-key number">5</button>
+                    <button className="mcdu-key number">6</button>
+                    <button className="mcdu-key number">7</button>
+                    <button className="mcdu-key number">8</button>
+                    <button className="mcdu-key number">9</button>
+                    <button className="mcdu-key number">0</button>
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  <div className="mcdu-nav-keys">
+                    <button className="mcdu-key nav">←</button>
+                    <button className="mcdu-key nav">↑</button>
+                    <button className="mcdu-key nav">→</button>
+                    <button className="mcdu-key nav">↓</button>
+                  </div>
+
+                  {/* Special Keys */}
+                  <div className="mcdu-nav-keys">
+                    <button className="mcdu-key special">SP</button>
+                    <button className="mcdu-key special">OVFY</button>
+                    <button className="mcdu-key special">CLR</button>
+                  </div>
+
+                  {/* Bottom Control Keys */}
                   <div className="mcdu-control-keys">
-                    <button className="mcdu-key control">CLR</button>
+                    <button className="mcdu-key control">BRT</button>
+                    <button className="mcdu-key control">DIM</button>
                     <button className="mcdu-key control" onClick={() => setMcduDisplay({
                       title: "MCDU",
                       lines: [
@@ -1875,7 +1912,6 @@ export default function App() {
                       ],
                       activeFunction: "MENU"
                     })}>MENU</button>
-                    <button className="mcdu-key control">→</button>
                   </div>
                 </div>
               </div>
