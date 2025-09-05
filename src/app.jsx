@@ -39,82 +39,124 @@ export default function App() {
     currentPage: "INIT",
     lines: [],
     scratchpad: "",
-    activeLineSelect: null
+    activeLineSelect: null,
+    fromAirport: "",
+    toAirport: "",
+    flightNumberMcdu: "",
+    grossWeight: ""
   });
 
+  const [groundCrewSchedule, setGroundCrewSchedule] = useState([]);
+  const [equipmentStatus, setEquipmentStatus] = useState({});
+  const [activeIncidents, setActiveIncidents] = useState([]);
+  const [maintenanceLog, setMaintenanceLog] = useState([]);
+
   const handleMcduKey = (key) => {
-    if (key >= 'A' && key <= 'Z') {
-      setMcduDisplay(prev => ({
-        ...prev,
-        scratchpad: prev.scratchpad + key
-      }));
-    } else if (key >= '0' && key <= '9') {
-      setMcduDisplay(prev => ({
-        ...prev,
-        scratchpad: prev.scratchpad + key
-      }));
-    } else if (key === 'CLR') {
-      setMcduDisplay(prev => ({
-        ...prev,
-        scratchpad: prev.scratchpad.slice(0, -1)
-      }));
-    } else if (key === 'SP') {
-      setMcduDisplay(prev => ({
-        ...prev,
-        scratchpad: prev.scratchpad + ' '
-      }));
-    } else if (key === '/') {
-      setMcduDisplay(prev => ({
-        ...prev,
-        scratchpad: prev.scratchpad + '/'
-      }));
-    } else if (key.startsWith('LSK')) {
-      // Handle Line Select Key presses
-      const lineNumber = parseInt(key.replace('LSK', ''));
-      handleLineSelect(lineNumber);
-    } else if (key === 'INIT') {
-      setMcduDisplay(prev => ({ ...prev, currentPage: 'INIT' }));
-    } else if (key === 'F-PLN') {
-      setMcduDisplay(prev => ({ ...prev, currentPage: 'FPLN' }));
-    } else if (key === 'PERF') {
-      setMcduDisplay(prev => ({ ...prev, currentPage: 'PERF' }));
-    } else if (key === 'DATA') {
-      setMcduDisplay(prev => ({ ...prev, currentPage: 'DATA' }));
-    }
-    updateMcduDisplay();
-  };
-
-  const handleLineSelect = (lineNumber) => {
-    if (mcduDisplay.scratchpad) {
-      // Insert scratchpad content into selected line
-      const newLines = [...mcduDisplay.lines];
-      if (lineNumber <= newLines.length) {
-        newLines[lineNumber - 1] = mcduDisplay.scratchpad;
-        setMcduDisplay(prev => ({
-          ...prev,
-          lines: newLines,
-          scratchpad: ""
-        }));
+    setMcduDisplay(prev => {
+      let newState = { ...prev };
+      
+      if (key >= 'A' && key <= 'Z') {
+        newState.scratchpad = prev.scratchpad + key;
+      } else if (key >= '0' && key <= '9') {
+        newState.scratchpad = prev.scratchpad + key;
+      } else if (key === 'CLR') {
+        if (prev.scratchpad.length > 0) {
+          newState.scratchpad = prev.scratchpad.slice(0, -1);
+        } else {
+          newState.scratchpad = '';
+        }
+      } else if (key === 'SP') {
+        newState.scratchpad = prev.scratchpad + ' ';
+      } else if (key === '/') {
+        newState.scratchpad = prev.scratchpad + '/';
+      } else if (key === '.') {
+        newState.scratchpad = prev.scratchpad + '.';
+      } else if (key === '-') {
+        newState.scratchpad = prev.scratchpad + '-';
+      } else if (key.startsWith('LSK')) {
+        const lineNumber = parseInt(key.replace(/LSK(\d+)[LR]/, '$1'));
+        const side = key.includes('L') ? 'L' : 'R';
+        handleLineSelect(lineNumber, side);
+        return newState; // Don't update display here
+      } else if (key === 'INIT') {
+        newState.currentPage = 'INIT';
+        newState.scratchpad = '';
+      } else if (key === 'F-PLN') {
+        newState.currentPage = 'FPLN';
+        newState.scratchpad = '';
+      } else if (key === 'PERF') {
+        newState.currentPage = 'PERF';
+        newState.scratchpad = '';
+      } else if (key === 'DATA') {
+        newState.currentPage = 'DATA';
+        newState.scratchpad = '';
+      } else if (key === 'MENU') {
+        newState.currentPage = 'MENU';
+        newState.scratchpad = '';
       }
-    }
+      
+      // Update display based on new state
+      return updateMcduDisplayState(newState);
+    });
   };
 
-  const updateMcduDisplay = () => {
+  const handleLineSelect = (lineNumber, side) => {
+    setMcduDisplay(prev => {
+      if (prev.scratchpad) {
+        // Handle specific line selections based on page
+        let newState = { ...prev };
+        
+        switch (prev.currentPage) {
+          case 'INIT':
+            if (lineNumber === 2 && side === 'L') {
+              // FROM airport
+              if (prev.scratchpad.length === 4) {
+                newState.fromAirport = prev.scratchpad;
+                newState.scratchpad = '';
+              }
+            } else if (lineNumber === 2 && side === 'R') {
+              // TO airport
+              if (prev.scratchpad.length === 4) {
+                newState.toAirport = prev.scratchpad;
+                newState.scratchpad = '';
+              }
+            } else if (lineNumber === 3 && side === 'L') {
+              // Flight number
+              newState.flightNumberMcdu = prev.scratchpad;
+              newState.scratchpad = '';
+            }
+            break;
+          case 'PERF':
+            if (lineNumber === 2 && side === 'L') {
+              // Gross weight input
+              newState.grossWeight = prev.scratchpad;
+              newState.scratchpad = '';
+            }
+            break;
+        }
+        
+        return updateMcduDisplayState(newState);
+      }
+      return prev;
+    });
+  };
+
+  const updateMcduDisplayState = (state) => {
     let newLines = [];
     
-    switch (mcduDisplay.currentPage) {
+    switch (state.currentPage) {
       case 'INIT':
         newLines = [
           "     A320 INIT      ",
           "",
           "FROM/TO",
-          `${selectedAirport || "----"}/----`,
+          `${state.fromAirport || selectedAirport || "----"}/${state.toAirport || "----"}`,
           "",
           "FLT NBR        COST INDEX",
-          `${flightNumber || "----"}              085`,
+          `${state.flightNumberMcdu || flightNumber || "----"}              085`,
           "",
           "ALTN         CRZ FL/TEMP",
-          "----         FL350/--C",
+          "----         FL350/-45C",
           "",
           "<INDEX       INIT>"
         ];
@@ -123,8 +165,8 @@ export default function App() {
         newLines = [
           "    A320 F-PLN     1/1",
           "",
-          `FROM         ${selectedAirport || "----"}`,
-          `TO           ----`,
+          `FROM         ${state.fromAirport || selectedAirport || "----"}`,
+          `TO           ${state.toAirport || "----"}`,
           "",
           "VIA          DIRECT",
           "",
@@ -139,14 +181,14 @@ export default function App() {
         newLines = [
           "   A320 PERF INIT   1/3",
           "",
-          "GW           ---.-T",
-          `PAX          ${passengerManifest.length}`,
+          "GW           " + (state.grossWeight || "---.-") + "T",
+          `PAX          ${passengerManifest.length}/180`,
           "",
-          "V1           ---KT",
-          "VR           ---KT", 
-          "V2           ---KT",
+          "V1           147KT",
+          "VR           152KT", 
+          "V2           159KT",
           "",
-          "TRANS ALT    18000",
+          "TRANS ALT    18000FT",
           "",
           "<TAKEOFF     APPR>"
         ];
@@ -167,11 +209,31 @@ export default function App() {
           "<REQUEST     PRINT>"
         ];
         break;
+      case 'MENU':
+        newLines = [
+          "    A320 MCDU MENU  ",
+          "",
+          "<FMGC        ATSU>",
+          "",
+          "<AIDS        CFDS>",
+          "",
+          "<MAINTENANCE     >",
+          "",
+          "<SYS REPORT/TEST>",
+          "",
+          "",
+          "<RETURN"
+        ];
+        break;
       default:
-        newLines = mcduDisplay.lines;
+        newLines = state.lines || [];
     }
     
-    setMcduDisplay(prev => ({ ...prev, lines: newLines }));
+    return { ...state, lines: newLines };
+  };
+
+  const updateMcduDisplay = () => {
+    setMcduDisplay(prev => updateMcduDisplayState(prev));
   };
 
   useEffect(() => {
@@ -1224,8 +1286,17 @@ export default function App() {
     });
   };
 
+  const [weightBalanceData, setWeightBalanceData] = useState(null);
+
   const calculateWeightAndBalance = () => {
     if (!aircraftData || passengerManifest.length === 0) return null;
+
+    // Use cached data if available and aircraft/passenger count hasn't changed
+    if (weightBalanceData && 
+        weightBalanceData.aircraftType === aircraft && 
+        weightBalanceData.passengerCount === passengerManifest.length) {
+      return weightBalanceData.data;
+    }
 
     const passengerWeight = passengerManifest.length * 84; // Average passenger weight in kg (84kg including carry-on)
     const baggageWeight = passengerManifest.length * 23; // Average checked baggage weight
@@ -1238,9 +1309,10 @@ export default function App() {
     const payloadWeight = passengerWeight + baggageWeight;
     const remainingCapacity = maxTakeoffWeight - operatingEmptyWeight - payloadWeight;
     
-    // Use 70-85% of remaining capacity for fuel to stay well within limits
-    const fuelWeight = Math.round(remainingCapacity * (0.70 + Math.random() * 0.15));
-    const cargoWeight = Math.round(Math.min(2000, remainingCapacity * 0.1)); // Small cargo load
+    // Use a fixed percentage based on aircraft type for consistency
+    const fuelPercentage = aircraft.includes('A380') ? 0.75 : aircraft.includes('747') ? 0.72 : 0.78;
+    const fuelWeight = Math.round(remainingCapacity * fuelPercentage);
+    const cargoWeight = Math.round(Math.min(2000, remainingCapacity * 0.08)); // Small cargo load
     
     const totalWeight = operatingEmptyWeight + passengerWeight + baggageWeight + fuelWeight + cargoWeight;
     
@@ -1257,9 +1329,9 @@ export default function App() {
       (fuelWeight * fuelArm);
     
     const cgPosition = totalMoment / totalWeight;
-    const cgPercentMAC = 25 + Math.random() * 8; // Keep CG between 25-33% MAC (safe range)
+    const cgPercentMAC = 27.5; // Fixed safe CG position
     
-    return {
+    const wbData = {
       passengerWeight,
       baggageWeight,
       fuelWeight,
@@ -1267,8 +1339,17 @@ export default function App() {
       totalWeight,
       cgPosition: cgPosition.toFixed(1),
       cgPercentMAC: cgPercentMAC.toFixed(1),
-      withinLimits: true // Always within limits now
+      withinLimits: true
     };
+
+    // Cache the data
+    setWeightBalanceData({
+      aircraftType: aircraft,
+      passengerCount: passengerManifest.length,
+      data: wbData
+    });
+    
+    return wbData;
   };
 
   const updateFlightDocument = (docType, updates) => {
@@ -1276,6 +1357,63 @@ export default function App() {
       ...prev,
       [docType]: { ...prev[docType], ...updates }
     }));
+  };
+
+  const addMaintenanceLog = (issue, severity, equipment) => {
+    const newLog = {
+      id: Date.now(),
+      timestamp: new Date().toLocaleTimeString(),
+      date: new Date().toLocaleDateString(),
+      issue,
+      severity,
+      equipment,
+      reportedBy: user?.username,
+      status: 'Open',
+      airport: selectedAirport
+    };
+    setMaintenanceLog(prev => [newLog, ...prev]);
+  };
+
+  const reportIncident = (type, description, location, severity) => {
+    const newIncident = {
+      id: Date.now(),
+      timestamp: new Date().toLocaleTimeString(),
+      date: new Date().toLocaleDateString(),
+      type,
+      description,
+      location,
+      severity,
+      reportedBy: user?.username,
+      status: 'Active',
+      airport: selectedAirport
+    };
+    setActiveIncidents(prev => [newIncident, ...prev]);
+  };
+
+  const updateEquipmentStatus = (equipment, status, location) => {
+    setEquipmentStatus(prev => ({
+      ...prev,
+      [equipment]: {
+        status,
+        location,
+        lastUpdate: new Date().toLocaleTimeString(),
+        updatedBy: user?.username
+      }
+    }));
+  };
+
+  const scheduleCrewMember = (name, shift, tasks, area) => {
+    const newSchedule = {
+      id: Date.now(),
+      name,
+      shift,
+      tasks,
+      area,
+      status: 'Scheduled',
+      scheduledBy: user?.username,
+      date: new Date().toLocaleDateString()
+    };
+    setGroundCrewSchedule(prev => [newSchedule, ...prev]);
   };
 
   const toggleChecklistItem = (category, index) => {
@@ -1955,11 +2093,12 @@ export default function App() {
                     {mcduDisplay.lines.map((line, index) => (
                       <div key={index} className="mcdu-line">{line}</div>
                     ))}
-                    {mcduDisplay.scratchpad && (
-                      <div className="mcdu-scratchpad">
-                        SCRATCHPAD: {mcduDisplay.scratchpad}
+                    <div className="mcdu-scratchpad-area">
+                      <div className="mcdu-scratchpad-label">SCRATCHPAD</div>
+                      <div className="mcdu-scratchpad-content">
+                        {mcduDisplay.scratchpad || "_"}
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
                 
@@ -2438,7 +2577,196 @@ export default function App() {
       const lowPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Cleaning", "Water Service", "Lavatory Service"].includes(r.service));
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
-      // Ground crew interface with operations guides
+      // Ground crew interface with multiple tabs
+      if (activeTab === "maintenance") {
+        return (
+          <div className="maintenance-container">
+            <div className="maintenance-header">
+              <h2>MAINTENANCE & INCIDENT REPORTING</h2>
+              <div className="maintenance-stats">
+                <div className="stat">
+                  <span className="stat-value">{maintenanceLog.filter(l => l.status === 'Open').length}</span>
+                  <span className="stat-label">OPEN ISSUES</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-value">{activeIncidents.length}</span>
+                  <span className="stat-label">ACTIVE INCIDENTS</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-value">{Object.keys(equipmentStatus).filter(e => equipmentStatus[e].status === 'Available').length}</span>
+                  <span className="stat-label">EQUIPMENT READY</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="maintenance-sections">
+              <div className="maintenance-section">
+                <h3>QUICK REPORT</h3>
+                <div className="quick-report-buttons">
+                  <button 
+                    className="report-btn critical" 
+                    onClick={() => addMaintenanceLog('Ground Support Equipment Malfunction', 'Critical', 'GPU Unit 3')}
+                  >
+                    🚨 EQUIPMENT FAILURE
+                  </button>
+                  <button 
+                    className="report-btn high" 
+                    onClick={() => reportIncident('Safety', 'Foreign Object Debris on taxiway', 'Taxiway Charlie', 'High')}
+                  >
+                    ⚠️ SAFETY INCIDENT
+                  </button>
+                  <button 
+                    className="report-btn medium" 
+                    onClick={() => addMaintenanceLog('Routine Inspection Due', 'Medium', 'Fuel Truck 2')}
+                  >
+                    🔧 MAINTENANCE DUE
+                  </button>
+                  <button 
+                    className="report-btn low" 
+                    onClick={() => reportIncident('Operational', 'Gate lighting malfunction', 'Gate B12', 'Low')}
+                  >
+                    💡 FACILITY ISSUE
+                  </button>
+                </div>
+              </div>
+
+              <div className="maintenance-section">
+                <h3>EQUIPMENT STATUS</h3>
+                <div className="equipment-grid">
+                  {['GPU Unit 1', 'GPU Unit 2', 'GPU Unit 3', 'Fuel Truck 1', 'Fuel Truck 2', 'Pushback Tractor 1', 'Pushback Tractor 2', 'Catering Truck 1', 'Baggage Cart 1', 'Baggage Cart 2'].map(equipment => (
+                    <div key={equipment} className="equipment-item">
+                      <div className="equipment-name">{equipment}</div>
+                      <div className="equipment-controls">
+                        <button 
+                          className="status-btn available" 
+                          onClick={() => updateEquipmentStatus(equipment, 'Available', 'Equipment Pool')}
+                        >
+                          AVAILABLE
+                        </button>
+                        <button 
+                          className="status-btn in-use" 
+                          onClick={() => updateEquipmentStatus(equipment, 'In Use', 'Gate Area')}
+                        >
+                          IN USE
+                        </button>
+                        <button 
+                          className="status-btn maintenance" 
+                          onClick={() => updateEquipmentStatus(equipment, 'Maintenance', 'Service Hangar')}
+                        >
+                          MAINTENANCE
+                        </button>
+                      </div>
+                      {equipmentStatus[equipment] && (
+                        <div className="equipment-status">
+                          <span className={`status-indicator ${equipmentStatus[equipment].status.toLowerCase().replace(' ', '-')}`}></span>
+                          <span>{equipmentStatus[equipment].status} - {equipmentStatus[equipment].location}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="maintenance-section">
+                <h3>MAINTENANCE LOG</h3>
+                <div className="maintenance-list">
+                  {maintenanceLog.map(log => (
+                    <div key={log.id} className={`maintenance-item ${log.severity.toLowerCase()}`}>
+                      <div className="maintenance-header">
+                        <span className="maintenance-issue">{log.issue}</span>
+                        <span className="maintenance-time">{log.date} {log.timestamp}</span>
+                      </div>
+                      <div className="maintenance-details">
+                        <span><strong>Equipment:</strong> {log.equipment}</span>
+                        <span><strong>Severity:</strong> {log.severity}</span>
+                        <span><strong>Reported by:</strong> {log.reportedBy}</span>
+                        <span><strong>Status:</strong> {log.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (activeTab === "scheduling") {
+        return (
+          <div className="scheduling-container">
+            <div className="scheduling-header">
+              <h2>CREW SCHEDULING & ASSIGNMENTS</h2>
+              <div className="scheduling-stats">
+                <div className="stat">
+                  <span className="stat-value">{groundCrewSchedule.filter(s => s.status === 'Scheduled').length}</span>
+                  <span className="stat-label">SCHEDULED</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-value">{groundCrewSchedule.filter(s => s.shift === 'Day').length}</span>
+                  <span className="stat-label">DAY SHIFT</span>
+                </div>
+                <div className="stat">
+                  <span className="stat-value">{groundCrewSchedule.filter(s => s.shift === 'Night').length}</span>
+                  <span className="stat-label">NIGHT SHIFT</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="scheduling-sections">
+              <div className="scheduling-section">
+                <h3>QUICK SCHEDULE</h3>
+                <div className="quick-schedule-buttons">
+                  <button 
+                    className="schedule-btn" 
+                    onClick={() => scheduleCrewMember('Ground Crew A', 'Day', ['Baggage Handling', 'Marshalling'], 'Gates 1-5')}
+                  >
+                    👷‍♂️ SCHEDULE BAGGAGE CREW
+                  </button>
+                  <button 
+                    className="schedule-btn" 
+                    onClick={() => scheduleCrewMember('Fuel Crew B', 'Day', ['Aircraft Fueling', 'Safety Monitoring'], 'Fuel Area')}
+                  >
+                    ⛽ SCHEDULE FUEL CREW
+                  </button>
+                  <button 
+                    className="schedule-btn" 
+                    onClick={() => scheduleCrewMember('Catering Team C', 'Day', ['Cabin Service', 'Water Service'], 'Gates 6-10')}
+                  >
+                    🍽️ SCHEDULE CATERING
+                  </button>
+                  <button 
+                    className="schedule-btn" 
+                    onClick={() => scheduleCrewMember('Maintenance Tech D', 'Night', ['Routine Checks', 'Equipment Service'], 'Maintenance Area')}
+                  >
+                    🔧 SCHEDULE MAINTENANCE
+                  </button>
+                </div>
+              </div>
+
+              <div className="scheduling-section">
+                <h3>CREW ASSIGNMENTS</h3>
+                <div className="crew-list">
+                  {groundCrewSchedule.map(crew => (
+                    <div key={crew.id} className="crew-item">
+                      <div className="crew-header">
+                        <span className="crew-name">{crew.name}</span>
+                        <span className="crew-shift">{crew.shift} SHIFT</span>
+                      </div>
+                      <div className="crew-details">
+                        <span><strong>Area:</strong> {crew.area}</span>
+                        <span><strong>Tasks:</strong> {crew.tasks.join(', ')}</span>
+                        <span><strong>Scheduled by:</strong> {crew.scheduledBy}</span>
+                        <span><strong>Date:</strong> {crew.date}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       if (activeTab === "guides") {
         return (
           <div className="guides-container">
@@ -2766,6 +3094,20 @@ export default function App() {
             >
               <span className="nav-icon">🏠</span>
               <span>OPERATIONS</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'maintenance' ? 'active' : ''}`}
+              onClick={() => setActiveTab('maintenance')}
+            >
+              <span className="nav-icon">🔧</span>
+              <span>MAINTENANCE</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'scheduling' ? 'active' : ''}`}
+              onClick={() => setActiveTab('scheduling')}
+            >
+              <span className="nav-icon">📅</span>
+              <span>SCHEDULING</span>
             </button>
             <button
               className={`nav-btn ${activeTab === 'guides' ? 'active' : ''}`}
