@@ -2088,108 +2088,217 @@ export default function App() {
           return (
             <div className="mcdu-container">
               <div className="mcdu-unit">
-                <div className="mcdu-screen">
-                  <div className="mcdu-content">
-                    {mcduDisplay.lines.map((line, index) => (
-                      <div key={index} className="mcdu-line">{line}</div>
-                    ))}
-                    <div className="mcdu-scratchpad-area">
-                      <div className="mcdu-scratchpad-label">SCRATCHPAD</div>
-                      <div className="mcdu-scratchpad-content">
-                        {mcduDisplay.scratchpad || "_"}
+                {/* MCDU Header */}
+                <div className="mcdu-header">
+                  <div className="mcdu-label">MCDU</div>
+                  <div className="mcdu-model">A320 FAMILY</div>
+                </div>
+
+                {/* Main Screen */}
+                <div className="mcdu-main-screen">
+                  <div className="mcdu-screen-bezel">
+                    <div className="mcdu-screen-inner">
+                      <div className="mcdu-display-area">
+                        {/* Line Select Labels */}
+                        <div className="mcdu-line-selects">
+                          <div className="lsk-labels left">
+                            {[1,2,3,4,5,6].map(num => (
+                              <button key={`L${num}`} className="lsk-button left" onClick={() => handleMcduKey(`LSK${num}L`)}>
+                                <span className="lsk-arrow">◄</span>
+                              </button>
+                            ))}
+                          </div>
+                          
+                          {/* Display Content */}
+                          <div className="mcdu-display-content">
+                            <div className="mcdu-title-line">
+                              {mcduDisplay.currentPage === 'INIT' && 'A320 MCDU     INIT'}
+                              {mcduDisplay.currentPage === 'FPLN' && 'A320 MCDU    F-PLN'}
+                              {mcduDisplay.currentPage === 'PERF' && 'A320 MCDU     PERF'}
+                              {mcduDisplay.currentPage === 'DATA' && 'A320 MCDU     DATA'}
+                              {mcduDisplay.currentPage === 'MENU' && 'A320 MCDU     MENU'}
+                            </div>
+                            
+                            {/* Dynamic Content Based on Page */}
+                            <div className="mcdu-content-lines">
+                              {mcduDisplay.currentPage === 'INIT' && (
+                                <>
+                                  <div className="mcdu-line small-text">CO RTE</div>
+                                  <div className="mcdu-line">FROM/TO</div>
+                                  <div className="mcdu-line large-text cyan">{mcduDisplay.fromAirport || selectedAirport || '□□□□'}/{mcduDisplay.toAirport || '□□□□'}</div>
+                                  <div className="mcdu-line small-text">FLT NBR        CRZ FL/TEMP</div>
+                                  <div className="mcdu-line large-text cyan">{mcduDisplay.flightNumberMcdu || flightNumber || '□□□□'}         FL350/-45°C</div>
+                                  <div className="mcdu-line small-text">COST INDEX</div>
+                                  <div className="mcdu-line large-text">85</div>
+                                </>
+                              )}
+                              
+                              {mcduDisplay.currentPage === 'FPLN' && (
+                                <>
+                                  <div className="mcdu-line small-text">ORIGIN        DEST</div>
+                                  <div className="mcdu-line large-text cyan">{mcduDisplay.fromAirport || selectedAirport || '----'}          {mcduDisplay.toAirport || '----'}</div>
+                                  <div className="mcdu-line small-text">RUNWAY        VIA</div>
+                                  <div className="mcdu-line large-text">27           DIRECT</div>
+                                  <div className="mcdu-line small-text">DIST   TIME   FUEL</div>
+                                  <div className="mcdu-line large-text">150NM  0+25   1.2T</div>
+                                </>
+                              )}
+                              
+                              {mcduDisplay.currentPage === 'PERF' && (
+                                <>
+                                  <div className="mcdu-line small-text">GW         ZFW</div>
+                                  <div className="mcdu-line large-text cyan">{mcduDisplay.grossWeight || '75.2'}T        58.4T</div>
+                                  <div className="mcdu-line small-text">V1    VR    V2</div>
+                                  <div className="mcdu-line large-text">147   152   159</div>
+                                  <div className="mcdu-line small-text">FLAPS  THS</div>
+                                  <div className="mcdu-line large-text">1+F    UP2.1</div>
+                                </>
+                              )}
+
+                              {mcduDisplay.currentPage === 'DATA' && (
+                                <>
+                                  <div className="mcdu-line small-text">GPS         IRS</div>
+                                  <div className="mcdu-line large-text green">PRIMARY     PRIMARY</div>
+                                  <div className="mcdu-line small-text">PRINT FUNCTION</div>
+                                  <div className="mcdu-line large-text">READY</div>
+                                  <div className="mcdu-line small-text">ACARS STATUS</div>
+                                  <div className="mcdu-line large-text green">ACTIVE</div>
+                                </>
+                              )}
+
+                              {mcduDisplay.currentPage === 'MENU' && (
+                                <>
+                                  <div className="mcdu-line small-text">FMGC      ATSU</div>
+                                  <div className="mcdu-line large-text">MENU      MENU</div>
+                                  <div className="mcdu-line small-text">AIDS      CFDS</div>
+                                  <div className="mcdu-line large-text">MENU      MENU</div>
+                                  <div className="mcdu-line small-text">MAINTENANCE</div>
+                                  <div className="mcdu-line large-text">MENU</div>
+                                </>
+                              )}
+                            </div>
+
+                            {/* Scratchpad */}
+                            <div className="mcdu-scratchpad">
+                              <div className="scratchpad-content">
+                                {mcduDisplay.scratchpad || '_'}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="lsk-labels right">
+                            {[1,2,3,4,5,6].map(num => (
+                              <button key={`R${num}`} className="lsk-button right" onClick={() => handleMcduKey(`LSK${num}R`)}>
+                                <span className="lsk-arrow">►</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                
-                <div className="mcdu-keypad">
-                  {/* Top Function Keys Row */}
-                  <div className="mcdu-function-keys">
-                    <button className="mcdu-key function" onClick={() => handleMcduKey('DIR')}>DIR</button>
-                    <button className="mcdu-key function" onClick={() => handleMcduKey('PROG')}>PROG</button>
-                    <button className="mcdu-key function" onClick={() => handleMcduKey('PERF')}>PERF</button>
-                    <button className="mcdu-key function" onClick={() => handleMcduKey('INIT')}>INIT</button>
-                    <button className="mcdu-key function" onClick={() => handleMcduKey('DATA')}>DATA</button>
-                    <button className="mcdu-key function"></button>
-                  </div>
 
-                  {/* Line Select Keys */}
-                  <div className="mcdu-line-select-keys">
-                    <div className="mcdu-left-keys">
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK1L')}>◄</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK2L')}>◄</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK3L')}>◄</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK4L')}>◄</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK5L')}>◄</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK6L')}>◄</button>
-                    </div>
-                    <div className="mcdu-right-keys">
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK1R')}>►</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK2R')}>►</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK3R')}>►</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK4R')}>►</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK5R')}>►</button>
-                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK6R')}>►</button>
-                    </div>
-                  </div>
+                {/* Function Keys */}
+                <div className="mcdu-function-row">
+                  <button className="mcdu-btn function" onClick={() => handleMcduKey('DIR')}>DIR</button>
+                  <button className="mcdu-btn function" onClick={() => handleMcduKey('PROG')}>PROG</button>
+                  <button className="mcdu-btn function" onClick={() => handleMcduKey('PERF')}>PERF</button>
+                  <button className="mcdu-btn function" onClick={() => handleMcduKey('INIT')}>INIT</button>
+                  <button className="mcdu-btn function" onClick={() => handleMcduKey('DATA')}>DATA</button>
+                  <button className="mcdu-btn function disabled"></button>
+                </div>
 
-                  {/* Navigation Keys Row */}
-                  <div className="mcdu-nav-keys">
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('F-PLN')}>F-PLN</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('RAD NAV')}>RAD NAV</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('FUEL PRED')}>FUEL PRED</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('SEC F-PLN')}>SEC F-PLN</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('ATC COMM')}>ATC COMM</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('MCDU MENU')}>MCDU MENU</button>
-                  </div>
+                {/* Navigation Keys */}
+                <div className="mcdu-nav-row">
+                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('F-PLN')}>F-PLN</button>
+                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('RAD')}>RAD<br/>NAV</button>
+                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('FUEL')}>FUEL<br/>PRED</button>
+                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('SEC')}>SEC<br/>F-PLN</button>
+                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('ATC')}>ATC<br/>COMM</button>
+                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('MCDU MENU')}>MCDU<br/>MENU</button>
+                </div>
 
-                  {/* AIRPORT key row */}
-                  <div className="mcdu-nav-keys">
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('AIRPORT')}>AIRPORT</button>
-                    <button className="mcdu-key special"></button>
-                    <button className="mcdu-key special"></button>
-                    <button className="mcdu-key special"></button>
-                    <button className="mcdu-key special"></button>
-                    <button className="mcdu-key special"></button>
-                  </div>
+                {/* Airport/Special Row */}
+                <div className="mcdu-special-row">
+                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('AIRPORT')}>AIRPORT</button>
+                  <button className="mcdu-btn nav disabled"></button>
+                  <button className="mcdu-btn nav disabled"></button>
+                  <button className="mcdu-btn nav disabled"></button>
+                  <button className="mcdu-btn nav disabled"></button>
+                  <button className="mcdu-btn nav disabled"></button>
+                </div>
 
-                  {/* Arrow Keys */}
-                  <div className="mcdu-arrow-keys">
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('←')}>◄</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('↑')}>▲</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('→')}>►</button>
-                    <button className="mcdu-key nav" onClick={() => handleMcduKey('↓')}>▼</button>
-                  </div>
+                {/* Arrow Keys */}
+                <div className="mcdu-arrow-row">
+                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('←')}>←</button>
+                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('↑')}>↑</button>
+                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('→')}>→</button>
+                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('↓')}>↓</button>
+                </div>
 
-                  {/* Letter Grid */}
-                  <div className="mcdu-letter-grid">
-                    {['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y'].map(letter => (
-                      <button key={letter} className="mcdu-key letter" onClick={() => handleMcduKey(letter)}>{letter}</button>
+                {/* Alpha Keys */}
+                <div className="mcdu-alpha-section">
+                  <div className="mcdu-alpha-row">
+                    {['A','B','C','D','E'].map(letter => (
+                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
                     ))}
                   </div>
-
-                  {/* Number Row */}
-                  <div className="mcdu-number-row">
-                    {['1','2','3','4','5','6','7','8','9','0'].map(number => (
-                      <button key={number} className="mcdu-key number" onClick={() => handleMcduKey(number)}>{number}</button>
+                  <div className="mcdu-alpha-row">
+                    {['F','G','H','I','J'].map(letter => (
+                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
                     ))}
                   </div>
-
-                  {/* Bottom Special Keys */}
-                  <div className="mcdu-bottom-keys">
-                    <button className="mcdu-key special" onClick={() => handleMcduKey('Z')}>Z</button>
-                    <button className="mcdu-key special" onClick={() => handleMcduKey('/')}>/</button>
-                    <button className="mcdu-key special" onClick={() => handleMcduKey('SP')}>SP</button>
-                    <button className="mcdu-key special" onClick={() => handleMcduKey('OVFY')}>OVFY</button>
-                    <button className="mcdu-key special" onClick={() => handleMcduKey('CLR')}>CLR</button>
+                  <div className="mcdu-alpha-row">
+                    {['K','L','M','N','O'].map(letter => (
+                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
+                    ))}
                   </div>
-
-                  {/* Control Keys */}
-                  <div className="mcdu-control-keys">
-                    <button className="mcdu-key control">BRT</button>
-                    <button className="mcdu-key control">DIM</button>
-                    <button className="mcdu-key control">MENU</button>
+                  <div className="mcdu-alpha-row">
+                    {['P','Q','R','S','T'].map(letter => (
+                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
+                    ))}
                   </div>
+                  <div className="mcdu-alpha-row">
+                    {['U','V','W','X','Y'].map(letter => (
+                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Numeric Keys */}
+                <div className="mcdu-numeric-section">
+                  <div className="mcdu-numeric-row">
+                    {['1','2','3','4','5'].map(number => (
+                      <button key={number} className="mcdu-btn numeric" onClick={() => handleMcduKey(number)}>{number}</button>
+                    ))}
+                  </div>
+                  <div className="mcdu-numeric-row">
+                    {['6','7','8','9','0'].map(number => (
+                      <button key={number} className="mcdu-btn numeric" onClick={() => handleMcduKey(number)}>{number}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Special Characters */}
+                <div className="mcdu-special-chars">
+                  <button className="mcdu-btn special" onClick={() => handleMcduKey('.')}>.</button>
+                  <button className="mcdu-btn special" onClick={() => handleMcduKey('/')}>/</button>
+                  <button className="mcdu-btn special" onClick={() => handleMcduKey('SP')}>SP</button>
+                  <button className="mcdu-btn special" onClick={() => handleMcduKey('OVFY')}>OVFY</button>
+                  <button className="mcdu-btn special clr" onClick={() => handleMcduKey('CLR')}>CLR</button>
+                </div>
+
+                {/* Bottom Special */}
+                <div className="mcdu-bottom-special">
+                  <button className="mcdu-btn special" onClick={() => handleMcduKey('Z')}>Z</button>
+                  <button className="mcdu-btn special" onClick={() => handleMcduKey('+/-')}>+/-</button>
+                </div>
+
+                {/* Brightness Controls */}
+                <div className="mcdu-brightness">
+                  <button className="mcdu-btn brightness">BRT</button>
+                  <button className="mcdu-btn brightness">DIM</button>
                 </div>
               </div>
             </div>
