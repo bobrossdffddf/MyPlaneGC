@@ -1752,172 +1752,82 @@ export default function App() {
             <div className="mcdu-container">
               <div className="mcdu-unit">
                 <div className="mcdu-screen">
-                  <div className="mcdu-header">
-                    <div className="mcdu-title">{mcduDisplay.currentPage}</div>
-                    <div className="mcdu-page">1/2</div>
-                  </div>
                   <div className="mcdu-content">
-                    {mcduDisplay.lines.map((line, index) => (
-                      <div key={index} className="mcdu-line">{line}</div>
-                    ))}
+                    <div className="mcdu-line">TAKE OFF RWY 22L</div>
+                    <div className="mcdu-line">122     FLT ACTR</div>
+                    <div className="mcdu-line">125       F=144</div>
+                    <div className="mcdu-line">129  SLAT/FLAP TO 141KT</div>
+                    <div className="mcdu-line">125       CLEAN  FL170M+3</div>
+                    <div className="mcdu-line">              175KT/5</div>
+                    <div className="mcdu-line">TRANS ALT      FLEX TO TEMP</div>
+                    <div className="mcdu-line">  5000           52°C</div>
+                    <div className="mcdu-line">THR RED/ACC   ENG OUT ACC</div>
+                    <div className="mcdu-line">  2150/2150       2150</div>
+                    <div className="mcdu-line">                  NEXT</div>
+                    <div className="mcdu-line">                PHASE></div>
                   </div>
                 </div>
                 
                 <div className="mcdu-keypad">
-                  {/* Top Function Keys */}
+                  {/* Top Function Keys Row */}
                   <div className="mcdu-function-keys">
-                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      currentPage: "DIR",
-                      lines: [
-                        "DIR TO",
-                        "",
-                        `FROM         ${selectedAirport || "----"}`,
-                        "TO           ----",
-                        "",
-                        "DIRECT TO",
-                        "----",
-                        "",
-                        "DIST         ---NM",
-                        "BRG          ---°",
-                        "",
-                        "<INDEX       INIT>"
-                      ],
-                      activeFunction: "DIR"
-                    })}>DIR</button>
-                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      currentPage: "PROG",
-                      lines: [
-                        "PROGRESS      1/2",
-                        "",
-                        "TO DEST      ---NM",
-                        "ETA          --:--",
-                        "",
-                        "FUEL PRED    --.-T",
-                        "FUEL USED    --.-T",
-                        "",
-                        "WIND         ---/--",
-                        "SAT          --°C",
-                        "",
-                        "<BRG/DIST    FUEL>"
-                      ],
-                      activeFunction: "PROG"
-                    })}>PROG</button>
-                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      currentPage: "PERF",
-                      lines: generatePerfPage(),
-                      activeFunction: "PERF"
-                    })}>PERF</button>
-                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      currentPage: "INIT",
-                      lines: generateInitPage(),
-                      activeFunction: "INIT"
-                    })}>INIT</button>
-                    <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      currentPage: "DATA",
-                      lines: [
-                        "STATUS        1/5",
-                        "",
-                        "ENG           L+R",
-                        "LEAP-1A26",
-                        "",
-                        "ACTIVE NAV DATABASE",
-                        "AIRAC 2508  28NOV24",
-                        "",
-                        "SOFTWARE      STATUS",
-                        "STD           OPER",
-                        "",
-                        "<CHG CODE     XLOAD>"
-                      ],
-                      activeFunction: "DATA"
-                    })}>DATA</button>
+                    <button className="mcdu-key function">DIR</button>
+                    <button className="mcdu-key function">PROG</button>
+                    <button className="mcdu-key function">PERF</button>
+                    <button className="mcdu-key function">INIT</button>
+                    <button className="mcdu-key function">DATA</button>
+                    <button className="mcdu-key function"></button>
                   </div>
 
                   {/* Line Select Keys */}
                   <div className="mcdu-line-select-keys">
                     <div className="mcdu-left-keys">
-                      <button className="mcdu-key line-select">L1</button>
-                      <button className="mcdu-key line-select">L2</button>
-                      <button className="mcdu-key line-select">L3</button>
-                      <button className="mcdu-key line-select">L4</button>
-                      <button className="mcdu-key line-select">L5</button>
-                      <button className="mcdu-key line-select">L6</button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
                     </div>
                     <div className="mcdu-right-keys">
-                      <button className="mcdu-key line-select">R1</button>
-                      <button className="mcdu-key line-select">R2</button>
-                      <button className="mcdu-key line-select">R3</button>
-                      <button className="mcdu-key line-select">R4</button>
-                      <button className="mcdu-key line-select">R5</button>
-                      <button className="mcdu-key line-select">R6</button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select"></button>
                     </div>
                   </div>
 
-                  {/* Navigation Keys */}
+                  {/* Navigation Keys Row */}
                   <div className="mcdu-nav-keys">
-                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
-                      currentPage: "F-PLN",
-                      lines: generateNavPage(),
-                      activeFunction: "F-PLN"
-                    })}>F-PLN</button>
-                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
-                      currentPage: "RAD NAV",
-                      lines: [
-                        "RAD NAV       1/4",
-                        "",
-                        "VOR L        108.50",
-                        "CRS          ---°",
-                        "",
-                        "VOR R        ------",
-                        "CRS          ---°",
-                        "",
-                        "ADF L        ------",
-                        "ADF R        ------",
-                        "",
-                        "<LS           LS>"
-                      ],
-                      activeFunction: "RAD NAV"
-                    })}>RAD NAV</button>
-                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
-                      currentPage: "FUEL",
-                      lines: [
-                        "FUEL PRED     1/4",
-                        "",
-                        "DEST         --.-T",
-                        "ALTN         --.-T",
-                        "",
-                        "MIN DEST     --.-T",
-                        "EXTRA        --.-T",
-                        "",
-                        "FOB          --.-T",
-                        "",
-                        "",
-                        "<FUEL PLANNING   >"
-                      ],
-                      activeFunction: "FUEL"
-                    })}>FUEL PRED</button>
+                    <button className="mcdu-key nav">F-PLN</button>
+                    <button className="mcdu-key nav">RAD NAV</button>
+                    <button className="mcdu-key nav">FUEL PRED</button>
                     <button className="mcdu-key nav">SEC F-PLN</button>
                     <button className="mcdu-key nav">ATC COMM</button>
-                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
-                      currentPage: "MENU",
-                      lines: [
-                        "MCDU MENU     1/2",
-                        "",
-                        "<FMGC         REQUEST>",
-                        "",
-                        "<ACARS        ATSU>",
-                        "",
-                        "<AIDS         CFDS>",
-                        "",
-                        "<SYSTEM REPORT/TEST>",
-                        "",
-                        "",
-                        "<PRINT        BITE>"
-                      ],
-                      activeFunction: "MENU"
-                    })}>MCDU MENU</button>
+                    <button className="mcdu-key nav">MCDU MENU</button>
                   </div>
 
-                  {/* Letter Grid (like your image) */}
+                  {/* AIRPORT key row */}
+                  <div className="mcdu-nav-keys">
+                    <button className="mcdu-key nav">AIRPORT</button>
+                    <button className="mcdu-key special"></button>
+                    <button className="mcdu-key special"></button>
+                    <button className="mcdu-key special"></button>
+                    <button className="mcdu-key special"></button>
+                    <button className="mcdu-key special"></button>
+                  </div>
+
+                  {/* Arrow Keys */}
+                  <div className="mcdu-arrow-keys">
+                    <button className="mcdu-key nav">←</button>
+                    <button className="mcdu-key nav">↑</button>
+                    <button className="mcdu-key nav">→</button>
+                    <button className="mcdu-key nav">↓</button>
+                  </div>
+
+                  {/* Letter Grid */}
                   <div className="mcdu-letter-grid">
                     <button className="mcdu-key letter">A</button>
                     <button className="mcdu-key letter">B</button>
@@ -1960,42 +1870,20 @@ export default function App() {
                     <button className="mcdu-key number">0</button>
                   </div>
 
-                  {/* Navigation Arrows */}
-                  <div className="mcdu-nav-keys">
-                    <button className="mcdu-key nav">←</button>
-                    <button className="mcdu-key nav">↑</button>
-                    <button className="mcdu-key nav">→</button>
-                    <button className="mcdu-key nav">↓</button>
-                  </div>
-
-                  {/* Special Keys */}
-                  <div className="mcdu-nav-keys">
+                  {/* Bottom Special Keys */}
+                  <div className="mcdu-bottom-keys">
+                    <button className="mcdu-key special">Z</button>
+                    <button className="mcdu-key special">/</button>
                     <button className="mcdu-key special">SP</button>
                     <button className="mcdu-key special">OVFY</button>
                     <button className="mcdu-key special">CLR</button>
                   </div>
 
-                  {/* Bottom Control Keys */}
+                  {/* Control Keys */}
                   <div className="mcdu-control-keys">
                     <button className="mcdu-key control">BRT</button>
                     <button className="mcdu-key control">DIM</button>
-                    <button className="mcdu-key control" onClick={() => setMcduDisplay({
-                      title: "MCDU",
-                      lines: [
-                        "MCDU MENU",
-                        "",
-                        "<FMGC     REQUEST>",
-                        "",
-                        "<ACARS    ATSU>",
-                        "",
-                        "<AIDS     CFDS>",
-                        "",
-                        "________________",
-                        "",
-                        "SELECT FUNCTION"
-                      ],
-                      activeFunction: "MENU"
-                    })}>MENU</button>
+                    <button className="mcdu-key control">MENU</button>
                   </div>
                 </div>
               </div>

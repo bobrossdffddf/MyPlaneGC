@@ -2497,95 +2497,72 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
 
-/* Professional MCDU Styling - Realistic Aircraft Unit */
+/* Realistic MCDU Styling - Based on Real Aircraft Unit */
 .mcdu-container {
-  background: rgba(15, 20, 35, 0.98);
-  border-radius: 25px;
-  padding: 40px;
+  background: linear-gradient(135deg, #4a5f7a, #5a7299, #6b85b3);
+  border-radius: 15px;
+  padding: 20px;
   margin: 20px auto;
-  border: 2px solid rgba(255, 149, 0, 0.4);
-  backdrop-filter: blur(30px);
+  border: 8px solid #2c3e50;
   box-shadow: 
-    0 25px 80px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 20px 40px rgba(0, 0, 0, 0.6),
+    inset 0 2px 8px rgba(255, 255, 255, 0.2),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 800px;
-  max-width: 600px;
+  max-width: 400px;
   position: relative;
+  transform: perspective(1200px) rotateX(15deg);
 }
 
 .mcdu-container::before {
-  content: 'MCDU - A320 FAMILY';
+  content: '';
   position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: rgba(255, 149, 0, 0.8);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 2px;
-  font-family: 'SF Mono', monospace;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  background: linear-gradient(145deg, #7a8fa4, #8faac4, #a4c5e4);
+  border-radius: 8px;
+  z-index: -1;
 }
 
 .mcdu-unit {
-  background: linear-gradient(145deg, #0a0a0a, #1a1a1a, #0f0f0f);
-  border-radius: 20px;
-  padding: 30px 25px;
-  border: 8px solid #2a2a2a;
-  box-shadow: 
-    0 30px 80px rgba(0, 0, 0, 0.9),
-    inset 0 5px 20px rgba(255, 255, 255, 0.03),
-    inset 0 -5px 20px rgba(0, 0, 0, 0.8),
-    0 0 0 2px #404040;
-  font-family: 'Courier New', 'SF Mono', monospace;
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  min-height: 720px;
-  transform: perspective(1000px) rotateX(2deg);
-}
-
-.mcdu-unit::before {
-  content: '';
-  position: absolute;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
-  background: linear-gradient(45deg, #333333, #1a1a1a, #333333, #1a1a1a);
-  border-radius: 25px;
-  z-index: -1;
-  background-size: 200% 200%;
-  animation: metalShine 4s ease-in-out infinite;
-}
-
-@keyframes metalShine {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.mcdu-screen {
-  background: 
-    radial-gradient(circle at 30% 20%, #001a00, #000f00),
-    linear-gradient(135deg, #000800, #001100, #000600);
-  border: 4px solid #1a1a1a;
+  background: linear-gradient(145deg, #5a7299, #6b85b3, #7c99cc);
   border-radius: 12px;
-  padding: 20px 15px;
-  margin-bottom: 25px;
-  min-height: 240px;
-  color: #00ff41;
+  padding: 15px;
+  width: 100%;
+  max-width: 350px;
   font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  position: relative;
   box-shadow: 
-    inset 0 5px 15px rgba(0, 0, 0, 0.9),
-    inset 0 -2px 8px rgba(0, 255, 65, 0.1),
-    0 0 20px rgba(0, 255, 65, 0.1);
+    inset 0 2px 4px rgba(255, 255, 255, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Screen styling to match the green display */
+.mcdu-screen {
+  background: linear-gradient(135deg, #001100, #002200, #001100);
+  border: 6px solid #2c3e50;
+  border-radius: 8px;
+  padding: 15px 12px;
+  margin-bottom: 15px;
+  height: 160px;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-weight: bold;
+  box-shadow: 
+    inset 0 4px 8px rgba(0, 0, 0, 0.8),
+    inset 0 -2px 4px rgba(0, 255, 0, 0.1),
+    0 0 15px rgba(0, 255, 0, 0.2);
   position: relative;
   overflow: hidden;
-  transform: perspective(800px) rotateX(-1deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .mcdu-screen::before {
@@ -2596,301 +2573,234 @@ body {
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 15% 25%, rgba(0, 255, 65, 0.06) 0%, transparent 30%),
-    radial-gradient(circle at 85% 75%, rgba(0, 255, 65, 0.04) 0%, transparent 30%),
-    linear-gradient(90deg, transparent 0%, rgba(0, 255, 65, 0.02) 50%, transparent 100%);
+    radial-gradient(circle at 20% 30%, rgba(0, 255, 0, 0.08) 0%, transparent 40%),
+    linear-gradient(90deg, transparent 0%, rgba(0, 255, 0, 0.03) 50%, transparent 100%);
   pointer-events: none;
-  animation: screenFlicker 3s ease-in-out infinite;
+  animation: screenGlow 4s ease-in-out infinite;
 }
 
-@keyframes screenFlicker {
+@keyframes screenGlow {
   0%, 100% { opacity: 1; }
-  98% { opacity: 1; }
-  99% { opacity: 0.98; }
-}
-
-.mcdu-screen::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 255, 65, 0.03) 1%,
-    transparent 2%,
-    transparent 98%,
-    rgba(0, 255, 65, 0.03) 99%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-
-.mcdu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid rgba(0, 255, 65, 0.6);
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-  position: relative;
-}
-
-.mcdu-title {
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 1rem;
-  text-shadow: 0 0 5px rgba(255, 255, 255, 0.4);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-.mcdu-page {
-  color: #00ff41;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
-  text-shadow: 0 0 3px rgba(0, 255, 65, 0.6);
+  50% { opacity: 0.8; }
 }
 
 .mcdu-content {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
   position: relative;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .mcdu-line {
   font-family: 'Courier New', monospace;
-  color: #00ff41;
-  font-size: 0.82rem;
-  text-shadow: 0 0 3px rgba(0, 255, 65, 0.6);
-  letter-spacing: 1px;
-  min-height: 16px;
-  font-weight: 600;
-  padding: 2px 0;
-  transition: all 0.2s ease;
+  color: #00ff00;
+  font-size: 0.7rem;
+  text-shadow: 0 0 2px rgba(0, 255, 0, 0.8);
+  letter-spacing: 0.5px;
+  font-weight: bold;
+  margin: 1px 0;
+  white-space: pre;
 }
 
-.mcdu-line:hover {
-  color: #33ff66;
-  text-shadow: 0 0 5px rgba(51, 255, 102, 0.8);
-}
-
-.mcdu-keypad {
-  display: grid;
-  gap: 12px;
-}
-
+/* Top function keys row */
 .mcdu-function-keys {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
-  margin-bottom: 10px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 3px;
+  margin-bottom: 8px;
 }
 
+/* Line select keys on sides */
 .mcdu-line-select-keys {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  gap: 40px;
+  margin-bottom: 8px;
+  gap: 15px;
 }
 
 .mcdu-left-keys, .mcdu-right-keys {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
 }
 
+/* Navigation keys row */
 .mcdu-nav-keys {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
+  gap: 3px;
   margin-bottom: 8px;
 }
 
+/* Arrow keys */
+.mcdu-arrow-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  margin-bottom: 8px;
+}
+
+/* Letters grid */
 .mcdu-letter-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
+  gap: 3px;
   margin-bottom: 8px;
 }
 
+/* Numbers row */
 .mcdu-number-row {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
   margin-bottom: 8px;
 }
 
+/* Bottom special keys */
+.mcdu-bottom-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  margin-bottom: 8px;
+}
+
+/* Control keys */
 .mcdu-control-keys {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 3px;
 }
 
+/* Base key styling */
 .mcdu-key {
-  background: linear-gradient(145deg, #4a4a4a, #2a2a2a, #1a1a1a);
-  border: 3px solid #5a5a5a;
-  border-radius: 6px;
-  color: #ffffff;
-  font-weight: 800;
-  font-size: 0.7rem;
-  padding: 10px 8px;
+  background: linear-gradient(145deg, #34495e, #2c3e50, #1a252f);
+  border: 2px solid #1a252f;
+  border-radius: 4px;
+  color: #ecf0f1;
+  font-weight: bold;
+  font-size: 0.6rem;
+  padding: 6px 4px;
   cursor: pointer;
   transition: all 0.15s ease;
-  font-family: 'Courier New', monospace;
+  font-family: 'Arial', sans-serif;
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.6),
-    inset 0 2px 4px rgba(255, 255, 255, 0.1),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    0 3px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-height: 35px;
+  letter-spacing: 0.3px;
+  min-height: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden;
-}
-
-.mcdu-key::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.mcdu-key:hover::before {
-  left: 100%;
 }
 
 .mcdu-key:hover {
-  background: linear-gradient(145deg, #5a5a5a, #3a3a3a, #2a2a2a);
-  border-color: #6a6a6a;
-  box-shadow: 
-    0 6px 12px rgba(0, 0, 0, 0.7),
-    inset 0 3px 6px rgba(255, 255, 255, 0.15),
-    inset 0 -3px 6px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(145deg, #3e5a75, #34495e, #2c3e50);
   transform: translateY(-1px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.3),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .mcdu-key:active {
-  transform: translateY(2px);
-  background: linear-gradient(145deg, #2a2a2a, #1a1a1a, #0a0a0a);
+  transform: translateY(1px);
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.8),
-    inset 0 2px 6px rgba(0, 0, 0, 0.5);
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
+/* Function keys styling */
 .mcdu-key.function {
-  background: linear-gradient(145deg, #3a3a00, #2a2a00, #1a1a00);
-  color: #ffcc00;
-  border-color: #4a4a00;
+  background: linear-gradient(145deg, #27ae60, #229954, #1e8449);
+  color: #ffffff;
   font-weight: 900;
-  min-height: 38px;
-  text-shadow: 0 0 3px rgba(255, 204, 0, 0.6);
+  min-height: 28px;
+  font-size: 0.55rem;
 }
 
 .mcdu-key.function:hover {
-  background: linear-gradient(145deg, #4a4a00, #3a3a00, #2a2a00);
-  color: #ffdd33;
-  text-shadow: 0 0 5px rgba(255, 221, 51, 0.8);
+  background: linear-gradient(145deg, #2ecc71, #27ae60, #229954);
 }
 
+/* Line select keys */
 .mcdu-key.line-select {
-  background: linear-gradient(145deg, #002a00, #001a00, #000a00);
-  border-color: #003a00;
-  color: #00ff41;
+  background: linear-gradient(145deg, #e67e22, #d68910, #b7950b);
+  color: #ffffff;
   font-weight: 900;
-  width: 40px;
-  min-height: 35px;
-  text-shadow: 0 0 3px rgba(0, 255, 65, 0.6);
+  width: 25px;
+  min-height: 22px;
+  font-size: 0.55rem;
 }
 
 .mcdu-key.line-select:hover {
-  background: linear-gradient(145deg, #003a00, #002a00, #001a00);
-  color: #33ff66;
-  text-shadow: 0 0 5px rgba(51, 255, 102, 0.8);
+  background: linear-gradient(145deg, #f39c12, #e67e22, #d68910);
 }
 
+/* Navigation keys */
 .mcdu-key.nav {
-  background: linear-gradient(145deg, #1a3a5a, #0a2a4a, #001a3a);
-  border-color: #2a4a6a;
-  color: #66ccff;
+  background: linear-gradient(145deg, #3498db, #2980b9, #21618c);
+  color: #ffffff;
   font-weight: 800;
-  font-size: 0.65rem;
-  text-shadow: 0 0 3px rgba(102, 204, 255, 0.6);
+  font-size: 0.5rem;
+  min-height: 26px;
 }
 
 .mcdu-key.nav:hover {
-  background: linear-gradient(145deg, #2a4a6a, #1a3a5a, #0a2a4a);
-  color: #99ddff;
-  text-shadow: 0 0 5px rgba(153, 221, 255, 0.8);
+  background: linear-gradient(145deg, #5dade2, #3498db, #2980b9);
 }
 
+/* Letter keys */
 .mcdu-key.letter {
-  background: linear-gradient(145deg, #3a3a3a, #2a2a2a, #1a1a1a);
-  border-color: #4a4a4a;
-  color: #e6e6e6;
-  font-size: 0.75rem;
+  background: linear-gradient(145deg, #566573, #34495e, #2c3e50);
+  color: #ffffff;
+  font-size: 0.6rem;
   font-weight: 800;
-  min-height: 32px;
+  min-height: 24px;
 }
 
 .mcdu-key.letter:hover {
-  background: linear-gradient(145deg, #4a4a4a, #3a3a3a, #2a2a2a);
-  color: #ffffff;
+  background: linear-gradient(145deg, #6c7b7f, #566573, #34495e);
 }
 
+/* Number keys */
 .mcdu-key.number {
-  background: linear-gradient(145deg, #2a3a4a, #1a2a3a, #0a1a2a);
-  border-color: #3a4a5a;
-  color: #cce6ff;
-  font-size: 0.85rem;
+  background: linear-gradient(145deg, #85929e, #6c7b7f, #566573);
+  color: #ffffff;
+  font-size: 0.65rem;
   font-weight: 900;
-  min-height: 34px;
-  text-shadow: 0 0 3px rgba(204, 230, 255, 0.6);
+  min-height: 26px;
 }
 
 .mcdu-key.number:hover {
-  background: linear-gradient(145deg, #3a4a5a, #2a3a4a, #1a2a3a);
-  color: #e6f3ff;
-  text-shadow: 0 0 5px rgba(230, 243, 255, 0.8);
+  background: linear-gradient(145deg, #a6acaf, #85929e, #6c7b7f);
 }
 
+/* Special operation keys */
 .mcdu-key.special {
-  background: linear-gradient(145deg, #4a1a1a, #3a0a0a, #2a0000);
-  border-color: #5a2a2a;
-  color: #ff9999;
+  background: linear-gradient(145deg, #8e44ad, #7d3c98, #6c3483);
+  color: #ffffff;
   font-weight: 900;
-  text-shadow: 0 0 3px rgba(255, 153, 153, 0.6);
+  font-size: 0.5rem;
 }
 
 .mcdu-key.special:hover {
-  background: linear-gradient(145deg, #5a2a2a, #4a1a1a, #3a0a0a);
-  color: #ffcccc;
-  text-shadow: 0 0 5px rgba(255, 204, 204, 0.8);
+  background: linear-gradient(145deg, #a569bd, #8e44ad, #7d3c98);
 }
 
+/* Control keys */
 .mcdu-key.control {
-  background: linear-gradient(145deg, #1a4a1a, #0a3a0a, #002a00);
-  border-color: #2a5a2a;
-  color: #99ff99;
+  background: linear-gradient(145deg, #dc7633, #ca6f1e, #ba6808);
+  color: #ffffff;
   font-weight: 900;
-  text-shadow: 0 0 3px rgba(153, 255, 153, 0.6);
+  font-size: 0.55rem;
 }
 
 .mcdu-key.control:hover {
-  background: linear-gradient(145deg, #2a5a2a, #1a4a1a, #0a3a0a);
-  color: #ccffcc;
-  text-shadow: 0 0 5px rgba(204, 255, 204, 0.8);
+  background: linear-gradient(145deg, #e8974f, #dc7633, #ca6f1e);
 }
 }
 
