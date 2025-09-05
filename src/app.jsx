@@ -36,13 +36,13 @@ export default function App() {
   const [assignedCallsign, setAssignedCallsign] = useState("");
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [mcduDisplay, setMcduDisplay] = useState({
-    title: aircraft || "A320-200",
+    title: "STATUS",
     lines: [
       "ENG",
       "LEAP-1A26",
       "ACTIVE NAV DATA BASE",
       "08SEP-05OCT       AIRAC",
-      "SECOND NAV DATA BASE",
+      "SECOND NAV DATA BASE", 
       "01AUG-07SEP",
       "",
       "CHG CODE",
@@ -681,13 +681,13 @@ export default function App() {
   };
 
   const assignPilotCallsign = () => {
-    // Generate airline callsign for pilots
-    const airlines = ["American", "Delta", "United", "Southwest", "JetBlue", "Alaska", "Frontier", "Spirit"];
-    const randomAirline = airlines[Math.floor(Math.random() * airlines.length)];
-    const flightNum = Math.floor(Math.random() * 9000) + 1000;
-    const newCallsign = `${randomAirline} ${flightNum}`;
-    setAssignedCallsign(newCallsign);
-    return newCallsign;
+    // Use the flight number entered by the pilot
+    if (flightNumber) {
+      const newCallsign = flightNumber;
+      setAssignedCallsign(newCallsign);
+      return newCallsign;
+    }
+    return "";
   };
 
   const assignGroundCallsign = () => {
@@ -874,10 +874,9 @@ export default function App() {
 
   const claimStand = () => {
     if (selectedStand && flightNumber && aircraft && selectedAirport) {
-      let callsign = assignedCallsign;
-      if (!assignedCallsign) {
-        callsign = assignPilotCallsign();
-      }
+      // Use flight number as callsign for pilots
+      const callsign = flightNumber;
+      setAssignedCallsign(callsign);
       
       socket.emit("claimStand", {
         stand: selectedStand,
@@ -903,10 +902,11 @@ export default function App() {
     let callsign = assignedCallsign;
     
     if (userMode === "pilot") {
-      if (!assignedCallsign) {
-        callsign = assignPilotCallsign();
+      if (!assignedCallsign && flightNumber) {
+        callsign = flightNumber;
+        setAssignedCallsign(callsign);
       }
-      senderName = `${callsign} (${user?.username})`;
+      senderName = `${callsign || user?.username} (${user?.username})`;
     } else if (userMode === "groundcrew") {
       if (!assignedCallsign) {
         callsign = assignGroundCallsign();
@@ -1699,15 +1699,21 @@ export default function App() {
               <div className="mcdu-unit">
                 <div className="mcdu-screen">
                   <div className="mcdu-header">
-                    <div className="mcdu-title">{mcduDisplay.title}</div>
+                    <div className="mcdu-title">{aircraft || "A320-200"}</div>
                     <div className="mcdu-page">1/1</div>
                   </div>
                   <div className="mcdu-content">
-                    {mcduDisplay.lines.map((line, index) => (
-                      <div key={index} className="mcdu-line">
-                        {line}
-                      </div>
-                    ))}
+                    <div className="mcdu-line">FROM        TO</div>
+                    <div className="mcdu-line">{selectedAirport || "----"}        ----</div>
+                    <div className="mcdu-line">IRFD</div>
+                    <div className="mcdu-line">FLT NBR</div>
+                    <div className="mcdu-line">{flightNumber || "----"}</div>
+                    <div className="mcdu-line">----</div>
+                    <div className="mcdu-line">ALTN/CO RTE</div>
+                    <div className="mcdu-line">NONE</div>
+                    <div className="mcdu-line">TROPO     36090</div>
+                    <div className="mcdu-line">----</div>
+                    <div className="mcdu-line">TEMP/WIND</div>
                   </div>
                 </div>
                 
@@ -1715,15 +1721,15 @@ export default function App() {
                   {/* Top Function Keys */}
                   <div className="mcdu-function-keys">
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: aircraft || "A320-200",
+                      title: "DIR TO",
                       lines: [
                         "FROM       TO",
-                        selectedAirport + "      ----",
+                        (selectedAirport || "----") + "      ----",
                         "",
                         "FLT NBR",
                         flightNumber || "----",
                         "",
-                        "ALTN/CO RTE",
+                        "ALTN/CO RTE", 
                         "NONE",
                         "",
                         "TROPO      36090",
@@ -1771,14 +1777,14 @@ export default function App() {
                         "INITIALIZATION",
                         "",
                         "FROM/TO",
-                        selectedAirport + "/----",
+                        (selectedAirport || "----") + "/----",
                         "",
                         "FLT NBR",
                         flightNumber || "----",
                         "",
-                        "COST INDEX  25",
-                        "________________",
-                        "FLIGHT INIT"
+                        "ACFT TYPE",
+                        aircraft || "----",
+                        "COST INDEX  25"
                       ],
                       activeFunction: "INIT"
                     })}>INIT</button>
