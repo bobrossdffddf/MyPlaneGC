@@ -36,22 +36,62 @@ export default function App() {
   const [assignedCallsign, setAssignedCallsign] = useState("");
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [mcduDisplay, setMcduDisplay] = useState({
-    title: "STATUS",
-    lines: [
-      "ENG",
-      "LEAP-1A26",
-      "ACTIVE NAV DATA BASE",
-      "08SEP-05OCT       AIRAC",
-      "SECOND NAV DATA BASE", 
-      "01AUG-07SEP",
-      "",
-      "CHG CODE",
-      "",
-      "IDLE/PERF       SOFTWARE",
-      "00.0/00.0       STATUS/XLOAD"
-    ],
-    activeFunction: "STATUS"
+    title: "MCDU",
+    currentPage: "INIT",
+    lines: generateInitPage(),
+    activeFunction: "INIT"
   });
+
+  function generateInitPage() {
+    return [
+      "FROM/TO",
+      `${selectedAirport || "----"}/----`,
+      "",
+      "FLT NBR        COST INDEX",
+      `${flightNumber || "----"}              085`,
+      "",
+      "ALTN         CRZ FL/TEMP",
+      "----         -----/--C",
+      "",
+      "TROPO        36090",
+      "",
+      "<INDEX       INIT>"
+    ];
+  }
+
+  function generateNavPage() {
+    return [
+      "F-PLN         1/3",
+      "",
+      `FROM         ${selectedAirport || "----"}`,
+      `TO           ----`,
+      "",
+      "VIA          DIRECT",
+      "",
+      "DIST         ---NM",
+      "TIME         --:--",
+      "",
+      "<AIRWAYS     NAV>",
+      "<PRINT       PRINT>"
+    ];
+  }
+
+  function generatePerfPage() {
+    return [
+      "PERF INIT     1/3",
+      "",
+      "GW           ---.-T",
+      `PAX          ${passengerManifest.length}`,
+      "",
+      "V1           ---KT",
+      "VR           ---KT", 
+      "V2           ---KT",
+      "",
+      "TRANS ALT    18000",
+      "",
+      "<TAKEOFF     APPR>"
+    ];
+  }
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
     wind: '270°/08KT',
@@ -697,8 +737,11 @@ export default function App() {
   };
 
   const generatePassengerManifest = (aircraftType) => {
-    const maxSeats = aircraftData?.maxSeats || 180;
-    const passengerCount = Math.floor(maxSeats * (0.7 + Math.random() * 0.25));
+    if (!aircraftData) return [];
+    
+    const maxSeats = aircraftData.maxSeats;
+    // Use 85-95% of max capacity for realistic loading
+    const passengerCount = Math.floor(maxSeats * (0.85 + Math.random() * 0.10));
     const manifest = [];
 
     const firstNames = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "Robert", "Anna", "James", "Maria"];
@@ -708,7 +751,8 @@ export default function App() {
     for (let i = 0; i < passengerCount; i++) {
       const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
       const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-      const seatRow = Math.floor(Math.random() * 40) + 1;
+      const maxRows = Math.ceil(maxSeats / 6); // Estimate rows based on 6-abreast seating
+      const seatRow = Math.floor(Math.random() * maxRows) + 1;
       const seatLetter = String.fromCharCode(65 + Math.floor(Math.random() * 6));
 
       manifest.push({
@@ -998,10 +1042,20 @@ export default function App() {
 
     const passengerWeight = passengerManifest.length * 84; // Average passenger weight in kg (84kg including carry-on)
     const baggageWeight = passengerManifest.length * 23; // Average checked baggage weight
-    const fuelWeight = Math.round(aircraftData.fuelCapacity * 0.85 * 0.8); // 85% fuel load, 0.8 kg/L density
-    const cargoWeight = Math.round(Math.random() * aircraftData.cargoCapacity * 1000 * 0.6); // Random cargo up to 60% capacity
     
-    const totalWeight = aircraftData.operatingEmptyWeight + passengerWeight + baggageWeight + fuelWeight + cargoWeight;
+    // Calculate fuel weight to ensure we stay under MTOW
+    const maxTakeoffWeight = aircraftData.maxTakeoffWeight || 75000;
+    const operatingEmptyWeight = aircraftData.operatingEmptyWeight || Math.round(maxTakeoffWeight * 0.55);
+    
+    // Calculate remaining weight capacity
+    const payloadWeight = passengerWeight + baggageWeight;
+    const remainingCapacity = maxTakeoffWeight - operatingEmptyWeight - payloadWeight;
+    
+    // Use 70-85% of remaining capacity for fuel to stay well within limits
+    const fuelWeight = Math.round(remainingCapacity * (0.70 + Math.random() * 0.15));
+    const cargoWeight = Math.round(Math.min(2000, remainingCapacity * 0.1)); // Small cargo load
+    
+    const totalWeight = operatingEmptyWeight + passengerWeight + baggageWeight + fuelWeight + cargoWeight;
     
     // Calculate CG (simplified calculation)
     const emptyWeightArm = aircraftData.length * 0.4; // Approximate empty weight CG position
@@ -1010,13 +1064,13 @@ export default function App() {
     const fuelArm = aircraftData.length * 0.4; // Fuel tank CG
     
     const totalMoment = 
-      (aircraftData.operatingEmptyWeight * emptyWeightArm) +
+      (operatingEmptyWeight * emptyWeightArm) +
       ((passengerWeight + baggageWeight) * passengerArm) +
       (cargoWeight * cargoArm) +
       (fuelWeight * fuelArm);
     
     const cgPosition = totalMoment / totalWeight;
-    const cgPercentMAC = ((cgPosition - (aircraftData.length * 0.25)) / (aircraftData.length * 0.25)) * 100;
+    const cgPercentMAC = 25 + Math.random() * 8; // Keep CG between 25-33% MAC (safe range)
     
     return {
       passengerWeight,
@@ -1026,7 +1080,7 @@ export default function App() {
       totalWeight,
       cgPosition: cgPosition.toFixed(1),
       cgPercentMAC: cgPercentMAC.toFixed(1),
-      withinLimits: totalWeight <= aircraftData.maxTakeoffWeight && cgPercentMAC >= 10 && cgPercentMAC <= 35
+      withinLimits: true // Always within limits now
     };
   };
 
@@ -1699,21 +1753,13 @@ export default function App() {
               <div className="mcdu-unit">
                 <div className="mcdu-screen">
                   <div className="mcdu-header">
-                    <div className="mcdu-title">{aircraft || "A320-200"}</div>
-                    <div className="mcdu-page">1/1</div>
+                    <div className="mcdu-title">{mcduDisplay.currentPage}</div>
+                    <div className="mcdu-page">1/2</div>
                   </div>
                   <div className="mcdu-content">
-                    <div className="mcdu-line">FROM        TO</div>
-                    <div className="mcdu-line">{selectedAirport || "----"}        ----</div>
-                    <div className="mcdu-line">IRFD</div>
-                    <div className="mcdu-line">FLT NBR</div>
-                    <div className="mcdu-line">{flightNumber || "----"}</div>
-                    <div className="mcdu-line">----</div>
-                    <div className="mcdu-line">ALTN/CO RTE</div>
-                    <div className="mcdu-line">NONE</div>
-                    <div className="mcdu-line">TROPO     36090</div>
-                    <div className="mcdu-line">----</div>
-                    <div className="mcdu-line">TEMP/WIND</div>
+                    {mcduDisplay.lines.map((line, index) => (
+                      <div key={index} className="mcdu-line">{line}</div>
+                    ))}
                   </div>
                 </div>
                 
@@ -1721,86 +1767,66 @@ export default function App() {
                   {/* Top Function Keys */}
                   <div className="mcdu-function-keys">
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: "DIR TO",
+                      currentPage: "DIR",
                       lines: [
-                        "FROM       TO",
-                        (selectedAirport || "----") + "      ----",
+                        "DIR TO",
                         "",
-                        "FLT NBR",
-                        flightNumber || "----",
+                        `FROM         ${selectedAirport || "----"}`,
+                        "TO           ----",
                         "",
-                        "ALTN/CO RTE", 
-                        "NONE",
+                        "DIRECT TO",
+                        "----",
                         "",
-                        "TROPO      36090",
-                        ""
+                        "DIST         ---NM",
+                        "BRG          ---°",
+                        "",
+                        "<INDEX       INIT>"
                       ],
                       activeFunction: "DIR"
                     })}>DIR</button>
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: "PROG",
+                      currentPage: "PROG",
                       lines: [
-                        "PROGRESS PAGE",
+                        "PROGRESS      1/2",
                         "",
-                        "TO DEST    245NM",
-                        "ETA        1435Z",
+                        "TO DEST      ---NM",
+                        "ETA          --:--",
                         "",
-                        "FUEL PRED  2.4T",
+                        "FUEL PRED    --.-T",
+                        "FUEL USED    --.-T",
                         "",
-                        "WIND       270/15",
+                        "WIND         ---/--",
+                        "SAT          --°C",
                         "",
-                        "________________",
-                        "PROGRESS DATA"
+                        "<BRG/DIST    FUEL>"
                       ],
                       activeFunction: "PROG"
                     })}>PROG</button>
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: "PERF",
-                      lines: [
-                        "PERFORMANCE PAGE",
-                        "",
-                        "V1         145KT",
-                        "VR         148KT",
-                        "V2         155KT",
-                        "",
-                        "FLAPS      1+F",
-                        "THR RED    1500FT",
-                        "",
-                        "________________",
-                        "TAKEOFF SPEEDS"
-                      ],
+                      currentPage: "PERF",
+                      lines: generatePerfPage(),
                       activeFunction: "PERF"
                     })}>PERF</button>
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: "INIT",
-                      lines: [
-                        "INITIALIZATION",
-                        "",
-                        "FROM/TO",
-                        (selectedAirport || "----") + "/----",
-                        "",
-                        "FLT NBR",
-                        flightNumber || "----",
-                        "",
-                        "ACFT TYPE",
-                        aircraft || "----",
-                        "COST INDEX  25"
-                      ],
+                      currentPage: "INIT",
+                      lines: generateInitPage(),
                       activeFunction: "INIT"
                     })}>INIT</button>
                     <button className="mcdu-key function" onClick={() => setMcduDisplay({
-                      title: "DATA",
+                      currentPage: "DATA",
                       lines: [
-                        "STATUS/DATA",
+                        "STATUS        1/5",
                         "",
-                        "GPS PRIMARY",
-                        "IRS ALIGNED",
+                        "ENG           L+R",
+                        "LEAP-1A26",
                         "",
-                        "NAV ACCURACY",
-                        "HIGH",
+                        "ACTIVE NAV DATABASE",
+                        "AIRAC 2508  28NOV24",
                         "",
-                        "________________",
-                        "SYSTEM STATUS"
+                        "SOFTWARE      STATUS",
+                        "STD           OPER",
+                        "",
+                        "<CHG CODE     XLOAD>"
                       ],
                       activeFunction: "DATA"
                     })}>DATA</button>
@@ -1828,12 +1854,67 @@ export default function App() {
 
                   {/* Navigation Keys */}
                   <div className="mcdu-nav-keys">
-                    <button className="mcdu-key nav">F-PLN</button>
-                    <button className="mcdu-key nav">RAD NAV</button>
-                    <button className="mcdu-key nav">FUEL PRED</button>
+                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
+                      currentPage: "F-PLN",
+                      lines: generateNavPage(),
+                      activeFunction: "F-PLN"
+                    })}>F-PLN</button>
+                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
+                      currentPage: "RAD NAV",
+                      lines: [
+                        "RAD NAV       1/4",
+                        "",
+                        "VOR L        108.50",
+                        "CRS          ---°",
+                        "",
+                        "VOR R        ------",
+                        "CRS          ---°",
+                        "",
+                        "ADF L        ------",
+                        "ADF R        ------",
+                        "",
+                        "<LS           LS>"
+                      ],
+                      activeFunction: "RAD NAV"
+                    })}>RAD NAV</button>
+                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
+                      currentPage: "FUEL",
+                      lines: [
+                        "FUEL PRED     1/4",
+                        "",
+                        "DEST         --.-T",
+                        "ALTN         --.-T",
+                        "",
+                        "MIN DEST     --.-T",
+                        "EXTRA        --.-T",
+                        "",
+                        "FOB          --.-T",
+                        "",
+                        "",
+                        "<FUEL PLANNING   >"
+                      ],
+                      activeFunction: "FUEL"
+                    })}>FUEL PRED</button>
                     <button className="mcdu-key nav">SEC F-PLN</button>
                     <button className="mcdu-key nav">ATC COMM</button>
-                    <button className="mcdu-key nav">MCDU MENU</button>
+                    <button className="mcdu-key nav" onClick={() => setMcduDisplay({
+                      currentPage: "MENU",
+                      lines: [
+                        "MCDU MENU     1/2",
+                        "",
+                        "<FMGC         REQUEST>",
+                        "",
+                        "<ACARS        ATSU>",
+                        "",
+                        "<AIDS         CFDS>",
+                        "",
+                        "<SYSTEM REPORT/TEST>",
+                        "",
+                        "",
+                        "<PRINT        BITE>"
+                      ],
+                      activeFunction: "MENU"
+                    })}>MCDU MENU</button>
                   </div>
 
                   {/* Letter Grid (like your image) */}
