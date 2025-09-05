@@ -960,14 +960,14 @@ body {
 
 .main-area {
   flex: 1;
-  padding: 30px;
+  padding: 20px;
   overflow-y: auto;
   overflow-x: hidden;
   background: rgba(15, 20, 25, 0.7);
-  height: calc(100vh - 200px);
-  min-height: calc(100vh - 200px);
-  max-height: calc(100vh - 200px);
-  margin-bottom: 100px;
+  height: calc(100vh - 140px);
+  min-height: calc(100vh - 140px);
+  max-height: calc(100vh - 140px);
+  margin-bottom: 80px;
 }
 
 .main-area::-webkit-scrollbar {
@@ -1005,11 +1005,12 @@ body {
   background: rgba(15, 23, 42, 0.95);
   border-bottom: 1px solid rgba(255, 149, 0, 0.3);
   backdrop-filter: blur(20px);
-  padding: 15px 25px;
+  padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  min-height: 60px;
 }
 
 .app-title {
@@ -1550,6 +1551,47 @@ body {
   border-radius: 6px;
   font-size: 0.7rem;
   margin-top: 5px;
+}
+
+.cargo-item {
+  border-left: 4px solid #f59e0b;
+}
+
+.cargo-item.high-priority {
+  border-left-color: #ef4444;
+}
+
+.cargo-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: right;
+  font-size: 0.8rem;
+  color: #a0a8b0;
+}
+
+.hazmat {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.priority-high {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.priority-medium {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.priority-standard {
+  color: #22c55e;
+  font-weight: 600;
 }
 
 /* Dashboard Styles */
@@ -2400,14 +2442,15 @@ body {
 .checklists-container {
   background: rgba(26, 31, 46, 0.95);
   border-radius: 20px;
-  padding: 30px;
+  padding: 20px;
   border: 1px solid rgba(255, 149, 0, 0.3);
   backdrop-filter: blur(20px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  height: 100%;
+  height: calc(100vh - 200px);
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.6s ease-out;
+  overflow: hidden;
 }
 
 .checklist-header {

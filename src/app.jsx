@@ -693,30 +693,32 @@ export default function App() {
   // Aircraft compatibility mapping
   const getAircraftCategory = (aircraftType) => {
     const wideBodyAircraft = ["A330", "A340", "A350", "A380", "B747-400", "B747-8", "B777-200", "B777-300", "B787-8", "B787-9", "B787-10"];
-    const narrowBodyAircraft = ["A318", "A319", "A320", "A321", "B737-700", "B737-800", "B737-900"];
-    const regionalAircraft = ["CRJ-200", "CRJ-700", "CRJ-900", "E170", "E175", "E190", "DHC-8", "ATR-72"];
+    const narrowBodyAircraft = ["A318", "A319", "A320", "A321", "B737-700", "B737-800", "B737-900", "MD-80", "MD-90"];
+    const regionalAircraft = ["CRJ-200", "CRJ-700", "CRJ-900", "E170", "E175", "E190"];
+    const turbopropAircraft = ["DHC-8", "ATR-72"];
     
     if (wideBodyAircraft.includes(aircraftType)) return "wide-body";
     if (narrowBodyAircraft.includes(aircraftType)) return "narrow-body";
     if (regionalAircraft.includes(aircraftType)) return "regional";
+    if (turbopropAircraft.includes(aircraftType)) return "turboprop";
     return "narrow-body"; // default
   };
 
   const isStandCompatible = (standType, aircraftType) => {
     const aircraftCategory = getAircraftCategory(aircraftType);
     
-    // Stand compatibility rules
+    // Strict stand compatibility rules
     switch (standType) {
       case "narrow":
-        return aircraftCategory === "narrow-body" || aircraftCategory === "regional";
+        return aircraftCategory === "narrow-body" || aircraftCategory === "regional" || aircraftCategory === "turboprop";
       case "medium":
-        return aircraftCategory === "narrow-body" || aircraftCategory === "wide-body" || aircraftCategory === "regional";
+        return aircraftCategory === "narrow-body" || aircraftCategory === "regional" || aircraftCategory === "turboprop";
       case "wide":
         return true; // Wide stands can accommodate all aircraft
       case "cargo":
         return true; // Cargo stands can accommodate all aircraft
       default:
-        return true;
+        return false;
     }
   };
 
@@ -769,6 +771,35 @@ export default function App() {
     return manifest;
   };
 
+  const generateCargoManifest = () => {
+    const cargoTypes = ["Electronics", "Automotive Parts", "Textiles", "Pharmaceuticals", "Food Products", "Machinery", "Documents", "Perishables"];
+    const companies = ["FedEx", "DHL", "UPS", "Amazon", "Maersk", "COSCO", "MSC", "CMA CGM"];
+    const cargoCount = Math.floor(Math.random() * 15) + 5; // 5-20 cargo items
+    const manifest = [];
+
+    for (let i = 0; i < cargoCount; i++) {
+      const cargoType = cargoTypes[Math.floor(Math.random() * cargoTypes.length)];
+      const company = companies[Math.floor(Math.random() * companies.length)];
+      const weight = Math.floor(Math.random() * 2000) + 100; // 100-2100 kg
+      const pieces = Math.floor(Math.random() * 10) + 1; // 1-10 pieces
+
+      manifest.push({
+        id: i + 1,
+        awbNumber: `${Math.floor(Math.random() * 900000) + 100000}`,
+        description: cargoType,
+        shipper: company,
+        pieces: pieces,
+        weight: weight,
+        volume: Math.floor(weight * 0.8), // Rough volume calculation
+        priority: Math.random() > 0.8 ? "High" : Math.random() > 0.5 ? "Medium" : "Standard",
+        hazmat: Math.random() > 0.9,
+        temperature: cargoType === "Perishables" ? "Refrigerated" : "Ambient"
+      });
+    }
+
+    return manifest;
+  };
+
   const getCurrentAirportStands = () => {
     if (!selectedAirport) return [];
     return getAirportConfig(selectedAirport).stands;
@@ -812,8 +843,10 @@ export default function App() {
         })
         .then(data => {
           setAircraftData(data);
-          // Generate passenger manifest when aircraft data is loaded
-          const manifest = generatePassengerManifest(aircraft);
+          // Generate appropriate manifest based on stand type
+          const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
+          const isCargoStand = currentStandData?.type === "cargo";
+          const manifest = isCargoStand ? generateCargoManifest() : generatePassengerManifest(aircraft);
           setPassengerManifest(manifest);
         })
         .catch(() => {
@@ -1015,21 +1048,23 @@ export default function App() {
   };
 
   const submitPermit = (permitType, formData) => {
+    const currentCallsign = assignedCallsign || flightNumber || "UNKNOWN";
     const newPermit = {
       id: Date.now(),
       type: permitType,
       data: formData,
       status: "SUBMITTED",
       submittedAt: new Date().toLocaleTimeString(),
-      callsign: assignedCallsign || assignPilotCallsign()
+      callsign: currentCallsign,
+      submittedBy: user?.username
     };
     
     setPermits(prev => [...prev, newPermit]);
     setActivePermitForm(null);
     
     socket.emit("chatMessage", {
-      text: `${permitType} permit submitted by ${assignedCallsign}`,
-      sender: "PERMITS",
+      text: `${permitType.toUpperCase()} PERMIT submitted by ${currentCallsign} (${user?.username})`,
+      sender: "PERMITS OFFICE",
       stand: selectedStand,
       airport: selectedAirport,
       timestamp: new Date().toLocaleTimeString(),
@@ -1764,7 +1799,7 @@ export default function App() {
                     <div className="mcdu-line">THR RED/ACC   ENG OUT ACC</div>
                     <div className="mcdu-line">  2150/2150       2150</div>
                     <div className="mcdu-line">                  NEXT</div>
-                    <div className="mcdu-line">                PHASE></div>
+                    <div className="mcdu-line">                PHASE&gt;</div>
                   </div>
                 </div>
                 
@@ -1891,56 +1926,109 @@ export default function App() {
           );
 
         case "manifest":
+          const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
+          const isCargoStand = currentStandData?.type === "cargo";
+          
           return (
             <div className="manifest-container">
               <div className="manifest-header">
-                <h2>PASSENGER MANIFEST</h2>
+                <h2>{isCargoStand ? "CARGO MANIFEST" : "PASSENGER MANIFEST"}</h2>
                 <div className="manifest-stats">
-                  <div className="stat">
-                    <span className="stat-value">{passengerManifest.length}</span>
-                    <span className="stat-label">TOTAL PAX</span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-value">{passengerManifest.filter(p => p.checkedIn).length}</span>
-                    <span className="stat-label">CHECKED IN</span>
-                  </div>
-                  <div className="stat">
-                    <span className="stat-value">{passengerManifest.filter(p => p.specialRequests).length}</span>
-                    <span className="stat-label">SPECIAL REQ</span>
-                  </div>
+                  {isCargoStand ? (
+                    <>
+                      <div className="stat">
+                        <span className="stat-value">{passengerManifest.length}</span>
+                        <span className="stat-label">TOTAL ITEMS</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-value">{passengerManifest.reduce((sum, item) => sum + (item.weight || 0), 0).toLocaleString()}</span>
+                        <span className="stat-label">TOTAL KG</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-value">{passengerManifest.filter(p => p.hazmat).length}</span>
+                        <span className="stat-label">HAZMAT</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="stat">
+                        <span className="stat-value">{passengerManifest.length}</span>
+                        <span className="stat-label">TOTAL PAX</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-value">{passengerManifest.filter(p => p.checkedIn).length}</span>
+                        <span className="stat-label">CHECKED IN</span>
+                      </div>
+                      <div className="stat">
+                        <span className="stat-value">{passengerManifest.filter(p => p.specialRequests).length}</span>
+                        <span className="stat-label">SPECIAL REQ</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
               <div className="manifest-content">
                 <div className="manifest-filters">
                   <select className="filter-select">
-                    <option value="all">All Passengers</option>
-                    <option value="checkedIn">Checked In</option>
-                    <option value="notCheckedIn">Not Checked In</option>
-                    <option value="special">Special Requests</option>
+                    {isCargoStand ? (
+                      <>
+                        <option value="all">All Cargo</option>
+                        <option value="priority">High Priority</option>
+                        <option value="hazmat">Hazmat Items</option>
+                        <option value="refrigerated">Refrigerated</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="all">All Passengers</option>
+                        <option value="checkedIn">Checked In</option>
+                        <option value="notCheckedIn">Not Checked In</option>
+                        <option value="special">Special Requests</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
                 <div className="passenger-list">
-                  {passengerManifest.map((passenger) => (
-                    <div key={passenger.id} className={`passenger-item ${passenger.checkedIn ? 'checked-in' : 'not-checked-in'}`}>
-                      <div className="passenger-info">
-                        <div className="passenger-name">{passenger.name}</div>
-                        <div className="passenger-details">
-                          <span className="seat">{passenger.seat}</span>
-                          <span className="class">{passenger.class}</span>
-                          {passenger.frequent && <span className="frequent">FREQUENT</span>}
+                  {passengerManifest.map((item) => (
+                    isCargoStand ? (
+                      <div key={item.id} className={`passenger-item cargo-item ${item.priority === 'High' ? 'high-priority' : ''}`}>
+                        <div className="passenger-info">
+                          <div className="passenger-name">AWB: {item.awbNumber}</div>
+                          <div className="passenger-details">
+                            <span className="seat">{item.description}</span>
+                            <span className="class">{item.shipper}</span>
+                            {item.hazmat && <span className="hazmat">HAZMAT</span>}
+                          </div>
+                        </div>
+                        <div className="passenger-status">
+                          <div className="cargo-details">
+                            <div>{item.pieces} pieces</div>
+                            <div>{item.weight} kg</div>
+                            <div className={`priority-${item.priority.toLowerCase()}`}>{item.priority}</div>
+                          </div>
                         </div>
                       </div>
-                      <div className="passenger-status">
-                        <div className={`check-status ${passenger.checkedIn ? 'checked' : 'pending'}`}>
-                          {passenger.checkedIn ? '✓' : '○'}
+                    ) : (
+                      <div key={item.id} className={`passenger-item ${item.checkedIn ? 'checked-in' : 'not-checked-in'}`}>
+                        <div className="passenger-info">
+                          <div className="passenger-name">{item.name}</div>
+                          <div className="passenger-details">
+                            <span className="seat">{item.seat}</span>
+                            <span className="class">{item.class}</span>
+                            {item.frequent && <span className="frequent">FREQUENT</span>}
+                          </div>
                         </div>
-                        {passenger.specialRequests && (
-                          <div className="special-req">{passenger.specialRequests}</div>
-                        )}
+                        <div className="passenger-status">
+                          <div className={`check-status ${item.checkedIn ? 'checked' : 'pending'}`}>
+                            {item.checkedIn ? '✓' : '○'}
+                          </div>
+                          {item.specialRequests && (
+                            <div className="special-req">{item.specialRequests}</div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )
                   ))}
                 </div>
               </div>
