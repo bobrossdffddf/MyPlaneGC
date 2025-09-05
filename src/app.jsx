@@ -36,62 +36,147 @@ export default function App() {
   const [assignedCallsign, setAssignedCallsign] = useState("");
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [mcduDisplay, setMcduDisplay] = useState({
-    title: "MCDU",
     currentPage: "INIT",
-    lines: generateInitPage(),
-    activeFunction: "INIT"
+    lines: [],
+    scratchpad: "",
+    activeLineSelect: null
   });
 
-  function generateInitPage() {
-    return [
-      "FROM/TO",
-      `${selectedAirport || "----"}/----`,
-      "",
-      "FLT NBR        COST INDEX",
-      `${flightNumber || "----"}              085`,
-      "",
-      "ALTN         CRZ FL/TEMP",
-      "----         -----/--C",
-      "",
-      "TROPO        36090",
-      "",
-      "<INDEX       INIT>"
-    ];
-  }
+  const handleMcduKey = (key) => {
+    if (key >= 'A' && key <= 'Z') {
+      setMcduDisplay(prev => ({
+        ...prev,
+        scratchpad: prev.scratchpad + key
+      }));
+    } else if (key >= '0' && key <= '9') {
+      setMcduDisplay(prev => ({
+        ...prev,
+        scratchpad: prev.scratchpad + key
+      }));
+    } else if (key === 'CLR') {
+      setMcduDisplay(prev => ({
+        ...prev,
+        scratchpad: prev.scratchpad.slice(0, -1)
+      }));
+    } else if (key === 'SP') {
+      setMcduDisplay(prev => ({
+        ...prev,
+        scratchpad: prev.scratchpad + ' '
+      }));
+    } else if (key === '/') {
+      setMcduDisplay(prev => ({
+        ...prev,
+        scratchpad: prev.scratchpad + '/'
+      }));
+    } else if (key.startsWith('LSK')) {
+      // Handle Line Select Key presses
+      const lineNumber = parseInt(key.replace('LSK', ''));
+      handleLineSelect(lineNumber);
+    } else if (key === 'INIT') {
+      setMcduDisplay(prev => ({ ...prev, currentPage: 'INIT' }));
+    } else if (key === 'F-PLN') {
+      setMcduDisplay(prev => ({ ...prev, currentPage: 'FPLN' }));
+    } else if (key === 'PERF') {
+      setMcduDisplay(prev => ({ ...prev, currentPage: 'PERF' }));
+    } else if (key === 'DATA') {
+      setMcduDisplay(prev => ({ ...prev, currentPage: 'DATA' }));
+    }
+    updateMcduDisplay();
+  };
 
-  function generateNavPage() {
-    return [
-      "F-PLN         1/3",
-      "",
-      `FROM         ${selectedAirport || "----"}`,
-      `TO           ----`,
-      "",
-      "VIA          DIRECT",
-      "",
-      "DIST         ---NM",
-      "TIME         --:--",
-      "",
-      "<AIRWAYS     NAV>",
-      "<PRINT       PRINT>"
-    ];
-  }
+  const handleLineSelect = (lineNumber) => {
+    if (mcduDisplay.scratchpad) {
+      // Insert scratchpad content into selected line
+      const newLines = [...mcduDisplay.lines];
+      if (lineNumber <= newLines.length) {
+        newLines[lineNumber - 1] = mcduDisplay.scratchpad;
+        setMcduDisplay(prev => ({
+          ...prev,
+          lines: newLines,
+          scratchpad: ""
+        }));
+      }
+    }
+  };
 
-  function generatePerfPage() {
-    return [
-      "PERF INIT     1/3",
-      "",
-      "GW           ---.-T",
-      `PAX          ${passengerManifest.length}`,
-      "",
-      "V1           ---KT",
-      "VR           ---KT", 
-      "V2           ---KT",
-      "",
-      "TRANS ALT    18000",
-      "",
-      "<TAKEOFF     APPR>"
-    ];
-  }
+  const updateMcduDisplay = () => {
+    let newLines = [];
+    
+    switch (mcduDisplay.currentPage) {
+      case 'INIT':
+        newLines = [
+          "     A320 INIT      ",
+          "",
+          "FROM/TO",
+          `${selectedAirport || "----"}/----`,
+          "",
+          "FLT NBR        COST INDEX",
+          `${flightNumber || "----"}              085`,
+          "",
+          "ALTN         CRZ FL/TEMP",
+          "----         FL350/--C",
+          "",
+          "<INDEX       INIT>"
+        ];
+        break;
+      case 'FPLN':
+        newLines = [
+          "    A320 F-PLN     1/1",
+          "",
+          `FROM         ${selectedAirport || "----"}`,
+          `TO           ----`,
+          "",
+          "VIA          DIRECT",
+          "",
+          "DIST         ---NM",
+          "TIME         --:--",
+          "",
+          "<AIRWAYS     NAV>",
+          "<PRINT       PRINT>"
+        ];
+        break;
+      case 'PERF':
+        newLines = [
+          "   A320 PERF INIT   1/3",
+          "",
+          "GW           ---.-T",
+          `PAX          ${passengerManifest.length}`,
+          "",
+          "V1           ---KT",
+          "VR           ---KT", 
+          "V2           ---KT",
+          "",
+          "TRANS ALT    18000",
+          "",
+          "<TAKEOFF     APPR>"
+        ];
+        break;
+      case 'DATA':
+        newLines = [
+          "    A320 DATA       ",
+          "",
+          "GPS PRIMARY      GPS",
+          "IRS1 PRIMARY     IRS",
+          "",
+          "PRINT FUNCTION",
+          "",
+          "ACARS FUNCTION",
+          "",
+          "AIDS",
+          "",
+          "<REQUEST     PRINT>"
+        ];
+        break;
+      default:
+        newLines = mcduDisplay.lines;
+    }
+    
+    setMcduDisplay(prev => ({ ...prev, lines: newLines }));
+  };
+
+  useEffect(() => {
+    updateMcduDisplay();
+  }, [mcduDisplay.currentPage, selectedAirport, flightNumber, passengerManifest.length]);
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
     wind: '270°/08KT',
@@ -690,36 +775,84 @@ export default function App() {
 
 
 
-  // Aircraft compatibility mapping
-  const getAircraftCategory = (aircraftType) => {
-    const wideBodyAircraft = ["A330", "A340", "A350", "A380", "B747-400", "B747-8", "B777-200", "B777-300", "B787-8", "B787-9", "B787-10"];
-    const narrowBodyAircraft = ["A318", "A319", "A320", "A321", "B737-700", "B737-800", "B737-900", "MD-80", "MD-90"];
-    const regionalAircraft = ["CRJ-200", "CRJ-700", "CRJ-900", "E170", "E175", "E190"];
-    const turbopropAircraft = ["DHC-8", "ATR-72"];
-    
-    if (wideBodyAircraft.includes(aircraftType)) return "wide-body";
-    if (narrowBodyAircraft.includes(aircraftType)) return "narrow-body";
-    if (regionalAircraft.includes(aircraftType)) return "regional";
-    if (turbopropAircraft.includes(aircraftType)) return "turboprop";
-    return "narrow-body"; // default
+  // Comprehensive aircraft database with detailed specifications
+  const aircraftDatabase = {
+    "A318": { wingspan: 34.1, length: 31.4, category: "narrow-body", doors: 3, maxSeats: 132, weightClass: "medium" },
+    "A319": { wingspan: 34.1, length: 33.8, category: "narrow-body", doors: 3, maxSeats: 156, weightClass: "medium" },
+    "A320": { wingspan: 34.1, length: 37.6, category: "narrow-body", doors: 4, maxSeats: 180, weightClass: "medium" },
+    "A321": { wingspan: 34.1, length: 44.5, category: "narrow-body", doors: 4, maxSeats: 220, weightClass: "heavy" },
+    "A330": { wingspan: 60.3, length: 58.8, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
+    "A340": { wingspan: 63.5, length: 63.7, category: "wide-body", doors: 6, maxSeats: 380, weightClass: "heavy" },
+    "A350": { wingspan: 64.8, length: 66.8, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
+    "A380": { wingspan: 79.8, length: 72.7, category: "super-heavy", doors: 8, maxSeats: 850, weightClass: "super" },
+    "B737-700": { wingspan: 35.8, length: 33.6, category: "narrow-body", doors: 3, maxSeats: 149, weightClass: "medium" },
+    "B737-800": { wingspan: 35.8, length: 39.5, category: "narrow-body", doors: 4, maxSeats: 189, weightClass: "medium" },
+    "B737-900": { wingspan: 35.8, length: 42.1, category: "narrow-body", doors: 4, maxSeats: 220, weightClass: "heavy" },
+    "B747-400": { wingspan: 64.4, length: 70.7, category: "wide-body", doors: 6, maxSeats: 660, weightClass: "heavy" },
+    "B747-8": { wingspan: 68.4, length: 76.3, category: "wide-body", doors: 6, maxSeats: 605, weightClass: "heavy" },
+    "B777-200": { wingspan: 60.9, length: 63.7, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
+    "B777-300": { wingspan: 64.8, length: 73.9, category: "wide-body", doors: 6, maxSeats: 550, weightClass: "heavy" },
+    "B787-8": { wingspan: 60.1, length: 56.7, category: "wide-body", doors: 6, maxSeats: 359, weightClass: "heavy" },
+    "B787-9": { wingspan: 60.1, length: 62.8, category: "wide-body", doors: 6, maxSeats: 420, weightClass: "heavy" },
+    "B787-10": { wingspan: 60.1, length: 68.3, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
+    "CRJ-200": { wingspan: 21.2, length: 26.8, category: "regional", doors: 2, maxSeats: 50, weightClass: "light" },
+    "CRJ-700": { wingspan: 23.2, length: 32.3, category: "regional", doors: 2, maxSeats: 78, weightClass: "medium" },
+    "CRJ-900": { wingspan: 24.9, length: 36.4, category: "regional", doors: 2, maxSeats: 90, weightClass: "medium" },
+    "E170": { wingspan: 26.0, length: 29.9, category: "regional", doors: 2, maxSeats: 80, weightClass: "medium" },
+    "E175": { wingspan: 26.0, length: 31.7, category: "regional", doors: 2, maxSeats: 88, weightClass: "medium" },
+    "E190": { wingspan: 28.7, length: 36.2, category: "regional", doors: 2, maxSeats: 114, weightClass: "medium" },
+    "DHC-8": { wingspan: 28.4, length: 32.8, category: "turboprop", doors: 2, maxSeats: 78, weightClass: "light" },
+    "ATR-72": { wingspan: 27.1, length: 27.2, category: "turboprop", doors: 2, maxSeats: 78, weightClass: "light" },
+    "MD-80": { wingspan: 32.9, length: 45.1, category: "narrow-body", doors: 4, maxSeats: 172, weightClass: "medium" },
+    "MD-90": { wingspan: 32.9, length: 46.5, category: "narrow-body", doors: 4, maxSeats: 172, weightClass: "medium" }
+  };
+
+  const standCompatibilityMatrix = {
+    "narrow": {
+      maxWingspan: 36,
+      maxLength: 50,
+      categories: ["regional", "turboprop", "narrow-body"],
+      maxWeightClass: ["light", "medium"]
+    },
+    "medium": {
+      maxWingspan: 52,
+      maxLength: 70,
+      categories: ["regional", "turboprop", "narrow-body"],
+      maxWeightClass: ["light", "medium", "heavy"]
+    },
+    "wide": {
+      maxWingspan: 80,
+      maxLength: 80,
+      categories: ["regional", "turboprop", "narrow-body", "wide-body", "super-heavy"],
+      maxWeightClass: ["light", "medium", "heavy", "super"]
+    },
+    "cargo": {
+      maxWingspan: 80,
+      maxLength: 80,
+      categories: ["regional", "turboprop", "narrow-body", "wide-body", "super-heavy"],
+      maxWeightClass: ["light", "medium", "heavy", "super"]
+    }
   };
 
   const isStandCompatible = (standType, aircraftType) => {
-    const aircraftCategory = getAircraftCategory(aircraftType);
+    const aircraft = aircraftDatabase[aircraftType];
+    const standLimits = standCompatibilityMatrix[standType];
     
-    // Strict stand compatibility rules
-    switch (standType) {
-      case "narrow":
-        return aircraftCategory === "narrow-body" || aircraftCategory === "regional" || aircraftCategory === "turboprop";
-      case "medium":
-        return aircraftCategory === "narrow-body" || aircraftCategory === "regional" || aircraftCategory === "turboprop";
-      case "wide":
-        return true; // Wide stands can accommodate all aircraft
-      case "cargo":
-        return true; // Cargo stands can accommodate all aircraft
-      default:
-        return false;
-    }
+    if (!aircraft || !standLimits) return false;
+    
+    // Check wingspan constraint
+    if (aircraft.wingspan > standLimits.maxWingspan) return false;
+    
+    // Check length constraint
+    if (aircraft.length > standLimits.maxLength) return false;
+    
+    // Check category compatibility
+    if (!standLimits.categories.includes(aircraft.category)) return false;
+    
+    // Check weight class compatibility
+    if (!standLimits.maxWeightClass.includes(aircraft.weightClass)) return false;
+    
+    return true;
   };
 
   const assignPilotCallsign = () => {
@@ -739,23 +872,42 @@ export default function App() {
   };
 
   const generatePassengerManifest = (aircraftType) => {
-    if (!aircraftData) return [];
+    const aircraftInfo = aircraftDatabase[aircraftType];
+    if (!aircraftInfo) return [];
     
-    const maxSeats = aircraftData.maxSeats;
+    const maxSeats = aircraftInfo.maxSeats;
     // Use 85-95% of max capacity for realistic loading
     const passengerCount = Math.floor(maxSeats * (0.85 + Math.random() * 0.10));
     const manifest = [];
 
-    const firstNames = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "Robert", "Anna", "James", "Maria"];
-    const lastNames = ["Smith", "Johnson", "Brown", "Davis", "Wilson", "Miller", "Moore", "Taylor", "Anderson", "Thomas"];
-    const seatClasses = ["Economy", "Premium Economy", "Business", "First"];
+    const firstNames = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "Robert", "Anna", "James", "Maria", "Carlos", "Sofia", "Ahmed", "Yuki", "Pierre", "Ingrid"];
+    const lastNames = ["Smith", "Johnson", "Brown", "Davis", "Wilson", "Miller", "Moore", "Taylor", "Anderson", "Thomas", "Garcia", "Rodriguez", "Chen", "Patel", "Mueller", "Schmidt"];
+    
+    // Determine seat configuration based on aircraft type
+    let seatConfig = { abreast: 6, letters: "ABCDEF" }; // Default narrow body
+    if (aircraftInfo.category === "wide-body") {
+      seatConfig = { abreast: 9, letters: "ABCDEFGHJ" }; // Wide body 3-3-3 or 2-4-2
+    } else if (aircraftInfo.category === "regional") {
+      seatConfig = { abreast: 4, letters: "ABCD" }; // Regional 2-2
+    } else if (aircraftInfo.category === "super-heavy") {
+      seatConfig = { abreast: 10, letters: "ABCDEFGHJK" }; // A380 configuration
+    }
+
+    // Determine class mix based on aircraft type
+    let seatClasses = ["Economy"];
+    if (aircraftInfo.category === "wide-body" || aircraftInfo.category === "super-heavy") {
+      seatClasses = ["Economy", "Premium Economy", "Business", "First"];
+    } else if (aircraftInfo.maxSeats > 150) {
+      seatClasses = ["Economy", "Premium Economy", "Business"];
+    }
+
+    const maxRows = Math.ceil(maxSeats / seatConfig.abreast);
 
     for (let i = 0; i < passengerCount; i++) {
       const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
       const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-      const maxRows = Math.ceil(maxSeats / 6); // Estimate rows based on 6-abreast seating
       const seatRow = Math.floor(Math.random() * maxRows) + 1;
-      const seatLetter = String.fromCharCode(65 + Math.floor(Math.random() * 6));
+      const seatLetter = seatConfig.letters[Math.floor(Math.random() * seatConfig.abreast)];
 
       manifest.push({
         id: i + 1,
@@ -763,7 +915,7 @@ export default function App() {
         seat: `${seatRow}${seatLetter}`,
         class: seatClasses[Math.floor(Math.random() * seatClasses.length)],
         checkedIn: Math.random() > 0.1,
-        specialRequests: Math.random() > 0.8 ? ["Wheelchair", "Dietary", "Unaccompanied Minor"][Math.floor(Math.random() * 3)] : null,
+        specialRequests: Math.random() > 0.8 ? ["Wheelchair", "Dietary", "Unaccompanied Minor", "Extra Legroom", "Bassinet"][Math.floor(Math.random() * 5)] : null,
         frequent: Math.random() > 0.7
       });
     }
@@ -833,49 +985,46 @@ export default function App() {
 
       tryLoadModel();
 
-      // Fetch aircraft data from API
-      fetch(`/api/aircraft/${aircraft}`)
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          }
-          throw new Error('Aircraft data not found');
-        })
-        .then(data => {
-          setAircraftData(data);
-          // Generate appropriate manifest based on stand type
-          const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
-          const isCargoStand = currentStandData?.type === "cargo";
-          const manifest = isCargoStand ? generateCargoManifest() : generatePassengerManifest(aircraft);
-          setPassengerManifest(manifest);
-        })
-        .catch(() => {
-          // Use default aircraft data
-          const defaultData = {
-            type: aircraft,
-            manufacturer: aircraft.startsWith('A') ? 'Airbus' : 'Boeing',
-            maxSeats: aircraft.includes('380') ? 850 : aircraft.includes('747') ? 660 : 180,
-            range: aircraft.includes('787') ? 15750 : 6500,
-            maxSpeed: 560,
-            engines: aircraft.includes('A380') || aircraft.includes('747') ? 4 : 2,
-            fuelCapacity: aircraft.includes('A380') ? 84535 : 26020,
-            engineType: "Turbofan",
-            firstFlight: "N/A",
-            maxTakeoffWeight: 75000,
-            maxLandingWeight: 68000,
-            cargoCapacity: 8.2,
-            climbRate: 3000,
-            length: 37.5,
-            wingspan: 34.1,
-            height: 12.5,
-            serviceCeiling: 41000,
-            cruiseSpeed: 470,
-            variants: ["-700", "-800"]
-          };
-          setAircraftData(defaultData);
-          const manifest = generatePassengerManifest(aircraft);
-          setPassengerManifest(manifest);
-        });
+      // Use internal aircraft database
+      const baseAircraftData = aircraftDatabase[aircraft];
+      if (baseAircraftData) {
+        const enrichedData = {
+          type: aircraft,
+          manufacturer: aircraft.startsWith('A') ? 'Airbus' : aircraft.startsWith('B') ? 'Boeing' : aircraft.startsWith('E') ? 'Embraer' : aircraft.startsWith('CRJ') ? 'Bombardier' : aircraft.startsWith('DHC') ? 'De Havilland' : aircraft.startsWith('ATR') ? 'ATR' : 'McDonnell Douglas',
+          maxSeats: baseAircraftData.maxSeats,
+          wingspan: baseAircraftData.wingspan,
+          length: baseAircraftData.length,
+          category: baseAircraftData.category,
+          doors: baseAircraftData.doors,
+          weightClass: baseAircraftData.weightClass,
+          range: aircraft.includes('787') ? 15750 : aircraft.includes('A380') ? 15200 : aircraft.includes('777') ? 14685 : aircraft.includes('A350') ? 15000 : aircraft.includes('747') ? 14815 : 6500,
+          maxSpeed: aircraft.includes('A380') ? 560 : aircraft.includes('747') ? 570 : 560,
+          engines: (aircraft.includes('A380') || aircraft.includes('747')) ? 4 : aircraft.includes('MD') ? 2 : aircraft.includes('A340') ? 4 : 2,
+          fuelCapacity: aircraft.includes('A380') ? 84535 : aircraft.includes('747') ? 74000 : aircraft.includes('777') ? 47890 : aircraft.includes('A350') ? 44150 : 26020,
+          engineType: aircraft.includes('DHC') || aircraft.includes('ATR') ? "Turboprop" : "Turbofan",
+          firstFlight: aircraft.includes('A380') ? "2005" : aircraft.includes('787') ? "2009" : aircraft.includes('A350') ? "2013" : "N/A",
+          maxTakeoffWeight: aircraft.includes('A380') ? 575000 : aircraft.includes('747') ? 412775 : aircraft.includes('777') ? 351534 : 75000,
+          maxLandingWeight: aircraft.includes('A380') ? 394625 : aircraft.includes('747') ? 295742 : aircraft.includes('777') ? 251290 : 68000,
+          operatingEmptyWeight: Math.round(baseAircraftData.maxSeats * 500), // Rough estimate
+          maxZeroFuelWeight: Math.round(baseAircraftData.maxSeats * 600), // Rough estimate
+          cargoCapacity: baseAircraftData.category === "wide-body" ? 15.5 : baseAircraftData.category === "super-heavy" ? 20.8 : 8.2,
+          climbRate: 3000,
+          height: aircraft.includes('A380') ? 24.1 : aircraft.includes('747') ? 19.4 : 12.5,
+          serviceCeiling: 41000,
+          cruiseSpeed: aircraft.includes('DHC') || aircraft.includes('ATR') ? 280 : 470,
+          variants: aircraft.includes('737') ? ["-700", "-800", "-900"] : aircraft.includes('A320') ? ["-200", "-200neo"] : ["-100", "-200"]
+        };
+        setAircraftData(enrichedData);
+        
+        // Generate appropriate manifest based on stand type
+        const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
+        const isCargoStand = currentStandData?.type === "cargo";
+        const manifest = isCargoStand ? generateCargoManifest() : generatePassengerManifest(aircraft);
+        setPassengerManifest(manifest);
+      } else {
+        setAircraftData(null);
+        setPassengerManifest([]);
+      }
     } else {
       setAircraftModel("");
       setAircraftData(null);
@@ -1048,22 +1197,25 @@ export default function App() {
   };
 
   const submitPermit = (permitType, formData) => {
-    const currentCallsign = assignedCallsign || flightNumber || "UNKNOWN";
+    const currentCallsign = assignedCallsign || flightNumber || `USER_${user?.username}`;
     const newPermit = {
       id: Date.now(),
       type: permitType,
       data: formData,
       status: "SUBMITTED",
       submittedAt: new Date().toLocaleTimeString(),
+      submittedDate: new Date().toLocaleDateString(),
       callsign: currentCallsign,
-      submittedBy: user?.username
+      submittedBy: user?.username,
+      airport: selectedAirport,
+      stand: selectedStand
     };
     
     setPermits(prev => [...prev, newPermit]);
     setActivePermitForm(null);
     
     socket.emit("chatMessage", {
-      text: `${permitType.toUpperCase()} PERMIT submitted by ${currentCallsign} (${user?.username})`,
+      text: `📋 ${permitType.replace(/([A-Z])/g, ' $1').toUpperCase()} PERMIT submitted by ${currentCallsign} (Pilot: ${user?.username})`,
       sender: "PERMITS OFFICE",
       stand: selectedStand,
       airport: selectedAirport,
@@ -1759,19 +1911,31 @@ export default function App() {
                   </div>
 
                   <div className="permits-list">
-                    <h3>SUBMITTED PERMITS</h3>
+                    <h3>SUBMITTED PERMITS ({permits.length})</h3>
                     {permits.length === 0 ? (
-                      <div className="no-permits">No permits submitted</div>
+                      <div className="no-permits">
+                        <div style={{ fontSize: '2rem', marginBottom: '10px' }}>📋</div>
+                        <div>No permits submitted yet</div>
+                        <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '5px' }}>
+                          Submit permits using the buttons above
+                        </div>
+                      </div>
                     ) : (
                       permits.map(permit => (
                         <div key={permit.id} className="permit-item">
                           <div className="permit-header">
-                            <span className="permit-type">{permit.type.toUpperCase()}</span>
+                            <span className="permit-type">
+                              📄 {permit.type.replace(/([A-Z])/g, ' $1').toUpperCase()} PERMIT
+                            </span>
                             <span className="permit-status">{permit.status}</span>
                           </div>
                           <div className="permit-details">
-                            <span>Submitted: {permit.submittedAt}</span>
-                            <span>Callsign: {permit.callsign}</span>
+                            <span><strong>Submitted:</strong> {permit.submittedDate} at {permit.submittedAt}</span>
+                            <span><strong>Callsign:</strong> {permit.callsign}</span>
+                          </div>
+                          <div className="permit-details">
+                            <span><strong>Pilot:</strong> {permit.submittedBy}</span>
+                            <span><strong>Stand:</strong> {permit.stand || 'N/A'}</span>
                           </div>
                         </div>
                       ))
@@ -1788,65 +1952,61 @@ export default function App() {
               <div className="mcdu-unit">
                 <div className="mcdu-screen">
                   <div className="mcdu-content">
-                    <div className="mcdu-line">TAKE OFF RWY 22L</div>
-                    <div className="mcdu-line">122     FLT ACTR</div>
-                    <div className="mcdu-line">125       F=144</div>
-                    <div className="mcdu-line">129  SLAT/FLAP TO 141KT</div>
-                    <div className="mcdu-line">125       CLEAN  FL170M+3</div>
-                    <div className="mcdu-line">              175KT/5</div>
-                    <div className="mcdu-line">TRANS ALT      FLEX TO TEMP</div>
-                    <div className="mcdu-line">  5000           52°C</div>
-                    <div className="mcdu-line">THR RED/ACC   ENG OUT ACC</div>
-                    <div className="mcdu-line">  2150/2150       2150</div>
-                    <div className="mcdu-line">                  NEXT</div>
-                    <div className="mcdu-line">                PHASE&gt;</div>
+                    {mcduDisplay.lines.map((line, index) => (
+                      <div key={index} className="mcdu-line">{line}</div>
+                    ))}
+                    {mcduDisplay.scratchpad && (
+                      <div className="mcdu-scratchpad">
+                        SCRATCHPAD: {mcduDisplay.scratchpad}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
                 <div className="mcdu-keypad">
                   {/* Top Function Keys Row */}
                   <div className="mcdu-function-keys">
-                    <button className="mcdu-key function">DIR</button>
-                    <button className="mcdu-key function">PROG</button>
-                    <button className="mcdu-key function">PERF</button>
-                    <button className="mcdu-key function">INIT</button>
-                    <button className="mcdu-key function">DATA</button>
+                    <button className="mcdu-key function" onClick={() => handleMcduKey('DIR')}>DIR</button>
+                    <button className="mcdu-key function" onClick={() => handleMcduKey('PROG')}>PROG</button>
+                    <button className="mcdu-key function" onClick={() => handleMcduKey('PERF')}>PERF</button>
+                    <button className="mcdu-key function" onClick={() => handleMcduKey('INIT')}>INIT</button>
+                    <button className="mcdu-key function" onClick={() => handleMcduKey('DATA')}>DATA</button>
                     <button className="mcdu-key function"></button>
                   </div>
 
                   {/* Line Select Keys */}
                   <div className="mcdu-line-select-keys">
                     <div className="mcdu-left-keys">
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK1L')}>◄</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK2L')}>◄</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK3L')}>◄</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK4L')}>◄</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK5L')}>◄</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK6L')}>◄</button>
                     </div>
                     <div className="mcdu-right-keys">
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
-                      <button className="mcdu-key line-select"></button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK1R')}>►</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK2R')}>►</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK3R')}>►</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK4R')}>►</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK5R')}>►</button>
+                      <button className="mcdu-key line-select" onClick={() => handleMcduKey('LSK6R')}>►</button>
                     </div>
                   </div>
 
                   {/* Navigation Keys Row */}
                   <div className="mcdu-nav-keys">
-                    <button className="mcdu-key nav">F-PLN</button>
-                    <button className="mcdu-key nav">RAD NAV</button>
-                    <button className="mcdu-key nav">FUEL PRED</button>
-                    <button className="mcdu-key nav">SEC F-PLN</button>
-                    <button className="mcdu-key nav">ATC COMM</button>
-                    <button className="mcdu-key nav">MCDU MENU</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('F-PLN')}>F-PLN</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('RAD NAV')}>RAD NAV</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('FUEL PRED')}>FUEL PRED</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('SEC F-PLN')}>SEC F-PLN</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('ATC COMM')}>ATC COMM</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('MCDU MENU')}>MCDU MENU</button>
                   </div>
 
                   {/* AIRPORT key row */}
                   <div className="mcdu-nav-keys">
-                    <button className="mcdu-key nav">AIRPORT</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('AIRPORT')}>AIRPORT</button>
                     <button className="mcdu-key special"></button>
                     <button className="mcdu-key special"></button>
                     <button className="mcdu-key special"></button>
@@ -1856,62 +2016,33 @@ export default function App() {
 
                   {/* Arrow Keys */}
                   <div className="mcdu-arrow-keys">
-                    <button className="mcdu-key nav">←</button>
-                    <button className="mcdu-key nav">↑</button>
-                    <button className="mcdu-key nav">→</button>
-                    <button className="mcdu-key nav">↓</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('←')}>◄</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('↑')}>▲</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('→')}>►</button>
+                    <button className="mcdu-key nav" onClick={() => handleMcduKey('↓')}>▼</button>
                   </div>
 
                   {/* Letter Grid */}
                   <div className="mcdu-letter-grid">
-                    <button className="mcdu-key letter">A</button>
-                    <button className="mcdu-key letter">B</button>
-                    <button className="mcdu-key letter">C</button>
-                    <button className="mcdu-key letter">D</button>
-                    <button className="mcdu-key letter">E</button>
-                    <button className="mcdu-key letter">F</button>
-                    <button className="mcdu-key letter">G</button>
-                    <button className="mcdu-key letter">H</button>
-                    <button className="mcdu-key letter">I</button>
-                    <button className="mcdu-key letter">J</button>
-                    <button className="mcdu-key letter">K</button>
-                    <button className="mcdu-key letter">L</button>
-                    <button className="mcdu-key letter">M</button>
-                    <button className="mcdu-key letter">N</button>
-                    <button className="mcdu-key letter">O</button>
-                    <button className="mcdu-key letter">P</button>
-                    <button className="mcdu-key letter">Q</button>
-                    <button className="mcdu-key letter">R</button>
-                    <button className="mcdu-key letter">S</button>
-                    <button className="mcdu-key letter">T</button>
-                    <button className="mcdu-key letter">U</button>
-                    <button className="mcdu-key letter">V</button>
-                    <button className="mcdu-key letter">W</button>
-                    <button className="mcdu-key letter">X</button>
-                    <button className="mcdu-key letter">Y</button>
+                    {['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y'].map(letter => (
+                      <button key={letter} className="mcdu-key letter" onClick={() => handleMcduKey(letter)}>{letter}</button>
+                    ))}
                   </div>
 
                   {/* Number Row */}
                   <div className="mcdu-number-row">
-                    <button className="mcdu-key number">1</button>
-                    <button className="mcdu-key number">2</button>
-                    <button className="mcdu-key number">3</button>
-                    <button className="mcdu-key number">4</button>
-                    <button className="mcdu-key number">5</button>
-                    <button className="mcdu-key number">6</button>
-                    <button className="mcdu-key number">7</button>
-                    <button className="mcdu-key number">8</button>
-                    <button className="mcdu-key number">9</button>
-                    <button className="mcdu-key number">0</button>
+                    {['1','2','3','4','5','6','7','8','9','0'].map(number => (
+                      <button key={number} className="mcdu-key number" onClick={() => handleMcduKey(number)}>{number}</button>
+                    ))}
                   </div>
 
                   {/* Bottom Special Keys */}
                   <div className="mcdu-bottom-keys">
-                    <button className="mcdu-key special">Z</button>
-                    <button className="mcdu-key special">/</button>
-                    <button className="mcdu-key special">SP</button>
-                    <button className="mcdu-key special">OVFY</button>
-                    <button className="mcdu-key special">CLR</button>
+                    <button className="mcdu-key special" onClick={() => handleMcduKey('Z')}>Z</button>
+                    <button className="mcdu-key special" onClick={() => handleMcduKey('/')}>/</button>
+                    <button className="mcdu-key special" onClick={() => handleMcduKey('SP')}>SP</button>
+                    <button className="mcdu-key special" onClick={() => handleMcduKey('OVFY')}>OVFY</button>
+                    <button className="mcdu-key special" onClick={() => handleMcduKey('CLR')}>CLR</button>
                   </div>
 
                   {/* Control Keys */}
