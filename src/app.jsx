@@ -55,6 +55,7 @@ export default function App() {
   const [quickFlightNumber, setQuickFlightNumber] = useState("");
   const [quickAircraft, setQuickAircraft] = useState("");
   const [activeServiceRequests, setActiveServiceRequests] = useState({});
+  const [commMinimized, setCommMinimized] = useState(false);
 
   const handleMcduKey = (key) => {
     setMcduDisplay(prev => {
@@ -3081,10 +3082,27 @@ export default function App() {
           {renderContent()}
         </div>
 
-        <div className="comm-panel">
+        <div className={`comm-panel ${commMinimized ? 'minimized' : ''}`}>
           <div className="comm-header">
-            <h3>GROUND COMMUNICATIONS</h3>
-            <div className="comm-status">ONLINE</div>
+            <div className="comm-header-content">
+              <h3>GROUND COMMUNICATIONS</h3>
+              <div className="comm-status">ONLINE</div>
+            </div>
+            <button 
+              className="comm-minimize-btn"
+              onClick={() => setCommMinimized(!commMinimized)}
+              title={commMinimized ? "Expand Communications" : "Minimize Communications"}
+            >
+              {commMinimized ? '📈' : '📉'}
+            </button>
+          </div>
+
+          <div 
+            className="comm-minimize-tab"
+            onClick={() => setCommMinimized(false)}
+          >
+            <div className="comm-tab-icon">💬</div>
+            <div className="comm-tab-text">COMMS</div>
           </div>
 
           <div className="messages-area">
