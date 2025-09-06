@@ -2129,9 +2129,12 @@ export default function App() {
                         <div key={permit.id} className="permit-item">
                           <div className="permit-header">
                             <span className="permit-type">
-                              📄 {permit.type.replace(/([A-Z])/g, ' $1').toUpperCase()} PERMIT
+                              {permit.type === 'overweight' && '⚖️ OVERWEIGHT PERMIT'}
+                              {permit.type === 'diplomatic' && '🏛️ DIPLOMATIC PERMIT'}
+                              {permit.type === 'special' && '🚨 SPECIAL OPERATIONS PERMIT'}
+                              {permit.type === 'weightBalance' && '📊 WEIGHT & BALANCE MANIFEST'}
                             </span>
-                            <span className="permit-status">{permit.status}</span>
+                            <span className={`permit-status ${permit.status.toLowerCase()}`}>{permit.status}</span>
                           </div>
                           <div className="permit-details">
                             <span><strong>Submitted:</strong> {permit.submittedDate} at {permit.submittedAt}</span>
@@ -2141,6 +2144,12 @@ export default function App() {
                             <span><strong>Pilot:</strong> {permit.submittedBy}</span>
                             <span><strong>Stand:</strong> {permit.stand || 'N/A'}</span>
                           </div>
+                          {permit.type === 'weightBalance' && (
+                            <div className="permit-additional-info">
+                              <span><strong>Aircraft:</strong> {aircraft || 'N/A'}</span>
+                              <span><strong>Passengers:</strong> {passengerManifest.length}</span>
+                            </div>
+                          )}
                         </div>
                       ))
                     )}
@@ -2150,225 +2159,7 @@ export default function App() {
             </div>
           );
 
-        case "mcdu":
-          return (
-            <div className="mcdu-container">
-              <div className="mcdu-unit">
-                {/* MCDU Header */}
-                <div className="mcdu-header">
-                  <div className="mcdu-label">MCDU</div>
-                  <div className="mcdu-model">A320 FAMILY</div>
-                </div>
-
-                {/* Main Screen */}
-                <div className="mcdu-main-screen">
-                  <div className="mcdu-screen-bezel">
-                    <div className="mcdu-screen-inner">
-                      <div className="mcdu-display-area">
-                        {/* Line Select Labels */}
-                        <div className="mcdu-line-selects">
-                          <div className="lsk-labels left">
-                            {[1,2,3,4,5,6].map(num => (
-                              <button key={`L${num}`} className="lsk-button left" onClick={() => handleMcduKey(`LSK${num}L`)}>
-                                <span className="lsk-arrow">◄</span>
-                              </button>
-                            ))}
-                          </div>
-                          
-                          {/* Display Content */}
-                          <div className="mcdu-display-content">
-                            <div className="mcdu-title-line">
-                              {mcduDisplay.currentPage === 'INIT' && 'A320 MCDU     INIT'}
-                              {mcduDisplay.currentPage === 'FPLN' && 'A320 MCDU    F-PLN'}
-                              {mcduDisplay.currentPage === 'PERF' && 'A320 MCDU     PERF'}
-                              {mcduDisplay.currentPage === 'DATA' && 'A320 MCDU     DATA'}
-                              {mcduDisplay.currentPage === 'MENU' && 'A320 MCDU     MENU'}
-                            </div>
-                            
-                            {/* Dynamic Content Based on Page */}
-                            <div className="mcdu-content-lines">
-                              {mcduDisplay.currentPage === 'INIT' && (
-                                <>
-                                  <div className="mcdu-line small-text">CO RTE</div>
-                                  <div className="mcdu-line">FROM/TO</div>
-                                  <div className="mcdu-line large-text cyan">{mcduDisplay.fromAirport || selectedAirport || '□□□□'}/{mcduDisplay.toAirport || '□□□□'}</div>
-                                  <div className="mcdu-line small-text">FLT NBR        CRZ FL/TEMP</div>
-                                  <div className="mcdu-line large-text cyan">{mcduDisplay.flightNumberMcdu || flightNumber || '□□□□'}         FL350/-45°C</div>
-                                  <div className="mcdu-line small-text">COST INDEX</div>
-                                  <div className="mcdu-line large-text">85</div>
-                                </>
-                              )}
-                              
-                              {mcduDisplay.currentPage === 'FPLN' && (
-                                <>
-                                  <div className="mcdu-line small-text">ORIGIN        DEST</div>
-                                  <div className="mcdu-line large-text cyan">{mcduDisplay.fromAirport || selectedAirport || '----'}          {mcduDisplay.toAirport || '----'}</div>
-                                  <div className="mcdu-line small-text">RUNWAY        VIA</div>
-                                  <div className="mcdu-line large-text">27           DIRECT</div>
-                                  <div className="mcdu-line small-text">DIST   TIME   FUEL</div>
-                                  <div className="mcdu-line large-text">150NM  0+25   1.2T</div>
-                                </>
-                              )}
-                              
-                              {mcduDisplay.currentPage === 'PERF' && (
-                                <>
-                                  <div className="mcdu-line small-text">GW         ZFW</div>
-                                  <div className="mcdu-line large-text cyan">{mcduDisplay.grossWeight || '75.2'}T        58.4T</div>
-                                  <div className="mcdu-line small-text">V1    VR    V2</div>
-                                  <div className="mcdu-line large-text">147   152   159</div>
-                                  <div className="mcdu-line small-text">FLAPS  THS</div>
-                                  <div className="mcdu-line large-text">1+F    UP2.1</div>
-                                </>
-                              )}
-
-                              {mcduDisplay.currentPage === 'DATA' && (
-                                <>
-                                  <div className="mcdu-line small-text">GPS         IRS</div>
-                                  <div className="mcdu-line large-text green">PRIMARY     PRIMARY</div>
-                                  <div className="mcdu-line small-text">PRINT FUNCTION</div>
-                                  <div className="mcdu-line large-text">READY</div>
-                                  <div className="mcdu-line small-text">ACARS STATUS</div>
-                                  <div className="mcdu-line large-text green">ACTIVE</div>
-                                </>
-                              )}
-
-                              {mcduDisplay.currentPage === 'MENU' && (
-                                <>
-                                  <div className="mcdu-line small-text">FMGC      ATSU</div>
-                                  <div className="mcdu-line large-text">MENU      MENU</div>
-                                  <div className="mcdu-line small-text">AIDS      CFDS</div>
-                                  <div className="mcdu-line large-text">MENU      MENU</div>
-                                  <div className="mcdu-line small-text">MAINTENANCE</div>
-                                  <div className="mcdu-line large-text">MENU</div>
-                                </>
-                              )}
-                            </div>
-
-                            {/* Scratchpad */}
-                            <div className="mcdu-scratchpad">
-                              <div className="scratchpad-content">
-                                {mcduDisplay.scratchpad || '_'}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="lsk-labels right">
-                            {[1,2,3,4,5,6].map(num => (
-                              <button key={`R${num}`} className="lsk-button right" onClick={() => handleMcduKey(`LSK${num}R`)}>
-                                <span className="lsk-arrow">►</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Function Keys */}
-                <div className="mcdu-function-row">
-                  <button className="mcdu-btn function" onClick={() => handleMcduKey('DIR')}>DIR</button>
-                  <button className="mcdu-btn function" onClick={() => handleMcduKey('PROG')}>PROG</button>
-                  <button className="mcdu-btn function" onClick={() => handleMcduKey('PERF')}>PERF</button>
-                  <button className="mcdu-btn function" onClick={() => handleMcduKey('INIT')}>INIT</button>
-                  <button className="mcdu-btn function" onClick={() => handleMcduKey('DATA')}>DATA</button>
-                  <button className="mcdu-btn function disabled"></button>
-                </div>
-
-                {/* Navigation Keys */}
-                <div className="mcdu-nav-row">
-                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('F-PLN')}>F-PLN</button>
-                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('RAD')}>RAD<br/>NAV</button>
-                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('FUEL')}>FUEL<br/>PRED</button>
-                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('SEC')}>SEC<br/>F-PLN</button>
-                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('ATC')}>ATC<br/>COMM</button>
-                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('MCDU MENU')}>MCDU<br/>MENU</button>
-                </div>
-
-                {/* Airport/Special Row */}
-                <div className="mcdu-special-row">
-                  <button className="mcdu-btn nav" onClick={() => handleMcduKey('AIRPORT')}>AIRPORT</button>
-                  <button className="mcdu-btn nav disabled"></button>
-                  <button className="mcdu-btn nav disabled"></button>
-                  <button className="mcdu-btn nav disabled"></button>
-                  <button className="mcdu-btn nav disabled"></button>
-                  <button className="mcdu-btn nav disabled"></button>
-                </div>
-
-                {/* Arrow Keys */}
-                <div className="mcdu-arrow-row">
-                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('←')}>←</button>
-                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('↑')}>↑</button>
-                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('→')}>→</button>
-                  <button className="mcdu-btn arrow" onClick={() => handleMcduKey('↓')}>↓</button>
-                </div>
-
-                {/* Alpha Keys */}
-                <div className="mcdu-alpha-section">
-                  <div className="mcdu-alpha-row">
-                    {['A','B','C','D','E'].map(letter => (
-                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
-                    ))}
-                  </div>
-                  <div className="mcdu-alpha-row">
-                    {['F','G','H','I','J'].map(letter => (
-                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
-                    ))}
-                  </div>
-                  <div className="mcdu-alpha-row">
-                    {['K','L','M','N','O'].map(letter => (
-                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
-                    ))}
-                  </div>
-                  <div className="mcdu-alpha-row">
-                    {['P','Q','R','S','T'].map(letter => (
-                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
-                    ))}
-                  </div>
-                  <div className="mcdu-alpha-row">
-                    {['U','V','W','X','Y'].map(letter => (
-                      <button key={letter} className="mcdu-btn alpha" onClick={() => handleMcduKey(letter)}>{letter}</button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Numeric Keys */}
-                <div className="mcdu-numeric-section">
-                  <div className="mcdu-numeric-row">
-                    {['1','2','3','4','5'].map(number => (
-                      <button key={number} className="mcdu-btn numeric" onClick={() => handleMcduKey(number)}>{number}</button>
-                    ))}
-                  </div>
-                  <div className="mcdu-numeric-row">
-                    {['6','7','8','9','0'].map(number => (
-                      <button key={number} className="mcdu-btn numeric" onClick={() => handleMcduKey(number)}>{number}</button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Special Characters */}
-                <div className="mcdu-special-chars">
-                  <button className="mcdu-btn special" onClick={() => handleMcduKey('.')}>.</button>
-                  <button className="mcdu-btn special" onClick={() => handleMcduKey('/')}>/</button>
-                  <button className="mcdu-btn special" onClick={() => handleMcduKey('SP')}>SP</button>
-                  <button className="mcdu-btn special" onClick={() => handleMcduKey('OVFY')}>OVFY</button>
-                  <button className="mcdu-btn special clr" onClick={() => handleMcduKey('CLR')}>CLR</button>
-                </div>
-
-                {/* Bottom Special */}
-                <div className="mcdu-bottom-special">
-                  <button className="mcdu-btn special" onClick={() => handleMcduKey('Z')}>Z</button>
-                  <button className="mcdu-btn special" onClick={() => handleMcduKey('+/-')}>+/-</button>
-                </div>
-
-                {/* Brightness Controls */}
-                <div className="mcdu-brightness">
-                  <button className="mcdu-btn brightness">BRT</button>
-                  <button className="mcdu-btn brightness">DIM</button>
-                </div>
-              </div>
-            </div>
-          );
+        
 
         case "manifest":
           const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
@@ -2752,195 +2543,7 @@ export default function App() {
       const lowPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Cleaning", "Water Service", "Lavatory Service"].includes(r.service));
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
-      // Ground crew interface with multiple tabs
-      if (activeTab === "maintenance") {
-        return (
-          <div className="maintenance-container">
-            <div className="maintenance-header">
-              <h2>MAINTENANCE & INCIDENT REPORTING</h2>
-              <div className="maintenance-stats">
-                <div className="stat">
-                  <span className="stat-value">{maintenanceLog.filter(l => l.status === 'Open').length}</span>
-                  <span className="stat-label">OPEN ISSUES</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value">{activeIncidents.length}</span>
-                  <span className="stat-label">ACTIVE INCIDENTS</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value">{Object.keys(equipmentStatus).filter(e => equipmentStatus[e].status === 'Available').length}</span>
-                  <span className="stat-label">EQUIPMENT READY</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="maintenance-sections">
-              <div className="maintenance-section">
-                <h3>QUICK REPORT</h3>
-                <div className="quick-report-buttons">
-                  <button 
-                    className="report-btn critical" 
-                    onClick={() => addMaintenanceLog('Ground Support Equipment Malfunction', 'Critical', 'GPU Unit 3')}
-                  >
-                    🚨 EQUIPMENT FAILURE
-                  </button>
-                  <button 
-                    className="report-btn high" 
-                    onClick={() => reportIncident('Safety', 'Foreign Object Debris on taxiway', 'Taxiway Charlie', 'High')}
-                  >
-                    ⚠️ SAFETY INCIDENT
-                  </button>
-                  <button 
-                    className="report-btn medium" 
-                    onClick={() => addMaintenanceLog('Routine Inspection Due', 'Medium', 'Fuel Truck 2')}
-                  >
-                    🔧 MAINTENANCE DUE
-                  </button>
-                  <button 
-                    className="report-btn low" 
-                    onClick={() => reportIncident('Operational', 'Gate lighting malfunction', 'Gate B12', 'Low')}
-                  >
-                    💡 FACILITY ISSUE
-                  </button>
-                </div>
-              </div>
-
-              <div className="maintenance-section">
-                <h3>EQUIPMENT STATUS</h3>
-                <div className="equipment-grid">
-                  {['GPU Unit 1', 'GPU Unit 2', 'GPU Unit 3', 'Fuel Truck 1', 'Fuel Truck 2', 'Pushback Tractor 1', 'Pushback Tractor 2', 'Catering Truck 1', 'Baggage Cart 1', 'Baggage Cart 2'].map(equipment => (
-                    <div key={equipment} className="equipment-item">
-                      <div className="equipment-name">{equipment}</div>
-                      <div className="equipment-controls">
-                        <button 
-                          className="status-btn available" 
-                          onClick={() => updateEquipmentStatus(equipment, 'Available', 'Equipment Pool')}
-                        >
-                          AVAILABLE
-                        </button>
-                        <button 
-                          className="status-btn in-use" 
-                          onClick={() => updateEquipmentStatus(equipment, 'In Use', 'Gate Area')}
-                        >
-                          IN USE
-                        </button>
-                        <button 
-                          className="status-btn maintenance" 
-                          onClick={() => updateEquipmentStatus(equipment, 'Maintenance', 'Service Hangar')}
-                        >
-                          MAINTENANCE
-                        </button>
-                      </div>
-                      {equipmentStatus[equipment] && (
-                        <div className="equipment-status">
-                          <span className={`status-indicator ${equipmentStatus[equipment].status.toLowerCase().replace(' ', '-')}`}></span>
-                          <span>{equipmentStatus[equipment].status} - {equipmentStatus[equipment].location}</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="maintenance-section">
-                <h3>MAINTENANCE LOG</h3>
-                <div className="maintenance-list">
-                  {maintenanceLog.map(log => (
-                    <div key={log.id} className={`maintenance-item ${log.severity.toLowerCase()}`}>
-                      <div className="maintenance-header">
-                        <span className="maintenance-issue">{log.issue}</span>
-                        <span className="maintenance-time">{log.date} {log.timestamp}</span>
-                      </div>
-                      <div className="maintenance-details">
-                        <span><strong>Equipment:</strong> {log.equipment}</span>
-                        <span><strong>Severity:</strong> {log.severity}</span>
-                        <span><strong>Reported by:</strong> {log.reportedBy}</span>
-                        <span><strong>Status:</strong> {log.status}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }
-
-      if (activeTab === "scheduling") {
-        return (
-          <div className="scheduling-container">
-            <div className="scheduling-header">
-              <h2>CREW SCHEDULING & ASSIGNMENTS</h2>
-              <div className="scheduling-stats">
-                <div className="stat">
-                  <span className="stat-value">{groundCrewSchedule.filter(s => s.status === 'Scheduled').length}</span>
-                  <span className="stat-label">SCHEDULED</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value">{groundCrewSchedule.filter(s => s.shift === 'Day').length}</span>
-                  <span className="stat-label">DAY SHIFT</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value">{groundCrewSchedule.filter(s => s.shift === 'Night').length}</span>
-                  <span className="stat-label">NIGHT SHIFT</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="scheduling-sections">
-              <div className="scheduling-section">
-                <h3>QUICK SCHEDULE</h3>
-                <div className="quick-schedule-buttons">
-                  <button 
-                    className="schedule-btn" 
-                    onClick={() => scheduleCrewMember('Ground Crew A', 'Day', ['Baggage Handling', 'Marshalling'], 'Gates 1-5')}
-                  >
-                    👷‍♂️ SCHEDULE BAGGAGE CREW
-                  </button>
-                  <button 
-                    className="schedule-btn" 
-                    onClick={() => scheduleCrewMember('Fuel Crew B', 'Day', ['Aircraft Fueling', 'Safety Monitoring'], 'Fuel Area')}
-                  >
-                    ⛽ SCHEDULE FUEL CREW
-                  </button>
-                  <button 
-                    className="schedule-btn" 
-                    onClick={() => scheduleCrewMember('Catering Team C', 'Day', ['Cabin Service', 'Water Service'], 'Gates 6-10')}
-                  >
-                    🍽️ SCHEDULE CATERING
-                  </button>
-                  <button 
-                    className="schedule-btn" 
-                    onClick={() => scheduleCrewMember('Maintenance Tech D', 'Night', ['Routine Checks', 'Equipment Service'], 'Maintenance Area')}
-                  >
-                    🔧 SCHEDULE MAINTENANCE
-                  </button>
-                </div>
-              </div>
-
-              <div className="scheduling-section">
-                <h3>CREW ASSIGNMENTS</h3>
-                <div className="crew-list">
-                  {groundCrewSchedule.map(crew => (
-                    <div key={crew.id} className="crew-item">
-                      <div className="crew-header">
-                        <span className="crew-name">{crew.name}</span>
-                        <span className="crew-shift">{crew.shift} SHIFT</span>
-                      </div>
-                      <div className="crew-details">
-                        <span><strong>Area:</strong> {crew.area}</span>
-                        <span><strong>Tasks:</strong> {crew.tasks.join(', ')}</span>
-                        <span><strong>Scheduled by:</strong> {crew.scheduledBy}</span>
-                        <span><strong>Date:</strong> {crew.date}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-      }
+      
 
       if (activeTab === "guides") {
         return (
@@ -3118,146 +2721,199 @@ export default function App() {
 
       return (
         <div className="groundcrew-main">
-          <div className="queue-header">
-            <h2>GROUND OPERATIONS - {selectedAirport}</h2>
-            <div className="operational-status">
-              <div className="status-indicator active"></div>
-              <span>ALL SYSTEMS OPERATIONAL</span>
+          <div className="ground-operations-header">
+            <div className="header-content">
+              <div className="header-left">
+                <h1>GROUND OPERATIONS CONTROL</h1>
+                <div className="airport-designation">{selectedAirport} - GROUND FREQUENCY 121.9</div>
+              </div>
+              <div className="header-right">
+                <div className="operational-status">
+                  <div className="status-indicator online"></div>
+                  <span>ALL SYSTEMS OPERATIONAL</span>
+                </div>
+                <div className="current-time">{new Date().toLocaleTimeString()}</div>
+              </div>
             </div>
-            <div className="queue-stats">
-              <div className="stat">
-                <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length}</span>
-                <span className="stat-label">PENDING</span>
+            
+            <div className="operations-metrics">
+              <div className="metric-card pending">
+                <div className="metric-icon">⏳</div>
+                <div className="metric-data">
+                  <span className="metric-value">{requests.filter(r => r.status === "REQUESTED").length}</span>
+                  <span className="metric-label">PENDING REQUESTS</span>
+                </div>
               </div>
-              <div className="stat">
-                <span className="stat-value">{requests.filter(r => r.status === "ACCEPTED").length}</span>
-                <span className="stat-label">IN PROGRESS</span>
+              <div className="metric-card active">
+                <div className="metric-icon">🔄</div>
+                <div className="metric-data">
+                  <span className="metric-value">{requests.filter(r => r.status === "ACCEPTED").length}</span>
+                  <span className="metric-label">ACTIVE SERVICES</span>
+                </div>
               </div>
-              <div className="stat">
-                <span className="stat-value">{requests.filter(r => r.status === "COMPLETED").length}</span>
-                <span className="stat-label">COMPLETED</span>
+              <div className="metric-card completed">
+                <div className="metric-icon">✅</div>
+                <div className="metric-data">
+                  <span className="metric-value">{requests.filter(r => r.status === "COMPLETED").length}</span>
+                  <span className="metric-label">COMPLETED TODAY</span>
+                </div>
+              </div>
+              <div className="metric-card efficiency">
+                <div className="metric-icon">📊</div>
+                <div className="metric-data">
+                  <span className="metric-value">98%</span>
+                  <span className="metric-label">EFFICIENCY</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="priority-columns">
-            <div className="priority-column critical">
-              <div className="column-header">
-                <h3>CRITICAL</h3>
-                <span className="count">{criticalPriorityRequests.length}</span>
+          <div className="service-management-board">
+            <div className="service-column critical">
+              <div className="column-header critical">
+                <div className="column-title">
+                  <span className="priority-icon">🚨</span>
+                  <h3>URGENT</h3>
+                </div>
+                <div className="request-count critical">{criticalPriorityRequests.length}</div>
               </div>
-              <div className="requests-list">
+              <div className="service-requests">
                 {criticalPriorityRequests.map((request, i) => (
-                  <div key={i} className="request-card critical">
-                    <div className="request-header">
-                      <span className="flight">{request.flight}</span>
-                      <span className="timer">{request.timestamp}</span>
+                  <div key={i} className="service-request critical">
+                    <div className="request-priority">URGENT</div>
+                    <div className="request-info">
+                      <div className="flight-details">
+                        <span className="flight-number">{request.flight}</span>
+                        <span className="stand-location">{request.stand}</span>
+                      </div>
+                      <div className="service-type">{request.service}</div>
+                      <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <div className="request-details">
-                      <div className="service">{request.service}</div>
-                      <div className="stand">{request.stand}</div>
-                    </div>
-                    <button onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} className="accept-btn critical">
-                      URGENT ACCEPT
+                    <button 
+                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} 
+                      className="action-btn urgent"
+                    >
+                      IMMEDIATE RESPONSE
                     </button>
                   </div>
                 ))}
+                {criticalPriorityRequests.length === 0 && (
+                  <div className="no-requests">
+                    <span className="no-requests-icon">✓</span>
+                    <span>No urgent requests</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="priority-column high">
-              <div className="column-header">
-                <h3>HIGH PRIORITY</h3>
-                <span className="count">{highPriorityRequests.length}</span>
+            <div className="service-column high">
+              <div className="column-header high">
+                <div className="column-title">
+                  <span className="priority-icon">⚡</span>
+                  <h3>HIGH PRIORITY</h3>
+                </div>
+                <div className="request-count high">{highPriorityRequests.length}</div>
               </div>
-              <div className="requests-list">
+              <div className="service-requests">
                 {highPriorityRequests.map((request, i) => (
-                  <div key={i} className="request-card high">
-                    <div className="request-header">
-                      <span className="flight">{request.flight}</span>
-                      <span className="timer">{request.timestamp}</span>
+                  <div key={i} className="service-request high">
+                    <div className="request-priority">HIGH</div>
+                    <div className="request-info">
+                      <div className="flight-details">
+                        <span className="flight-number">{request.flight}</span>
+                        <span className="stand-location">{request.stand}</span>
+                      </div>
+                      <div className="service-type">{request.service}</div>
+                      <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <div className="request-details">
-                      <div className="service">{request.service}</div>
-                      <div className="stand">{request.stand}</div>
-                    </div>
-                    <button onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} className="accept-btn">
-                      ACCEPT
+                    <button 
+                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} 
+                      className="action-btn high"
+                    >
+                      ACCEPT & ASSIGN
                     </button>
                   </div>
                 ))}
+                {highPriorityRequests.length === 0 && (
+                  <div className="no-requests">
+                    <span className="no-requests-icon">✓</span>
+                    <span>No high priority requests</span>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="priority-column medium">
-              <div className="column-header">
-                <h3>MEDIUM PRIORITY</h3>
-                <span className="count">{mediumPriorityRequests.length}</span>
+            <div className="service-column standard">
+              <div className="column-header standard">
+                <div className="column-title">
+                  <span className="priority-icon">📋</span>
+                  <h3>STANDARD</h3>
+                </div>
+                <div className="request-count standard">{mediumPriorityRequests.length + lowPriorityRequests.length}</div>
               </div>
-              <div className="requests-list">
-                {mediumPriorityRequests.map((request, i) => (
-                  <div key={i} className="request-card medium">
-                    <div className="request-header">
-                      <span className="flight">{request.flight}</span>
-                      <span className="timer">{request.timestamp}</span>
+              <div className="service-requests">
+                {[...mediumPriorityRequests, ...lowPriorityRequests].map((request, i) => (
+                  <div key={i} className="service-request standard">
+                    <div className="request-priority">STANDARD</div>
+                    <div className="request-info">
+                      <div className="flight-details">
+                        <span className="flight-number">{request.flight}</span>
+                        <span className="stand-location">{request.stand}</span>
+                      </div>
+                      <div className="service-type">{request.service}</div>
+                      <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <div className="request-details">
-                      <div className="service">{request.service}</div>
-                      <div className="stand">{request.stand}</div>
-                    </div>
-                    <button onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} className="accept-btn">
-                      ACCEPT
+                    <button 
+                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} 
+                      className="action-btn standard"
+                    >
+                      ASSIGN CREW
                     </button>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            <div className="priority-column low">
-              <div className="column-header">
-                <h3>LOW PRIORITY</h3>
-                <span className="count">{lowPriorityRequests.length}</span>
-              </div>
-              <div className="requests-list">
-                {lowPriorityRequests.map((request, i) => (
-                  <div key={i} className="request-card low">
-                    <div className="request-header">
-                      <span className="flight">{request.flight}</span>
-                      <span className="timer">{request.timestamp}</span>
-                    </div>
-                    <div className="request-details">
-                      <div className="service">{request.service}</div>
-                      <div className="stand">{request.stand}</div>
-                    </div>
-                    <button onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} className="accept-btn">
-                      ACCEPT
-                    </button>
+                {mediumPriorityRequests.length + lowPriorityRequests.length === 0 && (
+                  <div className="no-requests">
+                    <span className="no-requests-icon">✓</span>
+                    <span>No standard requests</span>
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
-            <div className="priority-column progress">
-              <div className="column-header">
-                <h3>IN PROGRESS</h3>
-                <span className="count">{inProgressRequests.length}</span>
+            <div className="service-column active">
+              <div className="column-header active">
+                <div className="column-title">
+                  <span className="priority-icon">🔄</span>
+                  <h3>IN PROGRESS</h3>
+                </div>
+                <div className="request-count active">{inProgressRequests.length}</div>
               </div>
-              <div className="requests-list">
+              <div className="service-requests">
                 {inProgressRequests.map((request, i) => (
-                  <div key={i} className="request-card progress">
-                    <div className="request-header">
-                      <span className="flight">{request.flight}</span>
-                      <span className="timer">{request.timestamp}</span>
+                  <div key={i} className="service-request active">
+                    <div className="request-priority">ACTIVE</div>
+                    <div className="request-info">
+                      <div className="flight-details">
+                        <span className="flight-number">{request.flight}</span>
+                        <span className="stand-location">{request.stand}</span>
+                      </div>
+                      <div className="service-type">{request.service}</div>
+                      <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <div className="request-details">
-                      <div className="service">{request.service}</div>
-                      <div className="stand">{request.stand}</div>
-                    </div>
-                    <button onClick={() => handleServiceAction(requests.indexOf(request), "COMPLETED")} className="complete-btn">
-                      COMPLETE
+                    <button 
+                      onClick={() => handleServiceAction(requests.indexOf(request), "COMPLETED")} 
+                      className="action-btn complete"
+                    >
+                      MARK COMPLETE
                     </button>
                   </div>
                 ))}
+                {inProgressRequests.length === 0 && (
+                  <div className="no-requests">
+                    <span className="no-requests-icon">✓</span>
+                    <span>No active services</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -3378,14 +3034,6 @@ export default function App() {
               <span className="nav-icon">👥</span>
               <span>MANIFEST</span>
             </button>
-            <button
-              className={`nav-btn ${activeTab === 'mcdu' ? 'active' : ''}`}
-              onClick={() => setActiveTab('mcdu')}
-            >
-              <span className="nav-icon">🖥️</span>
-              <span>MCDU</span>
-            </button>
-
           </>
         )}
         {userMode === "groundcrew" && (
@@ -3403,20 +3051,6 @@ export default function App() {
             >
               <span className="nav-icon">🅿️</span>
               <span>STANDS</span>
-            </button>
-            <button
-              className={`nav-btn ${activeTab === 'maintenance' ? 'active' : ''}`}
-              onClick={() => setActiveTab('maintenance')}
-            >
-              <span className="nav-icon">🔧</span>
-              <span>MAINTENANCE</span>
-            </button>
-            <button
-              className={`nav-btn ${activeTab === 'scheduling' ? 'active' : ''}`}
-              onClick={() => setActiveTab('scheduling')}
-            >
-              <span className="nav-icon">📅</span>
-              <span>SCHEDULING</span>
             </button>
             <button
               className={`nav-btn ${activeTab === 'guides' ? 'active' : ''}`}
