@@ -59,6 +59,8 @@ export default function App() {
   const [commMinimized, setCommMinimized] = useState(false);
   const [bottomNavHidden, setBottomNavHidden] = useState(false);
   const [mouseTimer, setMouseTimer] = useState(null);
+  const [chatFilter, setChatFilter] = useState("all");
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   const handleMcduKey = (key) => {
     setMcduDisplay(prev => {
@@ -1101,7 +1103,7 @@ export default function App() {
         seat: `${seatRow}${seatLetter}`,
         class: seatClasses[Math.floor(Math.random() * seatClasses.length)],
         checkedIn: Math.random() > 0.1,
-        specialRequests: Math.random() > 0.8 ? ["Wheelchair", "Dietary", "Unaccompanied Minor", "Extra Legroom", "Bassinet"][Math.floor(Math.random() * 5)] : null,
+        specialRequests: Math.random() > 0.8 ? "Wheelchair" : Math.random() > 0.7 ? "Dietary" : Math.random() > 0.6 ? "Unaccompanied Minor" : Math.random() > 0.5 ? "Extra Legroom" : Math.random() > 0.4 ? "Bassinet" : null,
         frequent: Math.random() > 0.7
       });
     }
@@ -1235,7 +1237,7 @@ export default function App() {
     if (messagesArea) {
       messagesArea.scrollTop = messagesArea.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, chatFilter]);
 
   useEffect(() => {
     fetch('/api/user')
@@ -1249,6 +1251,10 @@ export default function App() {
     socket.on("chatUpdate", (msg) => {
       if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
         setMessages((prev) => [...prev, msg]);
+        if (soundEnabled && msg.sender !== user?.username && msg.mode !== 'system' && msg.mode !== 'checklist') {
+          const audio = new Audio('/alert.mp3'); // Make sure to have an alert.mp3 file
+          audio.play();
+        }
       }
     });
 
@@ -1272,7 +1278,7 @@ export default function App() {
       socket.off("standUpdate");
       socket.off("atisUpdate");
     };
-  }, [selectedAirport]);
+  }, [selectedAirport, soundEnabled]);
 
   const handleLogin = () => {
     window.location.href = "/auth/discord";
@@ -1302,7 +1308,7 @@ export default function App() {
         alert("Please enter a valid ICAO flight number (e.g., AAL123, UAL456, BAW100)");
         return;
       }
-      
+
       // Use flight number as callsign for pilots
       const callsign = flightNumber.toUpperCase();
       setAssignedCallsign(callsign);
@@ -1896,7 +1902,7 @@ export default function App() {
 
             <div className="airport-grid-modern">
               {ptfsAirports
-                .filter(airport => 
+                .filter(airport =>
                   airport.toLowerCase().includes(airportSearchTerm.toLowerCase())
                 )
                 .map((airport) => (
@@ -2490,27 +2496,30 @@ export default function App() {
 
               <div className="manifest-content">
                 <div className="manifest-filters">
-                  <select className="filter-select">
-                    {isCargoStand ? (
-                      <>
-                        <option value="all">All Cargo</option>
-                        <option value="priority">High Priority</option>
-                        <option value="hazmat">Hazmat Items</option>
-                        <option value="refrigerated">Refrigerated</option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="all">All Passengers</option>
-                        <option value="checkedIn">Checked In</option>
-                        <option value="notCheckedIn">Not Checked In</option>
-                        <option value="special">Special Requests</option>
-                      </>
-                    )}
+                  <select
+                    value={chatFilter}
+                    onChange={(e) => setChatFilter(e.target.value)}
+                    className="chat-filter-select"
+                  >
+                    <option value="all">All Messages</option>
+                    <option value="pilot">Pilot Messages</option>
+                    <option value="groundcrew">Ground Crew</option>
+                    <option value="system">System Messages</option>
+                    <option value="checklist">Checklist Updates</option>
                   </select>
                 </div>
 
                 <div className="passenger-list">
-                  {passengerManifest.map((item) => (
+                  {passengerManifest
+                    .filter(item => {
+                      if (chatFilter === "all") return true;
+                      if (chatFilter === "pilot") return !item.hazmat && !item.specialRequests; // Simplified for passenger list
+                      if (chatFilter === "groundcrew") return false; // No ground crew messages in passenger manifest
+                      if (chatFilter === "system") return false; // No system messages in passenger manifest
+                      if (chatFilter === "checklist") return false; // No checklist updates in passenger manifest
+                      return true; // Default case
+                    })
+                    .map((item) => (
                     isCargoStand ? (
                       <div key={item.id} className={`passenger-item cargo-item ${item.priority === 'High' ? 'high-priority' : ''}`}>
                         <div className="passenger-info">
@@ -2645,7 +2654,7 @@ export default function App() {
                     >
                       <option value="">SELECT STAND</option>
                       {getCurrentAirportStands()
-                        .filter(stand => !aircraft || isStandCompatible(stand.type, aircraft))
+                        .filter(stand => !stands[stand.id])
                         .map(stand => {
                         const isOccupied = stands[stand.id];
                         const compatible = !aircraft || isStandCompatible(stand.type, aircraft);
@@ -3415,13 +3424,13 @@ export default function App() {
 
           <div className="messages-area">
             {messages
-              .filter(m => {
+              .filter(msg => {
                 // Only show messages from the current airport
-                if (m.airport && m.airport !== selectedAirport) return false;
+                if (msg.airport && msg.airport !== selectedAirport) return false;
                 // For pilots: show system messages and messages for the selected stand
                 // For ground crew: show all messages at the airport
                 if (userMode === "groundcrew") return true;
-                return m.mode === 'system' || m.mode === 'checklist' || !selectedStand || m.stand === selectedStand || m.stand === "GROUND";
+                return msg.mode === 'system' || msg.mode === 'checklist' || !selectedStand || msg.stand === selectedStand || msg.stand === "GROUND";
               })
               .slice(-20)
               .map((msg, i) => (
@@ -3435,25 +3444,42 @@ export default function App() {
               ))}
           </div>
 
+          <div className="comm-filters">
+            <div className="filter-row">
+              <select
+                value={chatFilter}
+                onChange={(e) => setChatFilter(e.target.value)}
+                className="chat-filter-select"
+              >
+                <option value="all">All Messages</option>
+                <option value="pilot">Pilot Messages</option>
+                <option value="groundcrew">Ground Crew</option>
+                <option value="system">System Messages</option>
+                <option value="checklist">Checklist Updates</option>
+              </select>
+              <button
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className={`sound-toggle ${soundEnabled ? 'enabled' : 'disabled'}`}
+                title={soundEnabled ? 'Sounds ON' : 'Sounds OFF'}
+              >
+                {soundEnabled ? '🔊' : '🔇'}
+              </button>
+            </div>
+          </div>
+
           <div className="input-area">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-              placeholder={
-                userMode === "groundcrew"
-                  ? "Message ground frequency..."
-                  : selectedStand
-                    ? `Message ${selectedStand}...`
-                    : "Select stand first..."
-              }
+              placeholder="Type your message..."
               className="message-input"
               disabled={userMode === "pilot" && !selectedStand}
             />
             <button
               onClick={sendMessage}
               className="send-btn"
-              disabled={userMode === "pilot" && !selectedStand}
+              disabled={!input.trim() || (userMode === "pilot" && !selectedStand)}
             >
               SEND
             </button>
