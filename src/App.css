@@ -4585,13 +4585,15 @@ body {
   animation: slideInRight 0.3s ease-out;
   transition: all 0.3s ease;
   margin-bottom: 8px;
-  min-height: 60px;
+  min-height: auto;
+  height: auto;
   display: flex;
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  overflow: visible;
 }
 
 .message:hover {
@@ -4648,7 +4650,7 @@ body {
   font-size: 0.9rem;
   line-height: 1.4;
   word-wrap: break-word;
-  word-break: break-all;
+  word-break: break-word;
   overflow-wrap: break-word;
   max-width: 100%;
   white-space: pre-wrap;
