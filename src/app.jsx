@@ -3156,16 +3156,20 @@ export default function App() {
               onClick={() => setCommMinimized(!commMinimized)}
               title={commMinimized ? "Expand Communications" : "Minimize Communications"}
             >
-              {commMinimized ? '📈' : '📉'}
+              {commMinimized ? '▶' : '◀'}
             </button>
           </div>
 
           <div 
-            className="comm-minimize-tab"
+            className="comm-minimized-indicator"
             onClick={() => setCommMinimized(false)}
           >
-            <div className="comm-tab-icon">💬</div>
-            <div className="comm-tab-text">COMMS</div>
+            <span>💬</span>
+            <span>C</span>
+            <span>O</span>
+            <span>M</span>
+            <span>M</span>
+            <span>S</span>
           </div>
 
           <div className="messages-area">

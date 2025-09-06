@@ -4127,12 +4127,31 @@ body {
   backdrop-filter: blur(20px);
   box-shadow: -2px 0 20px rgba(0, 0, 0, 0.3);
   margin-bottom: 80px;
+  transition: all 0.3s ease;
+}
+
+.comm-panel.minimized {
+  width: 60px;
+  overflow: hidden;
 }
 
 .comm-header {
   padding: 20px 25px;
   border-bottom: 1px solid rgba(255, 149, 0, 0.3);
   background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comm-panel.minimized .comm-header {
+  padding: 20px 10px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comm-header-content {
+  flex: 1;
 }
 
 .comm-header h3 {
@@ -4141,6 +4160,10 @@ body {
   font-weight: 600;
   margin-bottom: 8px;
   letter-spacing: 0.02em;
+}
+
+.comm-panel.minimized .comm-header h3 {
+  display: none;
 }
 
 .comm-status {
@@ -4154,6 +4177,61 @@ body {
   border: 1px solid rgba(34, 197, 94, 0.3);
   text-align: center;
   animation: pulse 2s infinite;
+}
+
+.comm-panel.minimized .comm-status {
+  display: none;
+}
+
+.comm-minimize-btn {
+  background: rgba(255, 149, 0, 0.2);
+  border: 1px solid rgba(255, 149, 0, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #ff9500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  min-width: 40px;
+  text-align: center;
+}
+
+.comm-minimize-btn:hover {
+  background: rgba(255, 149, 0, 0.3);
+  border-color: rgba(255, 149, 0, 0.5);
+  transform: scale(1.1);
+}
+
+.comm-panel.minimized .messages-area,
+.comm-panel.minimized .input-area {
+  display: none;
+}
+
+.comm-minimized-indicator {
+  display: none;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  color: #ff9500;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 20px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.comm-panel.minimized .comm-minimized-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+
+.comm-minimized-indicator:hover {
+  color: #ffb340;
+  transform: scale(1.1);
 }
 
 .messages-area {
