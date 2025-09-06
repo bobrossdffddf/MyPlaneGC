@@ -135,6 +135,18 @@ const airportConfigs = {
       // 1 spawner, very limited aircraft, no gates (remove gate option)
       { id: "RWY", type: "runway", capacity: "light", terminal: "Runway Operations", hasJetway: false, allowedAircraft: ["DHC-6 Twin Otter", "Cessna 172", "Cessna 182", "Cessna Caravan", "ATR-72"] }
     ]
+  },
+  "IMLR": {
+    stands: [
+      // 4 gates in passenger terminal
+      { id: "001", type: "narrow", capacity: "narrow-body", terminal: "Passenger Terminal", hasJetway: true, restrictions: ["Airbus A380", "Boeing 747", "Concorde"] },
+      { id: "002", type: "narrow", capacity: "narrow-body", terminal: "Passenger Terminal", hasJetway: true, restrictions: ["Airbus A380", "Boeing 747", "Concorde"] },
+      { id: "003", type: "medium", capacity: "wide-body", terminal: "Passenger Terminal", hasJetway: true, restrictions: ["Airbus A380", "Boeing 747", "Concorde"] },
+      { id: "004", type: "medium", capacity: "wide-body", terminal: "Passenger Terminal", hasJetway: true, restrictions: ["Airbus A380", "Boeing 747", "Concorde"] },
+      
+      // 1 helipad
+      { id: "H01", type: "helipad", capacity: "helicopter", terminal: "Helipad Area" }
+    ]
   }
 };
 
