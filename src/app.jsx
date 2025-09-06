@@ -62,6 +62,7 @@ export default function App() {
   const [chatFilter, setChatFilter] = useState("all");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [badWordsFilter, setBadWordsFilter] = useState(true);
+  const [lastServiceRequest, setLastServiceRequest] = useState({});
   
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
@@ -1283,10 +1284,33 @@ export default function App() {
         setMessages((prev) => [...prev, filteredMsg]);
         if (soundEnabled && msg.sender !== user?.username && msg.mode !== 'system' && msg.mode !== 'checklist') {
           try {
-            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmE');
-            audio.play().catch(e => console.log('Audio play failed:', e));
+            // Create a better quality notification sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
           } catch (e) {
             console.log('Audio creation failed:', e);
+            // Fallback to simple beep
+            try {
+              const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmE');
+              audio.volume = 0.3;
+              audio.play().catch(e => console.log('Audio play failed:', e));
+            } catch (fallbackError) {
+              console.log('Fallback audio failed:', fallbackError);
+            }
           }
         }
       }
@@ -1367,9 +1391,19 @@ export default function App() {
 
   const sendMessage = () => {
     if (input.trim() === "") return;
-    if (userMode === "pilot" && !selectedStand) {
-      alert("Please select a stand first to send messages");
-      return;
+    
+    if (userMode === "pilot") {
+      if (!selectedStand) {
+        alert("Please select a stand first to send messages");
+        return;
+      }
+      
+      // Check if stand is actually claimed by this user
+      const standData = stands[selectedStand];
+      if (!standData || standData.userId !== user?.id) {
+        alert("You must claim this stand before sending messages");
+        return;
+      }
     }
     
     // Check for bad words
@@ -1412,6 +1446,31 @@ export default function App() {
     if (!selectedStand) {
       alert("Please select and claim a stand first to request services");
       return;
+    }
+
+    // Check if stand is actually claimed by this user
+    const standData = stands[selectedStand];
+    if (!standData || standData.userId !== user?.id) {
+      alert("You must claim this stand before requesting services");
+      return;
+    }
+
+    // Rate limiting - prevent spam (except for Full Service)
+    if (service !== "Full Service") {
+      const now = Date.now();
+      const lastRequest = lastServiceRequest[service] || 0;
+      const timeSinceLastRequest = now - lastRequest;
+      
+      if (timeSinceLastRequest < 3000) { // 3 second cooldown
+        const remainingTime = Math.ceil((3000 - timeSinceLastRequest) / 1000);
+        alert(`Please wait ${remainingTime} seconds before requesting ${service} again`);
+        return;
+      }
+      
+      setLastServiceRequest(prev => ({
+        ...prev,
+        [service]: now
+      }));
     }
 
     if (service === "Full Service") {
@@ -2303,13 +2362,37 @@ export default function App() {
                               <div className="wb-signatures">
                                 <div className="wb-signature">
                                   <div className="signature-line">
-                                    {user?.username ? `✓ ${user.username}` : ''}
+                                    <input
+                                      type="text"
+                                      placeholder="Click to sign"
+                                      value={permitFormData.captainSignature || ''}
+                                      onChange={(e) => updatePermitFormData('captainSignature', e.target.value || `✓ ${user?.username} - ${new Date().toLocaleTimeString()}`)}
+                                      onFocus={(e) => {
+                                        if (!e.target.value) {
+                                          updatePermitFormData('captainSignature', `✓ ${user?.username} - ${new Date().toLocaleTimeString()}`);
+                                        }
+                                      }}
+                                      className="signature-input"
+                                      readOnly
+                                    />
                                   </div>
                                   <div>Captain Signature</div>
                                 </div>
                                 <div className="wb-signature">
                                   <div className="signature-line">
-                                    ✓ Ground Operations
+                                    <input
+                                      type="text"
+                                      placeholder="Ground ops signature"
+                                      value={permitFormData.loadMasterSignature || ''}
+                                      onChange={(e) => updatePermitFormData('loadMasterSignature', e.target.value || `✓ Ground Operations - ${new Date().toLocaleTimeString()}`)}
+                                      onFocus={(e) => {
+                                        if (!e.target.value) {
+                                          updatePermitFormData('loadMasterSignature', `✓ Ground Operations - ${new Date().toLocaleTimeString()}`);
+                                        }
+                                      }}
+                                      className="signature-input"
+                                      readOnly
+                                    />
                                   </div>
                                   <div>Load Master Signature</div>
                                 </div>
@@ -2549,31 +2632,8 @@ export default function App() {
               </div>
 
               <div className="manifest-content">
-                <div className="manifest-filters">
-                  <select
-                    value={chatFilter}
-                    onChange={(e) => setChatFilter(e.target.value)}
-                    className="chat-filter-select"
-                  >
-                    <option value="all">All Messages</option>
-                    <option value="pilot">Pilot Messages</option>
-                    <option value="groundcrew">Ground Crew</option>
-                    <option value="system">System Messages</option>
-                    <option value="checklist">Checklist Updates</option>
-                  </select>
-                </div>
-
                 <div className="passenger-list">
-                  {passengerManifest
-                    .filter(item => {
-                      if (chatFilter === "all") return true;
-                      if (chatFilter === "pilot") return !item.hazmat && !item.specialRequests; // Simplified for passenger list
-                      if (chatFilter === "groundcrew") return false; // No ground crew messages in passenger manifest
-                      if (chatFilter === "system") return false; // No system messages in passenger manifest
-                      if (chatFilter === "checklist") return false; // No checklist updates in passenger manifest
-                      return true; // Default case
-                    })
-                    .map((item) => (
+                  {passengerManifest.map((item) => (
                     isCargoStand ? (
                       <div key={item.id} className={`passenger-item cargo-item ${item.priority === 'High' ? 'high-priority' : ''}`}>
                         <div className="passenger-info">
@@ -3535,12 +3595,12 @@ export default function App() {
               onKeyPress={(e) => e.key === "Enter" && sendMessage()}
               placeholder="Type your message..."
               className="message-input"
-              disabled={userMode === "pilot" && !selectedStand}
+              disabled={userMode === "pilot" && (!selectedStand || !stands[selectedStand] || stands[selectedStand].userId !== user?.id)}
             />
             <button
               onClick={sendMessage}
               className="send-btn"
-              disabled={!input.trim() || (userMode === "pilot" && !selectedStand)}
+              disabled={!input.trim() || (userMode === "pilot" && (!selectedStand || !stands[selectedStand] || stands[selectedStand].userId !== user?.id))}
             >
               SEND
             </button>
