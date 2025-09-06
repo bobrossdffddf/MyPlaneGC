@@ -938,6 +938,7 @@ body {
   width: 100vw;
   background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2a2f3e 100%);
   overflow: hidden;
+  position: relative;
 }
 
 .tablet-header {
@@ -1020,6 +1021,8 @@ body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  height: calc(100vh - 60px);
+  position: relative;
 }
 
 .main-area {
@@ -1028,10 +1031,9 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   background: rgba(15, 20, 25, 0.7);
-  height: calc(100vh - 120px);
-  min-height: calc(100vh - 120px);
-  max-height: calc(100vh - 120px);
-  margin-bottom: 80px;
+  height: calc(100vh - 130px);
+  min-height: calc(100vh - 130px);
+  max-height: calc(100vh - 130px);
   transition: all 0.3s ease;
 }
 
@@ -4145,16 +4147,17 @@ body {
 /* Communication Panel */
 .comm-panel {
   width: 400px;
+  min-width: 350px;
   background: rgba(15, 20, 25, 0.98);
   border-left: 2px solid rgba(255, 149, 0, 0.4);
-  border-bottom: 2px solid rgba(255, 149, 0, 0.3);
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(25px);
-  box-shadow: -4px 0 25px rgba(0, 0, 0, 0.5), 0 -2px 15px rgba(255, 149, 0, 0.2);
-  margin-bottom: 80px;
+  box-shadow: -4px 0 25px rgba(0, 0, 0, 0.5);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 20px 0 0 0;
+  border-radius: 15px 0 0 0;
+  position: relative;
+  z-index: 10;
 }
 
 .comm-panel.minimized {
@@ -4164,13 +4167,14 @@ body {
 }
 
 .comm-header {
-  padding: 25px 30px;
+  padding: 20px 25px;
   border-bottom: 2px solid rgba(255, 149, 0, 0.4);
   background: linear-gradient(135deg, rgba(255, 149, 0, 0.15), rgba(255, 149, 0, 0.05));
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 20px 0 0 0;
+  border-radius: 15px 0 0 0;
+  min-height: 80px;
 }
 
 .comm-panel.minimized .comm-header {
@@ -4276,13 +4280,15 @@ body {
 
 .messages-area {
   flex: 1;
-  padding: 20px;
+  padding: 15px 20px;
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: calc(100vh - 300px);
+  gap: 10px;
+  height: calc(100vh - 280px);
+  max-height: calc(100vh - 280px);
+  min-height: 300px;
   scroll-behavior: smooth;
 }
 
@@ -4301,12 +4307,16 @@ body {
 }
 
 .message {
-  background: rgba(45, 55, 72, 0.8);
+  background: rgba(45, 55, 72, 0.9);
   border-radius: 12px;
-  padding: 12px 15px;
-  border-left: 3px solid rgba(255, 255, 255, 0.2);
+  padding: 15px;
+  border-left: 3px solid rgba(255, 255, 255, 0.3);
   animation: slideInRight 0.3s ease-out;
   transition: all 0.3s ease;
+  margin-bottom: 8px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
 }
 
 .message:hover {
@@ -4427,14 +4437,14 @@ body {
   right: 0;
   background: rgba(15, 20, 25, 0.98);
   border-top: 2px solid rgba(255, 149, 0, 0.4);
-  padding: 15px 20px;
+  padding: 12px 20px;
   display: flex;
   gap: 10px;
   backdrop-filter: blur(25px);
   box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.4);
-  z-index: 100;
-  transform: translateY(0);
-  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+  height: 70px;
+  min-height: 70px;
 }
 
 .bottom-nav.hidden {
