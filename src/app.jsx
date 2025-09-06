@@ -3334,8 +3334,7 @@ export default function App() {
         </div>
       </div>
 
-      <>
-      <div className={`bottom-nav ${bottomNavHidden ? 'hidden' : ''}`}>
+      <div className="bottom-nav">
         {userMode === "pilot" && (
           <>
             <button
@@ -3394,13 +3393,6 @@ export default function App() {
           </>
         )}
       </div>
-      
-      {/* Invisible trigger area to show nav when mouse approaches bottom */}
-      <div 
-        className="bottom-nav-trigger"
-        onMouseEnter={() => setBottomNavHidden(false)}
-      ></div>
-      </>
     </div>
   );
 }
