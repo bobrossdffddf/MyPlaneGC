@@ -424,10 +424,22 @@ export default function App() {
   ];
 
   const aircraftTypes = [
-    "A318", "A319", "A320", "A321", "A330", "A340", "A350", "A380",
-    "B737-700", "B737-800", "B737-900", "B747-400", "B747-8", "B777-200",
-    "B777-300", "B787-8", "B787-9", "B787-10", "CRJ-200", "CRJ-700",
-    "CRJ-900", "E170", "E175", "E190", "DHC-8", "ATR-72", "MD-80", "MD-90"
+    "A-10 Warthog", "A6M Zero", "Airbus A220", "Airbus A320", "Airbus A330", "Airbus A340", 
+    "Airbus A350", "Airbus A380", "Airbus Beluga", "Airbus H135", "Antonov An-22", "Antonov AN-225",
+    "ATR-72", "Avro Vulcan", "B-1 Lancer", "B-2 Spirit", "B29", "Beechcraft King Air 260",
+    "Bell 412", "Blimp", "Boeing 707", "Boeing 727", "Boeing 737", "Boeing 747", "Boeing 757",
+    "Boeing 767", "Boeing 777", "Boeing 787", "Boeing C-17 Globemaster III", "Boeing Dreamlifter",
+    "Bombardier CRJ700", "Bombardier Learjet", "Bombardier Q400", "C-130 Hercules", "Caproni Stipa",
+    "Cessna 172", "Cessna 182", "Cessna 402", "Cessna Caravan", "Chinook", "Cirrus Vision SF50",
+    "Concorde", "Derek's Creation", "DHC-6 Twin Otter", "Diamond DA50", "Embraer E190",
+    "English Electric Lightning", "Eurofighter Typhoon", "Extra 300s", "F-14 Tomcat",
+    "F-15E Strike Eagle", "F-16 Fighting Falcon", "F-22 Raptor", "F-35B", "F-4 Phantom",
+    "F/A-18 Super Hornet", "F4U Corsair", "Fokker Dr1", "Hawk T1", "Hawker Harrier",
+    "Hawker Hurricane", "Hot Air Balloon", "Lockheed L-1011 Tristar", "McDonnell Douglas MD-11",
+    "McDonnell Douglas MD-90", "Mig-15", "Military UFO", "P-38 Lightning", "P-51 Mustang",
+    "Paratrike", "Piper Cub", "Piper PA-28", "Saab JAS 39 Gripen", "Santa's Sled",
+    "Sikorsky S-92", "SR-71 Blackbird", "Sukhoi Su-27", "Sukhoi Su-57", "UH-60 Black Hawk",
+    "Walrus", "Wright Brothers Plane"
   ];
 
   const atcTrainingQuestions = {
@@ -916,34 +928,87 @@ export default function App() {
 
   // Comprehensive aircraft database with detailed specifications
   const aircraftDatabase = {
-    "A318": { wingspan: 34.1, length: 31.4, category: "narrow-body", doors: 3, maxSeats: 132, weightClass: "medium" },
-    "A319": { wingspan: 34.1, length: 33.8, category: "narrow-body", doors: 3, maxSeats: 156, weightClass: "medium" },
-    "A320": { wingspan: 34.1, length: 37.6, category: "narrow-body", doors: 4, maxSeats: 180, weightClass: "medium" },
-    "A321": { wingspan: 34.1, length: 44.5, category: "narrow-body", doors: 4, maxSeats: 220, weightClass: "heavy" },
-    "A330": { wingspan: 60.3, length: 58.8, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
-    "A340": { wingspan: 63.5, length: 63.7, category: "wide-body", doors: 6, maxSeats: 380, weightClass: "heavy" },
-    "A350": { wingspan: 64.8, length: 66.8, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
-    "A380": { wingspan: 79.8, length: 72.7, category: "super-heavy", doors: 8, maxSeats: 850, weightClass: "super" },
-    "B737-700": { wingspan: 35.8, length: 33.6, category: "narrow-body", doors: 3, maxSeats: 149, weightClass: "medium" },
-    "B737-800": { wingspan: 35.8, length: 39.5, category: "narrow-body", doors: 4, maxSeats: 189, weightClass: "medium" },
-    "B737-900": { wingspan: 35.8, length: 42.1, category: "narrow-body", doors: 4, maxSeats: 220, weightClass: "heavy" },
-    "B747-400": { wingspan: 64.4, length: 70.7, category: "wide-body", doors: 6, maxSeats: 660, weightClass: "heavy" },
-    "B747-8": { wingspan: 68.4, length: 76.3, category: "wide-body", doors: 6, maxSeats: 605, weightClass: "heavy" },
-    "B777-200": { wingspan: 60.9, length: 63.7, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
-    "B777-300": { wingspan: 64.8, length: 73.9, category: "wide-body", doors: 6, maxSeats: 550, weightClass: "heavy" },
-    "B787-8": { wingspan: 60.1, length: 56.7, category: "wide-body", doors: 6, maxSeats: 359, weightClass: "heavy" },
-    "B787-9": { wingspan: 60.1, length: 62.8, category: "wide-body", doors: 6, maxSeats: 420, weightClass: "heavy" },
-    "B787-10": { wingspan: 60.1, length: 68.3, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
-    "CRJ-200": { wingspan: 21.2, length: 26.8, category: "regional", doors: 2, maxSeats: 50, weightClass: "light" },
-    "CRJ-700": { wingspan: 23.2, length: 32.3, category: "regional", doors: 2, maxSeats: 78, weightClass: "medium" },
-    "CRJ-900": { wingspan: 24.9, length: 36.4, category: "regional", doors: 2, maxSeats: 90, weightClass: "medium" },
-    "E170": { wingspan: 26.0, length: 29.9, category: "regional", doors: 2, maxSeats: 80, weightClass: "medium" },
-    "E175": { wingspan: 26.0, length: 31.7, category: "regional", doors: 2, maxSeats: 88, weightClass: "medium" },
-    "E190": { wingspan: 28.7, length: 36.2, category: "regional", doors: 2, maxSeats: 114, weightClass: "medium" },
-    "DHC-8": { wingspan: 28.4, length: 32.8, category: "turboprop", doors: 2, maxSeats: 78, weightClass: "light" },
+    "A-10 Warthog": { wingspan: 17.5, length: 16.3, category: "military", doors: 1, maxSeats: 2, weightClass: "medium" },
+    "A6M Zero": { wingspan: 12.0, length: 9.1, category: "military", doors: 1, maxSeats: 1, weightClass: "light" },
+    "Airbus A220": { wingspan: 35.1, length: 35.0, category: "narrow-body", doors: 3, maxSeats: 130, weightClass: "medium" },
+    "Airbus A320": { wingspan: 35.8, length: 37.6, category: "narrow-body", doors: 4, maxSeats: 180, weightClass: "medium" },
+    "Airbus A330": { wingspan: 60.3, length: 58.8, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
+    "Airbus A340": { wingspan: 63.5, length: 63.7, category: "wide-body", doors: 6, maxSeats: 380, weightClass: "heavy" },
+    "Airbus A350": { wingspan: 64.8, length: 66.8, category: "wide-body", doors: 6, maxSeats: 440, weightClass: "heavy" },
+    "Airbus A380": { wingspan: 79.8, length: 72.7, category: "super-heavy", doors: 8, maxSeats: 850, weightClass: "super" },
+    "Airbus Beluga": { wingspan: 44.8, length: 56.2, category: "cargo", doors: 2, maxSeats: 0, weightClass: "heavy" },
+    "Airbus H135": { wingspan: 10.2, length: 12.1, category: "helicopter", doors: 2, maxSeats: 7, weightClass: "light" },
+    "Antonov An-22": { wingspan: 64.4, length: 57.9, category: "cargo", doors: 2, maxSeats: 0, weightClass: "super" },
+    "Antonov AN-225": { wingspan: 88.4, length: 84.0, category: "cargo", doors: 2, maxSeats: 0, weightClass: "super" },
     "ATR-72": { wingspan: 27.1, length: 27.2, category: "turboprop", doors: 2, maxSeats: 78, weightClass: "light" },
-    "MD-80": { wingspan: 32.9, length: 45.1, category: "narrow-body", doors: 4, maxSeats: 172, weightClass: "medium" },
-    "MD-90": { wingspan: 32.9, length: 46.5, category: "narrow-body", doors: 4, maxSeats: 172, weightClass: "medium" }
+    "Avro Vulcan": { wingspan: 30.3, length: 30.5, category: "military", doors: 1, maxSeats: 5, weightClass: "heavy" },
+    "B-1 Lancer": { wingspan: 41.8, length: 44.8, category: "military", doors: 1, maxSeats: 4, weightClass: "heavy" },
+    "B-2 Spirit": { wingspan: 52.4, length: 21.0, category: "military", doors: 1, maxSeats: 2, weightClass: "heavy" },
+    "B29": { wingspan: 43.1, length: 30.2, category: "military", doors: 2, maxSeats: 11, weightClass: "heavy" },
+    "Beechcraft King Air 260": { wingspan: 17.6, length: 14.2, category: "turboprop", doors: 2, maxSeats: 11, weightClass: "light" },
+    "Bell 412": { wingspan: 14.0, length: 17.1, category: "helicopter", doors: 2, maxSeats: 13, weightClass: "medium" },
+    "Blimp": { wingspan: 15.0, length: 50.0, category: "special", doors: 1, maxSeats: 12, weightClass: "light" },
+    "Boeing 707": { wingspan: 44.4, length: 46.6, category: "narrow-body", doors: 4, maxSeats: 189, weightClass: "heavy" },
+    "Boeing 727": { wingspan: 32.9, length: 46.7, category: "narrow-body", doors: 4, maxSeats: 189, weightClass: "medium" },
+    "Boeing 737": { wingspan: 35.8, length: 39.5, category: "narrow-body", doors: 4, maxSeats: 189, weightClass: "medium" },
+    "Boeing 747": { wingspan: 68.4, length: 76.3, category: "wide-body", doors: 6, maxSeats: 605, weightClass: "super" },
+    "Boeing 757": { wingspan: 38.1, length: 47.3, category: "narrow-body", doors: 4, maxSeats: 239, weightClass: "heavy" },
+    "Boeing 767": { wingspan: 47.6, length: 48.5, category: "wide-body", doors: 4, maxSeats: 290, weightClass: "heavy" },
+    "Boeing 777": { wingspan: 64.8, length: 73.9, category: "wide-body", doors: 6, maxSeats: 550, weightClass: "heavy" },
+    "Boeing 787": { wingspan: 60.1, length: 62.8, category: "wide-body", doors: 6, maxSeats: 420, weightClass: "heavy" },
+    "Boeing C-17 Globemaster III": { wingspan: 52.0, length: 53.0, category: "military-cargo", doors: 2, maxSeats: 0, weightClass: "super" },
+    "Boeing Dreamlifter": { wingspan: 64.4, length: 71.7, category: "cargo", doors: 2, maxSeats: 0, weightClass: "super" },
+    "Bombardier CRJ700": { wingspan: 23.2, length: 32.3, category: "regional", doors: 2, maxSeats: 78, weightClass: "medium" },
+    "Bombardier Learjet": { wingspan: 13.4, length: 17.9, category: "business", doors: 1, maxSeats: 9, weightClass: "light" },
+    "Bombardier Q400": { wingspan: 28.4, length: 32.8, category: "turboprop", doors: 2, maxSeats: 78, weightClass: "medium" },
+    "C-130 Hercules": { wingspan: 40.4, length: 29.8, category: "military-cargo", doors: 2, maxSeats: 0, weightClass: "heavy" },
+    "Caproni Stipa": { wingspan: 14.3, length: 10.7, category: "experimental", doors: 1, maxSeats: 2, weightClass: "light" },
+    "Cessna 172": { wingspan: 11.0, length: 8.3, category: "general-aviation", doors: 2, maxSeats: 4, weightClass: "light" },
+    "Cessna 182": { wingspan: 11.0, length: 8.8, category: "general-aviation", doors: 2, maxSeats: 4, weightClass: "light" },
+    "Cessna 402": { wingspan: 13.5, length: 11.1, category: "general-aviation", doors: 2, maxSeats: 9, weightClass: "light" },
+    "Cessna Caravan": { wingspan: 15.9, length: 12.7, category: "turboprop", doors: 2, maxSeats: 14, weightClass: "light" },
+    "Chinook": { wingspan: 18.3, length: 30.1, category: "helicopter", doors: 2, maxSeats: 55, weightClass: "heavy" },
+    "Cirrus Vision SF50": { wingspan: 11.7, length: 9.5, category: "business", doors: 1, maxSeats: 7, weightClass: "light" },
+    "Concorde": { wingspan: 25.6, length: 61.7, category: "supersonic", doors: 4, maxSeats: 128, weightClass: "heavy" },
+    "Derek's Creation": { wingspan: 20.0, length: 25.0, category: "experimental", doors: 1, maxSeats: 2, weightClass: "medium" },
+    "DHC-6 Twin Otter": { wingspan: 19.8, length: 15.8, category: "turboprop", doors: 2, maxSeats: 19, weightClass: "light" },
+    "Diamond DA50": { wingspan: 12.2, length: 9.0, category: "general-aviation", doors: 2, maxSeats: 5, weightClass: "light" },
+    "Embraer E190": { wingspan: 28.7, length: 36.2, category: "regional", doors: 2, maxSeats: 114, weightClass: "medium" },
+    "English Electric Lightning": { wingspan: 10.6, length: 16.8, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Eurofighter Typhoon": { wingspan: 10.9, length: 15.9, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Extra 300s": { wingspan: 7.4, length: 7.1, category: "aerobatic", doors: 1, maxSeats: 2, weightClass: "light" },
+    "F-14 Tomcat": { wingspan: 19.5, length: 19.1, category: "military", doors: 1, maxSeats: 2, weightClass: "heavy" },
+    "F-15E Strike Eagle": { wingspan: 13.1, length: 19.4, category: "military", doors: 1, maxSeats: 2, weightClass: "heavy" },
+    "F-16 Fighting Falcon": { wingspan: 9.8, length: 15.1, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "F-22 Raptor": { wingspan: 13.6, length: 18.9, category: "military", doors: 1, maxSeats: 1, weightClass: "heavy" },
+    "F-35B": { wingspan: 10.7, length: 15.6, category: "military", doors: 1, maxSeats: 1, weightClass: "heavy" },
+    "F-4 Phantom": { wingspan: 11.8, length: 19.2, category: "military", doors: 1, maxSeats: 2, weightClass: "heavy" },
+    "F/A-18 Super Hornet": { wingspan: 13.6, length: 18.3, category: "military", doors: 1, maxSeats: 2, weightClass: "heavy" },
+    "F4U Corsair": { wingspan: 12.5, length: 10.3, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Fokker Dr1": { wingspan: 7.2, length: 5.8, category: "military", doors: 1, maxSeats: 1, weightClass: "light" },
+    "Hawk T1": { wingspan: 9.4, length: 11.2, category: "military", doors: 1, maxSeats: 2, weightClass: "light" },
+    "Hawker Harrier": { wingspan: 9.3, length: 14.1, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Hawker Hurricane": { wingspan: 12.2, length: 9.8, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Hot Air Balloon": { wingspan: 20.0, length: 15.0, category: "special", doors: 1, maxSeats: 4, weightClass: "light" },
+    "Lockheed L-1011 Tristar": { wingspan: 47.3, length: 54.2, category: "wide-body", doors: 6, maxSeats: 400, weightClass: "heavy" },
+    "McDonnell Douglas MD-11": { wingspan: 51.7, length: 61.6, category: "wide-body", doors: 6, maxSeats: 410, weightClass: "heavy" },
+    "McDonnell Douglas MD-90": { wingspan: 32.9, length: 46.5, category: "narrow-body", doors: 4, maxSeats: 172, weightClass: "medium" },
+    "Mig-15": { wingspan: 10.1, length: 11.1, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Military UFO": { wingspan: 15.0, length: 12.0, category: "special", doors: 1, maxSeats: 3, weightClass: "light" },
+    "P-38 Lightning": { wingspan: 15.9, length: 11.5, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "P-51 Mustang": { wingspan: 11.3, length: 9.8, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Paratrike": { wingspan: 12.0, length: 6.0, category: "ultralight", doors: 0, maxSeats: 2, weightClass: "light" },
+    "Piper Cub": { wingspan: 10.7, length: 6.8, category: "general-aviation", doors: 2, maxSeats: 2, weightClass: "light" },
+    "Piper PA-28": { wingspan: 10.8, length: 7.3, category: "general-aviation", doors: 2, maxSeats: 4, weightClass: "light" },
+    "Saab JAS 39 Gripen": { wingspan: 8.4, length: 14.1, category: "military", doors: 1, maxSeats: 1, weightClass: "medium" },
+    "Santa's Sled": { wingspan: 8.0, length: 12.0, category: "special", doors: 0, maxSeats: 9, weightClass: "light" },
+    "Sikorsky S-92": { wingspan: 17.2, length: 20.9, category: "helicopter", doors: 2, maxSeats: 19, weightClass: "heavy" },
+    "SR-71 Blackbird": { wingspan: 16.9, length: 32.7, category: "military", doors: 1, maxSeats: 2, weightClass: "heavy" },
+    "Sukhoi Su-27": { wingspan: 14.7, length: 21.9, category: "military", doors: 1, maxSeats: 1, weightClass: "heavy" },
+    "Sukhoi Su-57": { wingspan: 14.0, length: 19.8, category: "military", doors: 1, maxSeats: 1, weightClass: "heavy" },
+    "UH-60 Black Hawk": { wingspan: 16.4, length: 19.8, category: "helicopter", doors: 2, maxSeats: 11, weightClass: "heavy" },
+    "Walrus": { wingspan: 14.0, length: 11.5, category: "seaplane", doors: 2, maxSeats: 6, weightClass: "medium" },
+    "Wright Brothers Plane": { wingspan: 12.3, length: 6.4, category: "historical", doors: 0, maxSeats: 1, weightClass: "light" }
   };
 
   const standCompatibilityMatrix = {
@@ -1063,28 +1128,34 @@ export default function App() {
   };
 
   const generateCargoManifest = () => {
-    const cargoTypes = ["Electronics", "Automotive Parts", "Textiles", "Pharmaceuticals", "Food Products", "Machinery", "Documents", "Perishables"];
-    const companies = ["FedEx", "DHL", "UPS", "Amazon", "Maersk", "COSCO", "MSC", "CMA CGM"];
+    const cargoTypes = ["Electronics", "Automotive Parts", "Textiles", "Pharmaceuticals", "Food Products", "Machinery", "Documents", "Perishables", "Medical Supplies", "Aircraft Parts", "Consumer Goods", "Industrial Equipment"];
+    const companies = ["FedEx", "DHL", "UPS", "Amazon", "Maersk", "COSCO", "MSC", "CMA CGM", "TNT", "DB Schenker", "Kuehne + Nagel", "Expeditors"];
+    const destinations = ["New York", "Los Angeles", "Chicago", "Miami", "London", "Paris", "Tokyo", "Seoul", "Dubai", "Singapore", "Frankfurt", "Amsterdam"];
     const cargoCount = Math.floor(Math.random() * 15) + 5; // 5-20 cargo items
     const manifest = [];
 
     for (let i = 0; i < cargoCount; i++) {
       const cargoType = cargoTypes[Math.floor(Math.random() * cargoTypes.length)];
       const company = companies[Math.floor(Math.random() * companies.length)];
+      const destination = destinations[Math.floor(Math.random() * destinations.length)];
       const weight = Math.floor(Math.random() * 2000) + 100; // 100-2100 kg
       const pieces = Math.floor(Math.random() * 10) + 1; // 1-10 pieces
+      const volume = Math.floor(weight * 0.6) + Math.floor(Math.random() * 200); // More realistic volume
 
       manifest.push({
         id: i + 1,
         awbNumber: `${Math.floor(Math.random() * 900000) + 100000}`,
         description: cargoType,
         shipper: company,
+        destination: destination,
         pieces: pieces,
         weight: weight,
-        volume: Math.floor(weight * 0.8), // Rough volume calculation
+        volume: volume,
         priority: Math.random() > 0.8 ? "High" : Math.random() > 0.5 ? "Medium" : "Standard",
         hazmat: Math.random() > 0.9,
-        temperature: cargoType === "Perishables" ? "Refrigerated" : "Ambient"
+        temperature: cargoType === "Perishables" || cargoType === "Medical Supplies" ? "Refrigerated" : "Ambient",
+        flightNumber: flightNumber || "CARGO001",
+        status: Math.random() > 0.9 ? "Priority" : "Normal"
       });
     }
 
@@ -1157,7 +1228,7 @@ export default function App() {
         
         // Generate appropriate manifest based on stand type
         const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
-        const isCargoStand = currentStandData?.type === "cargo";
+        const isCargoStand = currentStandData?.type === "cargo" || baseAircraftData.category === "cargo" || baseAircraftData.category === "military-cargo";
         const manifest = isCargoStand ? generateCargoManifest() : generatePassengerManifest(aircraft);
         setPassengerManifest(manifest);
       } else {
@@ -2351,7 +2422,9 @@ export default function App() {
 
         case "manifest":
           const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
-          const isCargoStand = currentStandData?.type === "cargo";
+          const currentAircraftData = aircraftData ? aircraftDatabase[aircraft] : null;
+          const isCargoStand = currentStandData?.type === "cargo" || 
+                              (currentAircraftData && (currentAircraftData.category === "cargo" || currentAircraftData.category === "military-cargo"));
           
           return (
             <div className="manifest-container">
@@ -2422,6 +2495,7 @@ export default function App() {
                           <div className="passenger-details">
                             <span className="seat">{item.description}</span>
                             <span className="class">{item.shipper}</span>
+                            {item.destination && <span className="destination">→ {item.destination}</span>}
                             {item.hazmat && <span className="hazmat">HAZMAT</span>}
                           </div>
                         </div>
@@ -2429,7 +2503,9 @@ export default function App() {
                           <div className="cargo-details">
                             <div>{item.pieces} pieces</div>
                             <div>{item.weight} kg</div>
+                            <div>{item.volume} m³</div>
                             <div className={`priority-${item.priority.toLowerCase()}`}>{item.priority}</div>
+                            <div className="temperature">{item.temperature}</div>
                           </div>
                         </div>
                       </div>
