@@ -76,14 +76,17 @@ export default function App() {
   const containsBadWords = (text) => {
     if (!badWordsFilter) return false;
     const lowerText = text.toLowerCase();
-    return badWords.some(word => lowerText.includes(word.toLowerCase()));
+    return badWords.some(word => {
+      const regex = new RegExp(`\\b${word.toLowerCase()}\\b`, 'gi');
+      return regex.test(lowerText);
+    });
   };
 
   const filterBadWords = (text) => {
     if (!badWordsFilter) return text;
     let filteredText = text;
     badWords.forEach(word => {
-      const regex = new RegExp(word, 'gi');
+      const regex = new RegExp(`\\b${word}\\b`, 'gi');
       filteredText = filteredText.replace(regex, '*'.repeat(word.length));
     });
     return filteredText;
