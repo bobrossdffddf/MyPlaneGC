@@ -1,4 +1,3 @@
-
 const airportConfigs = {
   "IRFD": {
     stands: [
@@ -14,18 +13,18 @@ const airportConfigs = {
       { id: "009", type: "narrow", capacity: "narrow-body", terminal: "Terminal 1", hasJetway: false, stairsRequired: true },
       { id: "010", type: "narrow", capacity: "narrow-body", terminal: "Terminal 1", hasJetway: false, stairsRequired: true },
       { id: "011", type: "wide", capacity: "super-heavy", terminal: "Terminal 1", hasJetway: true, jetways: 2, a380Capable: true },
-      
+
       // Terminal 2 Gates (17-20)
       { id: "017", type: "wide", capacity: "super-heavy", terminal: "Terminal 2", hasJetway: true },
       { id: "018", type: "wide", capacity: "super-heavy", terminal: "Terminal 2", hasJetway: true },
       { id: "019", type: "wide", capacity: "super-heavy", terminal: "Terminal 2", hasJetway: true },
       { id: "020", type: "wide", capacity: "super-heavy", terminal: "Terminal 2", hasJetway: true },
-      
+
       // Cargo Terminal (21-23)
       { id: "021", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
       { id: "022", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
       { id: "023", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
-      
+
       // Helipads
       { id: "H01", type: "helipad", capacity: "helicopter", terminal: "Helipad Area" },
       { id: "H02", type: "helipad", capacity: "helicopter", terminal: "Helipad Area" }
@@ -40,7 +39,7 @@ const airportConfigs = {
       { id: "004", type: "wide", capacity: "super-heavy", terminal: "Passenger Terminal", hasJetway: true },
       { id: "005", type: "wide", capacity: "super-heavy", terminal: "Passenger Terminal", hasJetway: true },
       { id: "006", type: "wide", capacity: "super-heavy", terminal: "Passenger Terminal", hasJetway: true },
-      
+
       // Cargo Terminal (4 spaces)
       { id: "C01", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
       { id: "C02", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
@@ -58,7 +57,7 @@ const airportConfigs = {
       { id: "005", type: "wide", capacity: "super-heavy", terminal: "Passenger Terminal", hasJetway: true },
       { id: "006", type: "wide", capacity: "super-heavy", terminal: "Passenger Terminal", hasJetway: true },
       { id: "007", type: "wide", capacity: "super-heavy", terminal: "Passenger Terminal", hasJetway: true },
-      
+
       // Cargo/Freighter Terminal (4 spaces)
       { id: "C01", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
       { id: "C02", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
@@ -77,11 +76,11 @@ const airportConfigs = {
       { id: "006", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true },
       { id: "007", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true },
       { id: "008", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true },
-      
+
       // Cargo (2 spawners)
       { id: "C01", type: "cargo", capacity: "cargo", terminal: "Cargo Area" },
       { id: "C02", type: "cargo", capacity: "cargo", terminal: "Cargo Area" },
-      
+
       // Helipads (2 spawners)
       { id: "H01", type: "helipad", capacity: "helicopter", terminal: "Helipad Area" },
       { id: "H02", type: "helipad", capacity: "helicopter", terminal: "Helipad Area" }
@@ -95,32 +94,6 @@ const airportConfigs = {
       { id: "003", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Boeing Dreamlifter", "Airbus A380", "Airbus A340", "Concorde"] },
       { id: "004", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Boeing Dreamlifter", "Airbus A380", "Airbus A340", "Concorde"] },
       { id: "005", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Boeing Dreamlifter", "Airbus A380", "Airbus A340", "Concorde"] }
-    ]
-  },
-  "ITKO": {
-    stands: [
-      // Full aircraft gates (1, 2, 8, 9, 10, 11, 12, 16, 17)
-      { id: "001", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "002", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "008", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "009", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "010", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "011", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "012", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "016", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      { id: "017", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
-      
-      // Bus-only gates (3, 4)
-      { id: "003", type: "narrow", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: false, busOnly: true },
-      { id: "004", type: "narrow", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: false, busOnly: true },
-      
-      // Short-medium haul gates (5, 6, 7, 13, 14, 15)
-      { id: "005", type: "medium", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: true },
-      { id: "006", type: "medium", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: true },
-      { id: "007", type: "medium", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: true },
-      { id: "013", type: "medium", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: true },
-      { id: "014", type: "medium", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: true },
-      { id: "015", type: "medium", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: true }
     ]
   },
   "ISAU": {

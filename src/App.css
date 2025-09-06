@@ -1038,6 +1038,68 @@ body {
 
 .header-right {
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.sound-toggle {
+  background: rgba(45, 55, 72, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sound-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.sound-toggle.enabled {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.sound-toggle.disabled {
+  background: rgba(45, 55, 72, 0.5);
+  color: #6b7280;
+}
+
+.switch-role-btn {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.switch-role-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
+}
+
+.user-info {
+  text-align: right;
 }
 
 .username {
@@ -6718,25 +6780,28 @@ body {
 }
 
 .signature-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  padding: 8px 12px;
-  color: #ffffff;
-  font-size: 0.9rem;
   width: 100%;
+  height: 40px;
+  border: none;
+  border-bottom: 2px solid #000;
+  background: transparent;
+  font-family: 'Brush Script MT', cursive;
+  font-size: 1.2rem;
+  text-align: center;
+  color: #000000;
+  outline: none;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .signature-input:focus {
   outline: none;
-  border-color: rgba(255, 149, 0, 0.6);
-  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+  border-bottom: 3px solid #ff9500;
+  background: rgba(255, 149, 0, 0.05);
 }
 
 .signature-input:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 149, 0, 0.1);
 }
 
 

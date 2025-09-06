@@ -63,21 +63,21 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [badWordsFilter, setBadWordsFilter] = useState(true);
   const [lastServiceRequest, setLastServiceRequest] = useState({});
-  
+
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
-  
+
   // Bad words list for filtering
   const badWords = [
     'fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap', 'piss', 'cock', 'dick', 'pussy', 'tits', 'boobs', 'sex', 'porn', 'nude', 'naked', 'kill', 'die', 'murder', 'suicide', 'rape', 'nazi', 'hitler', 'terrorist', 'bomb', 'gun', 'weapon', 'drug', 'cocaine', 'weed', 'marijuana', 'alcohol', 'beer', 'wine', 'drunk', 'stupid', 'idiot', 'moron', 'retard', 'gay', 'lesbian', 'homo', 'faggot', 'nigger', 'nigga', 'spic', 'chink', 'kike', 'wetback', 'towelhead', 'sand nigger', 'cracker', 'honkey', 'whitey', 'blackie'
   ];
-  
+
   const containsBadWords = (text) => {
     if (!badWordsFilter) return false;
     const lowerText = text.toLowerCase();
     return badWords.some(word => lowerText.includes(word.toLowerCase()));
   };
-  
+
   const filterBadWords = (text) => {
     if (!badWordsFilter) return text;
     let filteredText = text;
@@ -1123,13 +1123,29 @@ export default function App() {
       const seatRow = Math.floor(Math.random() * maxRows) + 1;
       const seatLetter = seatConfig.letters[Math.floor(Math.random() * seatConfig.abreast)];
 
+      // Determine special requests based on aircraft type and realism
+      let specialRequests = null;
+      const isMilitary = aircraftType.includes("A-10") || aircraftType.includes("F-") || aircraftType.includes("B-1") || aircraftType.includes("B-2") || aircraftType.includes("Spirit") || aircraftType.includes("Black Hawk") || aircraftType.includes("Military");
+
+      if (!isMilitary && Math.random() > 0.85) {
+        const possibleRequests = ["Extra Legroom", "Dietary", "Frequent Flyer Priority"];
+        // Only add wheelchair or unaccompanied minor for appropriate aircraft types
+        if (aircraftInfo.maxSeats > 50 && !aircraftType.includes("Spirit") && !aircraftType.includes("military")) {
+          possibleRequests.push("Wheelchair", "Bassinet");
+          if (aircraftInfo.maxSeats > 100) {
+            possibleRequests.push("Unaccompanied Minor");
+          }
+        }
+        specialRequests = possibleRequests[Math.floor(Math.random() * possibleRequests.length)];
+      }
+
       manifest.push({
         id: i + 1,
         name: `${firstName} ${lastName}`,
         seat: `${seatRow}${seatLetter}`,
         class: seatClasses[Math.floor(Math.random() * seatClasses.length)],
         checkedIn: Math.random() > 0.1,
-        specialRequests: Math.random() > 0.8 ? "Wheelchair" : Math.random() > 0.7 ? "Dietary" : Math.random() > 0.6 ? "Unaccompanied Minor" : Math.random() > 0.5 ? "Extra Legroom" : Math.random() > 0.4 ? "Bassinet" : null,
+        specialRequests: specialRequests,
         frequent: Math.random() > 0.7
       });
     }
@@ -1263,7 +1279,7 @@ export default function App() {
     if (messagesArea) {
       messagesArea.scrollTop = messagesArea.scrollHeight;
     }
-  }, [messages, chatFilter]);
+  }, [messages]);
 
   useEffect(() => {
     fetch('/api/user')
@@ -1288,17 +1304,17 @@ export default function App() {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            
+
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
-            
+
             oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
             oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
-            
+
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
+
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.5);
           } catch (e) {
@@ -1336,7 +1352,7 @@ export default function App() {
       socket.off("standUpdate");
       socket.off("atisUpdate");
     };
-  }, [selectedAirport, soundEnabled]);
+  }, [selectedAirport, soundEnabled, user]);
 
   const handleLogin = () => {
     window.location.href = "/auth/discord";
@@ -1391,13 +1407,13 @@ export default function App() {
 
   const sendMessage = () => {
     if (input.trim() === "") return;
-    
+
     if (userMode === "pilot") {
       if (!selectedStand) {
         alert("Please select a stand first to send messages");
         return;
       }
-      
+
       // Check if stand is actually claimed by this user
       const standData = stands[selectedStand];
       if (!standData || standData.userId !== user?.id) {
@@ -1405,7 +1421,7 @@ export default function App() {
         return;
       }
     }
-    
+
     // Check for bad words
     if (containsBadWords(input)) {
       alert("Message contains inappropriate language and cannot be sent.");
@@ -1460,13 +1476,12 @@ export default function App() {
       const now = Date.now();
       const lastRequest = lastServiceRequest[service] || 0;
       const timeSinceLastRequest = now - lastRequest;
-      
+
       if (timeSinceLastRequest < 3000) { // 3 second cooldown
-        const remainingTime = Math.ceil((3000 - timeSinceLastRequest) / 1000);
+        const remainingTime = Math.ceil((3000 - lastRequestTime) / 1000);
         alert(`Please wait ${remainingTime} seconds before requesting ${service} again`);
         return;
       }
-      
       setLastServiceRequest(prev => ({
         ...prev,
         [service]: now
@@ -1923,6 +1938,10 @@ export default function App() {
         </div>
       </div>
     );
+  };
+
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled);
   };
 
   if (loading) {
@@ -2397,7 +2416,7 @@ export default function App() {
                                   <div>Load Master Signature</div>
                                 </div>
                               </div>
-                              
+
                               <div className="wb-certification">
                                 <div className="certification-text">
                                   I certify that this aircraft is loaded and balanced in accordance with 
@@ -2955,7 +2974,6 @@ export default function App() {
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
 
-
       if (activeTab === "guides") {
         return (
           <div className="guides-container">
@@ -3495,13 +3513,27 @@ export default function App() {
           <div className="date-display">{currentTime.toDateString()}</div>
         </div>
         <div className="header-right">
+          <div className="header-controls">
+            <button onClick={toggleSound} className={`sound-toggle ${soundEnabled ? 'enabled' : 'disabled'}`}>
+              {soundEnabled ? '🔊' : '🔇'}
+            </button>
+            <button 
+              onClick={() => {
+                setUserMode(null);
+                setSelectedStand("");
+                setFlightNumber("");
+                setAircraft("");
+                setAssignedCallsign("");
+              }} 
+              className="switch-role-btn"
+            >
+              SWITCH ROLE
+            </button>
+          </div>
           <div className="user-info">
             <div className="username">{user.username}</div>
             <div className="user-role">{userMode?.toUpperCase()}</div>
           </div>
-          <button onClick={() => { setUserMode(null); setSelectedAirport(""); }} className="logout-btn">
-            SWITCH ROLE
-          </button>
         </div>
       </div>
 
@@ -3535,18 +3567,24 @@ export default function App() {
               {commMinimized ? "◀" : "▶"}
             </button>
           </div>
-
+          
           <div className="messages-area">
             {messages
               .filter(msg => {
-                // Only show messages from the current airport
+                // Filter messages by airport
                 if (msg.airport && msg.airport !== selectedAirport) return false;
-                // For pilots: show system messages and messages for the selected stand
-                // For ground crew: show all messages at the airport
-                if (userMode === "groundcrew") return true;
-                return msg.mode === 'system' || msg.mode === 'checklist' || !selectedStand || msg.stand === selectedStand || msg.stand === "GROUND";
+                // Filter messages based on user mode and relevant contexts
+                if (userMode === "groundcrew") {
+                  // Ground crew sees all messages at the airport
+                  return true;
+                } else if (userMode === "pilot") {
+                  // Pilots see system messages, checklist updates, and messages related to their stand or general ground comms
+                  return msg.mode === 'system' || msg.mode === 'checklist' || !selectedStand || msg.stand === selectedStand || msg.stand === "GROUND";
+                }
+                // Default to showing messages if no specific filtering is needed
+                return true;
               })
-              .slice(-20)
+              .slice(-20) // Show the latest 20 messages
               .map((msg, i) => (
                 <div key={i} className={`message ${msg.mode || 'system'}`}>
                   <div className="message-header">
@@ -3556,36 +3594,6 @@ export default function App() {
                   <div className="message-content">{msg.text}</div>
                 </div>
               ))}
-          </div>
-
-          <div className="comm-filters">
-            <div className="filter-row">
-              <select
-                value={chatFilter}
-                onChange={(e) => setChatFilter(e.target.value)}
-                className="chat-filter-select"
-              >
-                <option value="all">All Messages</option>
-                <option value="pilot">Pilot Messages</option>
-                <option value="groundcrew">Ground Crew</option>
-                <option value="system">System Messages</option>
-                <option value="checklist">Checklist Updates</option>
-              </select>
-              <button
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`sound-toggle ${soundEnabled ? 'enabled' : 'disabled'}`}
-                title={soundEnabled ? 'Sounds ON' : 'Sounds OFF'}
-              >
-                {soundEnabled ? '🔊' : '🔇'}
-              </button>
-              <button
-                onClick={() => setBadWordsFilter(!badWordsFilter)}
-                className={`filter-toggle ${badWordsFilter ? 'enabled' : 'disabled'}`}
-                title={badWordsFilter ? 'Bad Words Filter ON' : 'Bad Words Filter OFF'}
-              >
-                {badWordsFilter ? '🚫' : '💬'}
-              </button>
-            </div>
           </div>
 
           <div className="input-area">
