@@ -48,12 +48,73 @@ passport.deserializeUser((user, done) => {
 });
 
 // In-memory storage for demo (use database in production)
-let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {} } }
+let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {}, groundCrewCallsigns: new Map() } }
 let connectedUsers = new Map();
 let ptfsAtisData = {}; // Store real ATIS data from PTFS
 const claimedCallsigns = {}; // Store callsign data
 
 // Parse ATIS content to extract useful information
+// Ground crew callsign management
+const assignGroundCrewCallsign = (airport, userId) => {
+  if (!airportData[airport].groundCrewCallsigns) {
+    airportData[airport].groundCrewCallsigns = new Map();
+  }
+
+  // Check if user already has a callsign
+  for (const [callsign, assignedUserId] of airportData[airport].groundCrewCallsigns) {
+    if (assignedUserId === userId) {
+      return callsign;
+    }
+  }
+
+  // Find the lowest available callsign number
+  let callsignNumber = 1;
+  while (airportData[airport].groundCrewCallsigns.has(`GROUND ${callsignNumber}`)) {
+    callsignNumber++;
+  }
+
+  const newCallsign = `GROUND ${callsignNumber}`;
+  airportData[airport].groundCrewCallsigns.set(newCallsign, userId);
+  return newCallsign;
+};
+
+const releaseGroundCrewCallsign = (airport, userId) => {
+  if (!airportData[airport].groundCrewCallsigns) return;
+
+  // Find and remove the user's callsign
+  for (const [callsign, assignedUserId] of airportData[airport].groundCrewCallsigns) {
+    if (assignedUserId === userId) {
+      airportData[airport].groundCrewCallsigns.delete(callsign);
+      break;
+    }
+  }
+
+  // Reassign callsigns to maintain sequential numbering
+  const remainingAssignments = Array.from(airportData[airport].groundCrewCallsigns.entries())
+    .sort((a, b) => {
+      const numA = parseInt(a[0].split(' ')[1]);
+      const numB = parseInt(b[0].split(' ')[1]);
+      return numA - numB;
+    });
+
+  airportData[airport].groundCrewCallsigns.clear();
+
+  remainingAssignments.forEach(([oldCallsign, assignedUserId], index) => {
+    const newCallsign = `GROUND ${index + 1}`;
+    airportData[airport].groundCrewCallsigns.set(newCallsign, assignedUserId);
+    
+    // Notify the user of their new callsign if it changed
+    if (oldCallsign !== newCallsign) {
+      const userSocket = Array.from(io.sockets.sockets.values())
+        .find(socket => connectedUsers.get(socket.id)?.userId === assignedUserId);
+      
+      if (userSocket) {
+        userSocket.emit("callsignUpdate", { newCallsign });
+      }
+    }
+  });
+};
+
 const parseAtisContent = (atisInfo) => {
   const lines = atisInfo.lines || [];
   const content = atisInfo.content || '';
@@ -415,6 +476,7 @@ io.on("connection", (socket) => {
         stands: {},
         requests: [],
         users: new Map(),
+        groundCrewCallsigns: new Map(),
         atis: ptfsAtisData[data.airport] || {
           airport: data.airport,
           info: 'INFO ALPHA',
@@ -430,6 +492,13 @@ io.on("connection", (socket) => {
 
     // Add user to airport-specific data
     if (data.airport) {
+      // Assign ground crew callsign if user is ground crew
+      if (data.mode === 'groundcrew') {
+        const callsign = assignGroundCrewCallsign(data.airport, data.userId);
+        data.callsign = callsign;
+        socket.emit("callsignAssigned", { callsign });
+      }
+
       airportData[data.airport].users.set(socket.id, data);
       socket.join(data.airport); // Join airport-specific room
 
@@ -438,7 +507,7 @@ io.on("connection", (socket) => {
       socket.emit("serviceUpdate", airportData[data.airport].requests);
       socket.emit("atisUpdate", airportData[data.airport].atis);
 
-      console.log(`👤 User joined: ${data.userId} (Discord ID) → ${data.airport} as ${data.mode.toUpperCase()}`);
+      console.log(`👤 User joined: ${data.userId} (Discord ID) → ${data.airport} as ${data.mode.toUpperCase()}${data.callsign ? ` (${data.callsign})` : ''}`);
     }
   });
 
@@ -597,6 +666,11 @@ io.on("connection", (socket) => {
 
           console.log(`🏢 Stand released: ${stand} at ${userInfo.airport} (was ${info.pilot})`);
         }
+      }
+
+      // Release ground crew callsign if user was ground crew
+      if (userInfo.mode === 'groundcrew') {
+        releaseGroundCrewCallsign(userInfo.airport, userInfo.userId);
       }
 
       // Remove user from airport data

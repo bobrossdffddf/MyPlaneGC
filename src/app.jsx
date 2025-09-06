@@ -35,6 +35,7 @@ export default function App() {
   });
   const [groundCallsignCounter, setGroundCallsignCounter] = useState(1);
   const [assignedCallsign, setAssignedCallsign] = useState("");
+  const [groundCrewCallsign, setGroundCrewCallsign] = useState(""); // State for ground crew callsign
   const [activeGuideCategory, setActiveGuideCategory] = useState("fueling");
   const [mcduDisplay, setMcduDisplay] = useState({
     currentPage: "INIT",
@@ -86,6 +87,15 @@ export default function App() {
       filteredText = filteredText.replace(regex, '*'.repeat(word.length));
     });
     return filteredText;
+  };
+
+  // Helper function to add messages and filter bad words
+  const addChatMessage = (message) => {
+    const filteredMessage = {
+      ...message,
+      text: filterBadWords(message.text)
+    };
+    setMessages((prev) => [...prev, filteredMessage]);
   };
 
   const handleMcduKey = (key) => {
@@ -1080,9 +1090,11 @@ export default function App() {
   };
 
   const assignGroundCallsign = () => {
+    // Ensure the callsign is unique and stable for ground crew
     const newCallsign = `Ground ${groundCallsignCounter}`;
-    setGroundCallsignCounter(prev => prev + 1);
-    return newCallsign;
+    // No state update here, as the socket event will handle it
+    socket.emit("requestGroundCallsign", { userId: user?.id, airport: selectedAirport });
+    return newCallsign; // Return a temporary callsign until confirmed
   };
 
   const generatePassengerManifest = (aircraftType) => {
@@ -1298,7 +1310,7 @@ export default function App() {
           text: filterBadWords(msg.text)
         };
         setMessages((prev) => [...prev, filteredMsg]);
-        
+
         // Play sound only for specific message types and not for own messages
         const shouldPlaySound = soundEnabled && msg.sender !== user?.username && (
           msg.mode === 'system' || // System messages
@@ -1359,11 +1371,34 @@ export default function App() {
       }
     });
 
+    // Add socket listeners for callsign events
+    socket.on("callsignAssigned", (data) => {
+      setGroundCrewCallsign(data.callsign);
+    });
+
+    socket.on("callsignUpdate", (data) => {
+      setGroundCrewCallsign(data.newCallsign);
+      addChatMessage({
+        text: `Your callsign has been updated to ${data.newCallsign}`,
+        sender: "SYSTEM",
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "system"
+      });
+    });
+
+    socket.on("error", (error) => {
+      console.error("Socket error:", error);
+      alert(error.message || "An error occurred");
+    });
+
     return () => {
+      socket.off("standUpdate");
       socket.off("chatUpdate");
       socket.off("serviceUpdate");
-      socket.off("standUpdate");
       socket.off("atisUpdate");
+      socket.off("callsignAssigned"); // Remove listener
+      socket.off("callsignUpdate"); // Remove listener
+      socket.off("error");
     };
   }, [selectedAirport, soundEnabled, user]);
 
@@ -1379,6 +1414,7 @@ export default function App() {
     // Reset callsign when switching modes
     setAssignedCallsign("");
     setGroundCallsignCounter(1);
+    setGroundCrewCallsign(""); // Reset ground crew callsign as well
 
     socket.emit("userMode", { mode, airport, userId: user?.id });
   };
@@ -1451,8 +1487,13 @@ export default function App() {
       }
       senderName = `${callsign || user?.username} (${user?.username})`;
     } else if (userMode === "groundcrew") {
-      if (!assignedCallsign) {
-        callsign = assignGroundCallsign();
+      if (!assignedCallsign && groundCrewCallsign) { // Use groundCrewCallsign if available
+        callsign = groundCrewCallsign;
+        setAssignedCallsign(callsign); // Keep assignedCallsign consistent for pilot messages
+      } else if (!assignedCallsign && !groundCrewCallsign) {
+        // If no ground crew callsign is assigned yet, try to get one
+        callsign = assignGroundCallsign(); // This will emit the request
+        setAssignedCallsign(callsign); // Tentatively set for display
       }
       senderName = `${callsign} (${user?.username})`;
     }
@@ -1487,8 +1528,8 @@ export default function App() {
     // Rate limiting - prevent spam (except for Full Service)
     if (service !== "Full Service") {
       const now = Date.now();
-      const lastRequest = lastServiceRequest[service] || 0;
-      const timeSinceLastRequest = now - lastRequest;
+      const lastRequestTime = lastServiceRequest[service] || 0;
+      const timeSinceLastRequest = now - lastRequestTime;
 
       if (timeSinceLastRequest < 3000) { // 3 second cooldown
         const remainingTime = Math.ceil((3000 - lastRequestTime) / 1000);
@@ -1534,13 +1575,13 @@ export default function App() {
   };
 
   const handleServiceAction = (requestId, action) => {
-    socket.emit("serviceAction", { requestId, action, crewMember: user?.username });
+    socket.emit("serviceAction", { requestId, action, crewMember: user?.username, airport: selectedAirport });
   };
 
   const generatePermitId = (permitType) => {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `${permitType.substring(0, 3).toUpperCase()}${timestamp.toString().slice(-6)}${random}`;
+    return `${permitType.substring(0, 3).toUpperCase()}_${timestamp.toString().slice(-6)}${random}`;
   };
 
   const submitPermit = (permitType, formData) => {
@@ -1822,10 +1863,12 @@ export default function App() {
   const getAircraftImageUrl = (aircraftType) => {
     // Map aircraft types to real aircraft photos
     const aircraftImageMap = {
+      "A-10 Warthog": "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=500&h=300&fit=crop&crop=center",
+      "A6M Zero": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
       "Airbus A220": "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=500&h=300&fit=crop&crop=center",
       "Airbus A320": "https://images.unsplash.com/photo-1543198126-a8ad8e47fb22?w=500&h=300&fit=crop&crop=center",
       "Airbus A330": "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&h=300&fit=crop&crop=center",
-      "Airbus A340": "https://images.unsplash.com/photo-1525624286412-4099c83c1bc8?w=500&h=300&fit=crop&crop=center",
+      "Airbus A340": "https://images.unsplash.com/photo-1525624286412-40990003b8c8?w=500&h=300&fit=crop&crop=center",
       "Airbus A350": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
       "Airbus A380": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=300&fit=crop&crop=center",
       "Boeing 737": "https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?w=500&h=300&fit=crop&crop=center",
@@ -1851,7 +1894,7 @@ export default function App() {
   const renderAircraftDisplay = () => {
     if (aircraft && aircraftData) {
       const imageUrl = getAircraftImageUrl(aircraft);
-      
+
       return (
         <div className="aircraft-display-3d">
           <div className="aircraft-photo-container">
@@ -2029,6 +2072,11 @@ export default function App() {
                 <div className="role-icon">👷‍♂️</div>
                 <div className="role-title">GROUND OPERATIONS</div>
                 <div className="role-description">Handle service requests & manage ground operations</div>
+                {groundCrewCallsign && (
+                  <div className="callsign-display">
+                    <strong>Callsign: {groundCrewCallsign}</strong>
+                  </div>
+                )}
               </button>
             </div>
           </div>
@@ -3474,6 +3522,7 @@ export default function App() {
                 setFlightNumber("");
                 setAircraft("");
                 setAssignedCallsign("");
+                setGroundCrewCallsign(""); // Ensure ground callsign is also reset
               }} 
               className="switch-role-btn"
             >
@@ -3517,7 +3566,7 @@ export default function App() {
               {commMinimized ? "◀" : "▶"}
             </button>
           </div>
-          
+
           <div className="messages-area">
             {messages
               .filter(msg => {

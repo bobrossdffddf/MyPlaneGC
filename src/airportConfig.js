@@ -14,6 +14,13 @@ const airportConfigs = {
       { id: "010", type: "narrow", capacity: "narrow-body", terminal: "Terminal 1", hasJetway: false, stairsRequired: true },
       { id: "011", type: "wide", capacity: "super-heavy", terminal: "Terminal 1", hasJetway: true, jetways: 2, a380Capable: true },
 
+      // Terminal 1 Gates (12-16)
+      { id: "012", type: "narrow", capacity: "narrow-body", terminal: "Terminal 1", hasJetway: true },
+      { id: "013", type: "narrow", capacity: "narrow-body", terminal: "Terminal 1", hasJetway: true },
+      { id: "014", type: "medium", capacity: "wide-body", terminal: "Terminal 1", hasJetway: true },
+      { id: "015", type: "medium", capacity: "wide-body", terminal: "Terminal 1", hasJetway: true },
+      { id: "016", type: "wide", capacity: "super-heavy", terminal: "Terminal 1", hasJetway: true },
+
       // Terminal 2 Gates (17-20)
       { id: "017", type: "wide", capacity: "super-heavy", terminal: "Terminal 2", hasJetway: true },
       { id: "018", type: "wide", capacity: "super-heavy", terminal: "Terminal 2", hasJetway: true },
