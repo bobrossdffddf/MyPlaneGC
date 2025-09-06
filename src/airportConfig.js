@@ -137,6 +137,8 @@ const airportConfigs = {
       // 2 spawners, no jetbridges, restricted aircraft (no 747, A380, Concorde, A340, Boeing Dreamlifter)
       { id: "001", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: false, stairsRequired: true, restrictions: ["Boeing 747", "Airbus A380", "Concorde", "Airbus A340", "Boeing Dreamlifter"] },
       { id: "002", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: false, stairsRequired: true, restrictions: ["Boeing 747", "Airbus A380", "Concorde", "Airbus A340", "Boeing Dreamlifter"] }
+      { id: "001", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: false, stairsRequired: true, restrictions: ["Boeing 747", "Airbus A380", "Concorde", "Airbus A340", "Boeing Dreamlifter"] },
+      { id: "002", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: false, stairsRequired: true, restrictions: ["Boeing 747", "Airbus A380", "Concorde", "Airbus A340", "Boeing Dreamlifter"] }
     ]
   },
   "IIAB": {
