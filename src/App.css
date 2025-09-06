@@ -3427,9 +3427,10 @@ body {
 .tablet-content:has(.comm-panel.minimized) .main-area {
   margin-right: 0px;
   padding-right: 25px;
-  height: calc(100vh - 270px);
-  min-height: calc(100vh - 270px);
-  max-height: calc(100vh - 270px);
+  height: calc(100vh - 200px);
+  min-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
+  margin-bottom: 70px;
 }
 
 @media (max-width: 1600px) {
@@ -4174,6 +4175,8 @@ body {
   min-width: 60px;
   overflow: hidden;
   border-radius: 15px 0 0 15px;
+  position: relative;
+  z-index: 999;
 }
 
 .comm-panel.minimized .comm-header-content {
@@ -4191,8 +4194,9 @@ body {
 .comm-panel.minimized .comm-header {
   padding: 15px 10px;
   justify-content: center;
-  min-height: 100vh;
+  min-height: calc(100vh - 70px);
   border-bottom: none;
+  margin-bottom: 70px;
 }
 
 .comm-panel.minimized .comm-minimize-btn {
