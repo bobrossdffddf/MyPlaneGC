@@ -3423,6 +3423,10 @@ body {
   max-height: calc(100vh - 300px);
 }
 
+.tablet-content:has(.comm-panel.minimized) .main-area {
+  margin-right: 0px;
+}
+
 @media (max-width: 1600px) {
   .service-management-board {
     grid-template-columns: repeat(3, 1fr);
@@ -4166,6 +4170,18 @@ body {
   border-radius: 15px 0 0 15px;
 }
 
+.comm-panel.minimized .comm-header-content {
+  display: none;
+}
+
+.comm-panel.minimized .messages-area {
+  display: none;
+}
+
+.comm-panel.minimized .input-area {
+  display: none;
+}
+
 .comm-header {
   padding: 20px 25px;
   border-bottom: 2px solid rgba(255, 149, 0, 0.4);
@@ -4286,10 +4302,11 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: calc(100vh - 280px);
-  max-height: calc(100vh - 280px);
+  height: calc(100vh - 220px);
+  max-height: calc(100vh - 220px);
   min-height: 300px;
   scroll-behavior: smooth;
+  padding-bottom: 90px;
 }
 
 .messages-area::-webkit-scrollbar {
@@ -4375,6 +4392,9 @@ body {
   background: rgba(0, 0, 0, 0.3);
   display: flex;
   gap: 10px;
+  position: relative;
+  z-index: 1001;
+  margin-bottom: 80px;
 }
 
 .message-input {
