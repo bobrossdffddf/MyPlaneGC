@@ -63,7 +63,7 @@ export default function App() {
   const handleMcduKey = (key) => {
     setMcduDisplay(prev => {
       let newState = { ...prev };
-      
+
       if (key >= 'A' && key <= 'Z') {
         if (prev.scratchpad.length < 12) {
           newState.scratchpad = prev.scratchpad + key;
@@ -112,7 +112,7 @@ export default function App() {
         newState.currentPage = 'MENU';
         newState.scratchpad = '';
       }
-      
+
       return updateMcduDisplayState(newState);
     });
   };
@@ -120,7 +120,7 @@ export default function App() {
   const handleLineSelect = (lineNumber, side, currentState) => {
     if (currentState.scratchpad) {
       let newState = { ...currentState };
-      
+
       switch (currentState.currentPage) {
         case 'INIT':
           if (lineNumber === 2 && side === 'L') {
@@ -151,7 +151,7 @@ export default function App() {
           }
           break;
       }
-      
+
       return updateMcduDisplayState(newState);
     }
     return currentState;
@@ -159,7 +159,7 @@ export default function App() {
 
   const updateMcduDisplayState = (state) => {
     let newLines = [];
-    
+
     switch (state.currentPage) {
       case 'INIT':
         newLines = [
@@ -244,7 +244,7 @@ export default function App() {
       default:
         newLines = state.lines || [];
     }
-    
+
     return { ...state, lines: newLines };
   };
 
@@ -297,7 +297,7 @@ export default function App() {
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-    
+
     // Add event listeners to nav when it exists
     const navElement = document.querySelector('.bottom-nav');
     if (navElement) {
@@ -605,19 +605,6 @@ export default function App() {
         explanation: "Always include your callsign and be specific with numbers for operational coordination."
       },
       {
-        scenario: "You need pushback but there's another aircraft taxiing behind you.",
-        atcMessage: "Ground, American 1234 at gate A5, ready for pushback, advise when clear of traffic.",
-        question: "What should ground control coordinate?",
-        options: [
-          "Immediate pushback clearance",
-          "Hold for traffic, then coordinate pushback when area is clear",
-          "Taxi forward instead",
-          "Change gates"
-        ],
-        correct: 1,
-        explanation: "Ground control must ensure area is clear of conflicting traffic before approving pushback."
-      },
-      {
         scenario: "You need to coordinate a fuel truck for additional fuel.",
         atcMessage: "Ops, American 1234 at gate C8, requesting fuel truck for additional 2000 pounds fuel.",
         question: "What information should operations confirm?",
@@ -683,7 +670,7 @@ export default function App() {
             "Use precise, deliberate hand movements during final 50 feet of approach",
             "Continuously monitor wingtip clearance and jetbridge alignment",
             "Give clear STOP signal when aircraft nose gear reaches parking position marker",
-            "Verify nose gear is precisely on gate centerline before final stop",
+            "Verify nose gear is precisely on gate centerline before final parking approval",
             "Check jetbridge can be safely positioned before final parking approval",
             "Signal SET PARKING BRAKE with both hands pushing down motion",
             "Wait for pilot acknowledgment before approaching aircraft or signaling ground crew"
@@ -1041,21 +1028,21 @@ export default function App() {
   const isStandCompatible = (standType, aircraftType) => {
     const aircraft = aircraftDatabase[aircraftType];
     const standLimits = standCompatibilityMatrix[standType];
-    
+
     if (!aircraft || !standLimits) return false;
-    
+
     // Check wingspan constraint
     if (aircraft.wingspan > standLimits.maxWingspan) return false;
-    
+
     // Check length constraint
     if (aircraft.length > standLimits.maxLength) return false;
-    
+
     // Check category compatibility
     if (!standLimits.categories.includes(aircraft.category)) return false;
-    
+
     // Check weight class compatibility
     if (!standLimits.maxWeightClass.includes(aircraft.weightClass)) return false;
-    
+
     return true;
   };
 
@@ -1078,7 +1065,7 @@ export default function App() {
   const generatePassengerManifest = (aircraftType) => {
     const aircraftInfo = aircraftDatabase[aircraftType];
     if (!aircraftInfo) return [];
-    
+
     const maxSeats = aircraftInfo.maxSeats;
     // Use 85-95% of max capacity for realistic loading
     const passengerCount = Math.floor(maxSeats * (0.85 + Math.random() * 0.10));
@@ -1086,7 +1073,7 @@ export default function App() {
 
     const firstNames = ["John", "Sarah", "Michael", "Emma", "David", "Lisa", "Robert", "Anna", "James", "Maria", "Carlos", "Sofia", "Ahmed", "Yuki", "Pierre", "Ingrid"];
     const lastNames = ["Smith", "Johnson", "Brown", "Davis", "Wilson", "Miller", "Moore", "Taylor", "Anderson", "Thomas", "Garcia", "Rodriguez", "Chen", "Patel", "Mueller", "Schmidt"];
-    
+
     // Determine seat configuration based on aircraft type
     let seatConfig = { abreast: 6, letters: "ABCDEF" }; // Default narrow body
     if (aircraftInfo.category === "wide-body") {
@@ -1207,7 +1194,7 @@ export default function App() {
           category: baseAircraftData.category,
           doors: baseAircraftData.doors,
           weightClass: baseAircraftData.weightClass,
-          range: aircraft.includes('787') ? 15750 : aircraft.includes('A380') ? 15200 : aircraft.includes('777') ? 14685 : aircraft.includes('A350') ? 15000 : aircraft.includes('747') ? 14815 : 6500,
+          range: aircraft.includes('A380') ? 15200 : aircraft.includes('777') ? 14685 : aircraft.includes('A350') ? 15000 : aircraft.includes('747') ? 14815 : aircraft.includes('787') ? 15750 : 6500,
           maxSpeed: aircraft.includes('A380') ? 560 : aircraft.includes('747') ? 570 : 560,
           engines: (aircraft.includes('A380') || aircraft.includes('747')) ? 4 : aircraft.includes('MD') ? 2 : aircraft.includes('A340') ? 4 : 2,
           fuelCapacity: aircraft.includes('A380') ? 84535 : aircraft.includes('747') ? 74000 : aircraft.includes('777') ? 47890 : aircraft.includes('A350') ? 44150 : 26020,
@@ -1225,7 +1212,7 @@ export default function App() {
           variants: aircraft.includes('737') ? ["-700", "-800", "-900"] : aircraft.includes('A320') ? ["-200", "-200neo"] : ["-100", "-200"]
         };
         setAircraftData(enrichedData);
-        
+
         // Generate appropriate manifest based on stand type
         const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
         const isCargoStand = currentStandData?.type === "cargo" || baseAircraftData.category === "cargo" || baseAircraftData.category === "military-cargo";
@@ -1300,11 +1287,11 @@ export default function App() {
     console.log('Selecting mode:', mode, 'for airport:', airport);
     setUserMode(mode);
     setSelectedAirport(airport);
-    
+
     // Reset callsign when switching modes
     setAssignedCallsign("");
     setGroundCallsignCounter(1);
-    
+
     socket.emit("userMode", { mode, airport, userId: user?.id });
   };
 
@@ -1313,7 +1300,7 @@ export default function App() {
       // Use flight number as callsign for pilots
       const callsign = flightNumber;
       setAssignedCallsign(callsign);
-      
+
       socket.emit("claimStand", {
         stand: selectedStand,
         flightNumber,
@@ -1333,10 +1320,10 @@ export default function App() {
       alert("Please select a stand first to send messages");
       return;
     }
-    
+
     let senderName = user?.username;
     let callsign = assignedCallsign;
-    
+
     if (userMode === "pilot") {
       if (!assignedCallsign && flightNumber) {
         callsign = flightNumber;
@@ -1349,7 +1336,7 @@ export default function App() {
       }
       senderName = `${callsign} (${user?.username})`;
     }
-    
+
     const message = {
       text: input,
       sender: senderName,
@@ -1414,7 +1401,7 @@ export default function App() {
 
     const currentCallsign = assignedCallsign || flightNumber;
     const permitId = `${permitType}_${Date.now()}`;
-    
+
     const newPermit = {
       id: permitId,
       type: permitType,
@@ -1429,16 +1416,16 @@ export default function App() {
       aircraft: aircraft,
       passengers: passengerManifest.length
     };
-    
+
     setPermits(prev => {
       const updated = [...prev, newPermit];
       console.log("Updated permits:", updated);
       return updated;
     });
-    
+
     setActivePermitForm(null);
     setPermitFormData({});
-    
+
     // Send system message about permit submission
     socket.emit("chatMessage", {
       text: `📋 ${permitType.replace(/([A-Z])/g, ' $1').trim().toUpperCase()} PERMIT submitted by ${currentCallsign} - ID: ${permitId}`,
@@ -1456,7 +1443,7 @@ export default function App() {
           ? { ...permit, status: "APPROVED", approvedAt: new Date().toLocaleTimeString() }
           : permit
       ));
-      
+
       socket.emit("chatMessage", {
         text: `✅ ${permitType.replace(/([A-Z])/g, ' $1').trim().toUpperCase()} PERMIT APPROVED for ${currentCallsign}`,
         sender: "PERMITS OFFICE",
@@ -1489,37 +1476,37 @@ export default function App() {
 
     const passengerWeight = passengerManifest.length * 84; // Average passenger weight in kg (84kg including carry-on)
     const baggageWeight = passengerManifest.length * 23; // Average checked baggage weight
-    
+
     // Calculate fuel weight to ensure we stay under MTOW
     const maxTakeoffWeight = aircraftData.maxTakeoffWeight || 75000;
     const operatingEmptyWeight = aircraftData.operatingEmptyWeight || Math.round(maxTakeoffWeight * 0.55);
-    
+
     // Calculate remaining weight capacity
     const payloadWeight = passengerWeight + baggageWeight;
     const remainingCapacity = maxTakeoffWeight - operatingEmptyWeight - payloadWeight;
-    
+
     // Use a fixed percentage based on aircraft type for consistency
-    const fuelPercentage = aircraft.includes('A380') ? 0.75 : aircraft.includes('747') ? 0.72 : 0.78;
+    const fuelPercentage = aircraft.includes('A380') ? 0.75 : aircraft.includes('747') ? 0.72 : aircraft.includes('777') ? 0.78 : aircraft.includes('A350') ? 0.78 : 0.78; // Use a more consistent fuel percentage
     const fuelWeight = Math.round(remainingCapacity * fuelPercentage);
     const cargoWeight = Math.round(Math.min(2000, remainingCapacity * 0.08)); // Small cargo load
-    
+
     const totalWeight = operatingEmptyWeight + passengerWeight + baggageWeight + fuelWeight + cargoWeight;
-    
+
     // Calculate CG (simplified calculation)
     const emptyWeightArm = aircraftData.length * 0.4; // Approximate empty weight CG position
     const passengerArm = aircraftData.length * 0.45; // Passenger cabin CG
     const cargoArm = aircraftData.length * 0.3; // Cargo compartment CG
     const fuelArm = aircraftData.length * 0.4; // Fuel tank CG
-    
+
     const totalMoment = 
       (operatingEmptyWeight * emptyWeightArm) +
       ((passengerWeight + baggageWeight) * passengerArm) +
       (cargoWeight * cargoArm) +
       (fuelWeight * fuelArm);
-    
+
     const cgPosition = totalMoment / totalWeight;
     const cgPercentMAC = 27.5; // Fixed safe CG position
-    
+
     const wbData = {
       passengerWeight,
       baggageWeight,
@@ -1537,7 +1524,7 @@ export default function App() {
       passengerCount: passengerManifest.length,
       data: wbData
     });
-    
+
     return wbData;
   };
 
@@ -1607,7 +1594,7 @@ export default function App() {
 
   const assignFlightToStand = (standId, flightNumber, aircraft) => {
     if (!flightNumber || !aircraft) return;
-    
+
     socket.emit("claimStand", {
       stand: standId,
       flightNumber,
@@ -1649,7 +1636,7 @@ export default function App() {
       r.service === service && 
       r.status === "REQUESTED"
     );
-    
+
     if (requestIndex !== -1) {
       socket.emit("serviceAction", { 
         requestId: requestIndex, 
@@ -1822,10 +1809,10 @@ export default function App() {
       <div className="tablet-loading">
         <div className="loading-content">
           <div className="airline-logo-loading">
-            <div className="logo-icon">✈️</div>
-            <h1>PTFS GROUND CONTROL</h1>
-            <div className="system-info">Professional Aviation Ground Operations</div>
-          </div>
+              <div className="logo-icon">✈️</div>
+              <h1>MyPlane</h1>
+              <div className="system-info">Professional Aviation Ground Operations</div>
+            </div>
           <div className="loading-progress">
             <div className="progress-bar"></div>
             <div className="progress-text">Initializing Systems...</div>
@@ -1841,7 +1828,7 @@ export default function App() {
         <div className="login-content">
           <div className="brand-header">
             <div className="brand-icon">✈️</div>
-            <h1>PTFS GROUND CONTROL</h1>
+            <h1>MyPlane</h1>
             <div className="brand-subtitle">Professional Aviation Ground Operations</div>
             <div className="system-version">Version 3.1.0 | Build 2024</div>
           </div>
@@ -2022,7 +2009,7 @@ export default function App() {
                     <h3>{activePermitForm.toUpperCase()} PERMIT APPLICATION</h3>
                     <button onClick={() => setActivePermitForm(null)} className="close-form">×</button>
                   </div>
-                  
+
                   <div className="form-content">
                     {activePermitForm === "overweight" && (
                       <div className="permit-fields">
@@ -2159,7 +2146,7 @@ export default function App() {
                             <div>Date: {new Date().toLocaleDateString()}</div>
                           </div>
                         </div>
-                        
+
                         {(() => {
                           const wb = calculateWeightAndBalance();
                           return wb ? (
@@ -2418,14 +2405,14 @@ export default function App() {
             </div>
           );
 
-        
+
 
         case "manifest":
           const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
           const currentAircraftData = aircraftData ? aircraftDatabase[aircraft] : null;
           const isCargoStand = currentStandData?.type === "cargo" || 
                               (currentAircraftData && (currentAircraftData.category === "cargo" || currentAircraftData.category === "military-cargo"));
-          
+
           return (
             <div className="manifest-container">
               <div className="manifest-header">
@@ -2807,7 +2794,7 @@ export default function App() {
       const lowPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["Cleaning", "Water Service", "Lavatory Service"].includes(r.service));
       const inProgressRequests = requests.filter(r => r.status === "ACCEPTED");
 
-      
+
 
       if (activeTab === "guides") {
         return (
@@ -2872,7 +2859,7 @@ export default function App() {
                     <span className="toggle-text">{standManagementMode ? 'ENABLED' : 'DISABLED'}</span>
                   </button>
                 </div>
-                
+
                 <div className="stand-stats">
                   <div className="stat-item">
                     <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length}</span>
@@ -2896,7 +2883,7 @@ export default function App() {
                   const occupiedBy = stands[stand.id];
                   const standRequests = requests.filter(r => r.stand === stand.id && r.status === "REQUESTED");
                   const completedServices = requests.filter(r => r.stand === stand.id && r.status === "COMPLETED").length;
-                  
+
                   return (
                     <div 
                       key={stand.id} 
@@ -2912,7 +2899,7 @@ export default function App() {
                           <span className="status-text">{occupiedBy ? 'OCCUPIED' : 'AVAILABLE'}</span>
                         </div>
                       </div>
-                      
+
                       {occupiedBy ? (
                         <div className="occupied-stand-details">
                           <div className="flight-identification">
@@ -2925,7 +2912,7 @@ export default function App() {
                               <span className="pilot-name">{occupiedBy.pilot}</span>
                             </div>
                           </div>
-                          
+
                           <div className="service-management-section">
                             <div className="services-header">
                               <span className="services-title">SERVICES</span>
@@ -2934,7 +2921,7 @@ export default function App() {
                                 <span className="completed-count">{completedServices} COMPLETED</span>
                               </div>
                             </div>
-                            
+
                             {standRequests.length > 0 && (
                               <div className="active-services-list">
                                 {standRequests.map((req, i) => (
@@ -2954,7 +2941,7 @@ export default function App() {
                                 ))}
                               </div>
                             )}
-                            
+
                             {standManagementMode && (
                               <div className="service-quick-actions">
                                 <div className="quick-actions-header">QUICK SERVICES:</div>
@@ -3018,7 +3005,7 @@ export default function App() {
                             <div className="availability-icon">✈️</div>
                             <span className="availability-text">READY FOR ASSIGNMENT</span>
                           </div>
-                          
+
                           {standManagementMode && (
                             <div className="assignment-controls">
                               <div className="assignment-form-professional">
@@ -3122,7 +3109,7 @@ export default function App() {
                 <div className="current-time">{new Date().toLocaleTimeString()}</div>
               </div>
             </div>
-            
+
             <div className="operations-metrics">
               <div className="metric-card pending">
                 <div className="metric-icon">⏳</div>
@@ -3313,7 +3300,7 @@ export default function App() {
     <div className="tablet-interface">
       <div className="tablet-header">
         <div className="header-left">
-          <div className="app-title">PTFS GROUND CONTROL</div>
+          <div className="app-title">MyPlane</div>
           <div className="location-info">{selectedAirport} - {userMode?.toUpperCase()}</div>
         </div>
         <div className="header-center">
