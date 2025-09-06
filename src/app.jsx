@@ -2005,12 +2005,15 @@ export default function App() {
 
               {activePermitForm ? (
                 <div className="permit-form">
-                  <div className="form-header">
-                    <h3>{activePermitForm.toUpperCase()} PERMIT APPLICATION</h3>
-                    <button onClick={() => setActivePermitForm(null)} className="close-form">×</button>
-                  </div>
+                  <div className="permit-form-inner">
+                    <div className="permit-header">
+                      <h2>{activePermitForm.toUpperCase()} PERMIT APPLICATION</h2>
+                      <div className="permit-subtitle">Official Aviation Document</div>
+                      <div className="permit-number">Doc #{Date.now().toString().slice(-6)}</div>
+                      <button onClick={() => setActivePermitForm(null)} className="close-permit">×</button>
+                    </div>
 
-                  <div className="form-content">
+                    <div className="permit-content">
                     {activePermitForm === "overweight" && (
                       <div className="permit-fields">
                         <div className="permit-field">
@@ -2257,6 +2260,7 @@ export default function App() {
                         CANCEL
                       </button>
                     </div>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -2356,10 +2360,10 @@ export default function App() {
                           <div key={permit.id} className="permit-item">
                             <div className="permit-header">
                               <span className="permit-type">
-                                {permit.type === 'overweight' && '⚖️ OVERWEIGHT PERMIT'}
-                                {permit.type === 'diplomatic' && '🏛️ DIPLOMATIC PERMIT'}
-                                {permit.type === 'special' && '🚨 SPECIAL OPERATIONS PERMIT'}
-                                {permit.type === 'weightBalance' && '📊 WEIGHT & BALANCE MANIFEST'}
+                                {permit.type === 'overweight' && 'OVERWEIGHT PERMIT'}
+                                {permit.type === 'diplomatic' && 'DIPLOMATIC PERMIT'}
+                                {permit.type === 'special' && 'SPECIAL OPERATIONS PERMIT'}
+                                {permit.type === 'weightBalance' && 'WEIGHT & BALANCE MANIFEST'}
                               </span>
                               <span className={`permit-status ${permit.status.toLowerCase()}`}>
                                 {permit.status}
@@ -3095,6 +3099,33 @@ export default function App() {
 
       return (
         <div className="groundcrew-main">
+          <div className="ground-operations-instructions">
+            <div className="instructions-banner">
+              <div className="instructions-icon">📋</div>
+              <div className="instructions-content">
+                <h3>GROUND OPERATIONS INSTRUCTIONS</h3>
+                <div className="instructions-list">
+                  <div className="instruction-item">
+                    <span className="instruction-icon">🚨</span>
+                    <span>Handle URGENT requests immediately (De-icing, Maintenance, Security, Pushback)</span>
+                  </div>
+                  <div className="instruction-item">
+                    <span className="instruction-icon">⚡</span>
+                    <span>Process HIGH priority requests next (Ground Power, Fuel, Documentation)</span>
+                  </div>
+                  <div className="instruction-item">
+                    <span className="instruction-icon">📋</span>
+                    <span>Complete STANDARD requests in order (Catering, Baggage, Stairs, Cargo)</span>
+                  </div>
+                  <div className="instruction-item">
+                    <span className="instruction-icon">🔄</span>
+                    <span>Click "ACCEPT & ASSIGN" to take responsibility, then "MARK COMPLETE" when finished</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="ground-operations-header">
             <div className="header-content">
               <div className="header-left">
