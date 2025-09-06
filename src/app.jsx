@@ -201,7 +201,7 @@ export default function App() {
           `PAX          ${passengerManifest.length}/180`,
           "",
           "V1           147KT",
-          "VR           152KT", 
+          "VR           152KT",
           "V2           159KT",
           "",
           "TRANS ALT    18000FT",
@@ -424,7 +424,7 @@ export default function App() {
   ];
 
   const aircraftTypes = [
-    "A-10 Warthog", "A6M Zero", "Airbus A220", "Airbus A320", "Airbus A330", "Airbus A340", 
+    "A-10 Warthog", "A6M Zero", "Airbus A220", "Airbus A320", "Airbus A330", "Airbus A340",
     "Airbus A350", "Airbus A380", "Airbus Beluga", "Airbus H135", "Antonov An-22", "Antonov AN-225",
     "ATR-72", "Avro Vulcan", "B-1 Lancer", "B-2 Spirit", "B29", "Beechcraft King Air 260",
     "Bell 412", "Blimp", "Boeing 707", "Boeing 727", "Boeing 737", "Boeing 747", "Boeing 757",
@@ -1438,8 +1438,8 @@ export default function App() {
 
     // Simulate permit processing
     setTimeout(() => {
-      setPermits(prev => prev.map(permit => 
-        permit.id === permitId 
+      setPermits(prev => prev.map(permit =>
+        permit.id === permitId
           ? { ...permit, status: "APPROVED", approvedAt: new Date().toLocaleTimeString() }
           : permit
       ));
@@ -1468,8 +1468,8 @@ export default function App() {
     if (!aircraftData || passengerManifest.length === 0) return null;
 
     // Use cached data if available and aircraft/passenger count hasn't changed
-    if (weightBalanceData && 
-        weightBalanceData.aircraftType === aircraft && 
+    if (weightBalanceData &&
+        weightBalanceData.aircraftType === aircraft &&
         weightBalanceData.passengerCount === passengerManifest.length) {
       return weightBalanceData.data;
     }
@@ -1482,8 +1482,7 @@ export default function App() {
     const operatingEmptyWeight = aircraftData.operatingEmptyWeight || Math.round(maxTakeoffWeight * 0.55);
 
     // Calculate remaining weight capacity
-    const payloadWeight = passengerWeight + baggageWeight;
-    const remainingCapacity = maxTakeoffWeight - operatingEmptyWeight - payloadWeight;
+    const remainingCapacity = maxTakeoffWeight - operatingEmptyWeight - passengerWeight;
 
     // Use a fixed percentage based on aircraft type for consistency
     const fuelPercentage = aircraft.includes('A380') ? 0.75 : aircraft.includes('747') ? 0.72 : aircraft.includes('777') ? 0.78 : aircraft.includes('A350') ? 0.78 : 0.78; // Use a more consistent fuel percentage
@@ -1498,7 +1497,7 @@ export default function App() {
     const cargoArm = aircraftData.length * 0.3; // Cargo compartment CG
     const fuelArm = aircraftData.length * 0.4; // Fuel tank CG
 
-    const totalMoment = 
+    const totalMoment =
       (operatingEmptyWeight * emptyWeightArm) +
       ((passengerWeight + baggageWeight) * passengerArm) +
       (cargoWeight * cargoArm) +
@@ -1631,17 +1630,17 @@ export default function App() {
 
   const removeServiceRequest = (standId, service) => {
     // Find and remove the specific service request
-    const requestIndex = requests.findIndex(r => 
-      r.stand === standId && 
-      r.service === service && 
+    const requestIndex = requests.findIndex(r =>
+      r.stand === standId &&
+      r.service === service &&
       r.status === "REQUESTED"
     );
 
     if (requestIndex !== -1) {
-      socket.emit("serviceAction", { 
-        requestId: requestIndex, 
-        action: "CANCELLED", 
-        crewMember: user?.username 
+      socket.emit("serviceAction", {
+        requestId: requestIndex,
+        action: "CANCELLED",
+        crewMember: user?.username
       });
     }
   };
@@ -2018,9 +2017,9 @@ export default function App() {
                       <div className="permit-fields">
                         <div className="permit-field">
                           <label>Aircraft Registration:</label>
-                          <input 
-                            type="text" 
-                            className="permit-input" 
+                          <input
+                            type="text"
+                            className="permit-input"
                             placeholder="N123AB"
                             value={permitFormData.registration || ''}
                             onChange={(e) => updatePermitFormData('registration', e.target.value)}
@@ -2028,9 +2027,9 @@ export default function App() {
                         </div>
                         <div className="permit-field">
                           <label>Total Weight (kg):</label>
-                          <input 
-                            type="number" 
-                            className="permit-input" 
+                          <input
+                            type="number"
+                            className="permit-input"
                             placeholder="75000"
                             value={permitFormData.totalWeight || ''}
                             onChange={(e) => updatePermitFormData('totalWeight', e.target.value)}
@@ -2038,9 +2037,9 @@ export default function App() {
                         </div>
                         <div className="permit-field">
                           <label>Standard MTOW (kg):</label>
-                          <input 
-                            type="number" 
-                            className="permit-input" 
+                          <input
+                            type="number"
+                            className="permit-input"
                             placeholder="70000"
                             value={permitFormData.standardMTOW || ''}
                             onChange={(e) => updatePermitFormData('standardMTOW', e.target.value)}
@@ -2048,9 +2047,9 @@ export default function App() {
                         </div>
                         <div className="permit-field">
                           <label>Reason for Overweight:</label>
-                          <input 
-                            type="text" 
-                            className="permit-input" 
+                          <input
+                            type="text"
+                            className="permit-input"
                             placeholder="Additional fuel for weather diversion"
                             value={permitFormData.reason || ''}
                             onChange={(e) => updatePermitFormData('reason', e.target.value)}
@@ -2063,9 +2062,9 @@ export default function App() {
                       <div className="permit-fields">
                         <div className="permit-field">
                           <label>Diplomatic Mission:</label>
-                          <input 
-                            type="text" 
-                            className="permit-input" 
+                          <input
+                            type="text"
+                            className="permit-input"
                             placeholder="Embassy of..."
                             value={permitFormData.mission || ''}
                             onChange={(e) => updatePermitFormData('mission', e.target.value)}
@@ -2073,9 +2072,9 @@ export default function App() {
                         </div>
                         <div className="permit-field">
                           <label>Official Purpose:</label>
-                          <input 
-                            type="text" 
-                            className="permit-input" 
+                          <input
+                            type="text"
+                            className="permit-input"
                             placeholder="State visit"
                             value={permitFormData.purpose || ''}
                             onChange={(e) => updatePermitFormData('purpose', e.target.value)}
@@ -2083,7 +2082,7 @@ export default function App() {
                         </div>
                         <div className="permit-field">
                           <label>VIP Level:</label>
-                          <select 
+                          <select
                             className="permit-input"
                             value={permitFormData.vipLevel || ''}
                             onChange={(e) => updatePermitFormData('vipLevel', e.target.value)}
@@ -2102,7 +2101,7 @@ export default function App() {
                       <div className="permit-fields">
                         <div className="permit-field">
                           <label>Special Request Type:</label>
-                          <select 
+                          <select
                             className="permit-input"
                             value={permitFormData.requestType || ''}
                             onChange={(e) => updatePermitFormData('requestType', e.target.value)}
@@ -2117,9 +2116,9 @@ export default function App() {
                         </div>
                         <div className="permit-field">
                           <label>Details:</label>
-                          <input 
-                            type="text" 
-                            className="permit-input" 
+                          <input
+                            type="text"
+                            className="permit-input"
                             placeholder="Describe special requirements"
                             value={permitFormData.details || ''}
                             onChange={(e) => updatePermitFormData('details', e.target.value)}
@@ -2127,9 +2126,9 @@ export default function App() {
                         </div>
                         <div className="permit-field">
                           <label>Authority Contact:</label>
-                          <input 
-                            type="text" 
-                            className="permit-input" 
+                          <input
+                            type="text"
+                            className="permit-input"
                             placeholder="Contact person/department"
                             value={permitFormData.authorityContact || ''}
                             onChange={(e) => updatePermitFormData('authorityContact', e.target.value)}
@@ -2243,14 +2242,14 @@ export default function App() {
                     )}
 
                     <div className="permit-actions">
-                      <button 
+                      <button
                         className="submit-permit"
                         onClick={() => submitPermit(activePermitForm, permitFormData)}
                         disabled={!permitFormData || Object.keys(permitFormData).length === 0}
                       >
                         SUBMIT PERMIT
                       </button>
-                      <button 
+                      <button
                         className="cancel-permit"
                         onClick={() => {
                           setActivePermitForm(null);
@@ -2292,7 +2291,7 @@ export default function App() {
                           <div className="doc-title">Flight Plan</div>
                           <div className="doc-status">{flightDocuments.flightPlan.filed ? 'FILED' : 'PENDING'}</div>
                         </div>
-                        <button 
+                        <button
                           className="doc-action"
                           onClick={() => updateFlightDocument('flightPlan', { filed: !flightDocuments.flightPlan.filed })}
                         >
@@ -2306,7 +2305,7 @@ export default function App() {
                           <div className="doc-title">Weight & Balance</div>
                           <div className="doc-status">{flightDocuments.weightBalance.completed ? 'COMPLETED' : 'PENDING'}</div>
                         </div>
-                        <button 
+                        <button
                           className="doc-action"
                           onClick={() => setActivePermitForm('weightBalance')}
                         >
@@ -2320,7 +2319,7 @@ export default function App() {
                           <div className="doc-title">Weather Brief</div>
                           <div className="doc-status">{flightDocuments.weatherBrief.obtained ? 'OBTAINED' : 'PENDING'}</div>
                         </div>
-                        <button 
+                        <button
                           className="doc-action"
                           onClick={() => updateFlightDocument('weatherBrief', { obtained: !flightDocuments.weatherBrief.obtained })}
                         >
@@ -2334,7 +2333,7 @@ export default function App() {
                           <div className="doc-title">NOTAMs</div>
                           <div className="doc-status">{flightDocuments.notams.reviewed ? 'REVIEWED' : 'PENDING'}</div>
                         </div>
-                        <button 
+                        <button
                           className="doc-action"
                           onClick={() => updateFlightDocument('notams', { reviewed: !flightDocuments.notams.reviewed })}
                         >
@@ -2414,7 +2413,7 @@ export default function App() {
         case "manifest":
           const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
           const currentAircraftData = aircraftData ? aircraftDatabase[aircraft] : null;
-          const isCargoStand = currentStandData?.type === "cargo" || 
+          const isCargoStand = currentStandData?.type === "cargo" ||
                               (currentAircraftData && (currentAircraftData.category === "cargo" || currentAircraftData.category === "military-cargo"));
 
           return (
@@ -2855,7 +2854,7 @@ export default function App() {
               <div className="management-controls">
                 <div className="control-group">
                   <label className="control-label">MANAGEMENT MODE:</label>
-                  <button 
+                  <button
                     className={`management-toggle ${standManagementMode ? 'active' : 'inactive'}`}
                     onClick={() => setStandManagementMode(!standManagementMode)}
                   >
@@ -2889,8 +2888,8 @@ export default function App() {
                   const completedServices = requests.filter(r => r.stand === stand.id && r.status === "COMPLETED").length;
 
                   return (
-                    <div 
-                      key={stand.id} 
+                    <div
+                      key={stand.id}
                       className={`stand-card-professional ${occupiedBy ? 'occupied' : 'available'} ${standManagementMode ? 'management-enabled' : ''}`}
                     >
                       <div className="stand-header-professional">
@@ -2933,7 +2932,7 @@ export default function App() {
                                     <span className="service-name">{req.service}</span>
                                     <span className="service-time">{req.timestamp}</span>
                                     {standManagementMode && (
-                                      <button 
+                                      <button
                                         className="remove-service-btn"
                                         onClick={() => removeServiceRequest(stand.id, req.service)}
                                         title="Cancel Service"
@@ -2950,7 +2949,7 @@ export default function App() {
                               <div className="service-quick-actions">
                                 <div className="quick-actions-header">QUICK SERVICES:</div>
                                 <div className="service-action-buttons">
-                                  <button 
+                                  <button
                                     className="service-action-btn fuel"
                                     onClick={() => addServiceRequest(stand.id, "Fuel Service")}
                                     title="Request Fuel Service"
@@ -2958,7 +2957,7 @@ export default function App() {
                                     <span className="service-icon">⛽</span>
                                     <span className="service-label">FUEL</span>
                                   </button>
-                                  <button 
+                                  <button
                                     className="service-action-btn catering"
                                     onClick={() => addServiceRequest(stand.id, "Catering")}
                                     title="Request Catering"
@@ -2966,7 +2965,7 @@ export default function App() {
                                     <span className="service-icon">🍽️</span>
                                     <span className="service-label">CATERING</span>
                                   </button>
-                                  <button 
+                                  <button
                                     className="service-action-btn pushback"
                                     onClick={() => addServiceRequest(stand.id, "Pushback")}
                                     title="Request Pushback"
@@ -2974,7 +2973,7 @@ export default function App() {
                                     <span className="service-icon">🚛</span>
                                     <span className="service-label">PUSHBACK</span>
                                   </button>
-                                  <button 
+                                  <button
                                     className="service-action-btn power"
                                     onClick={() => addServiceRequest(stand.id, "Ground Power")}
                                     title="Request Ground Power"
@@ -2982,7 +2981,7 @@ export default function App() {
                                     <span className="service-icon">🔌</span>
                                     <span className="service-label">POWER</span>
                                   </button>
-                                  <button 
+                                  <button
                                     className="service-action-btn cleaning"
                                     onClick={() => addServiceRequest(stand.id, "Cleaning")}
                                     title="Request Cleaning"
@@ -2990,7 +2989,7 @@ export default function App() {
                                     <span className="service-icon">🧹</span>
                                     <span className="service-label">CLEAN</span>
                                   </button>
-                                  <button 
+                                  <button
                                     className="service-action-btn baggage"
                                     onClick={() => addServiceRequest(stand.id, "Baggage")}
                                     title="Request Baggage Service"
@@ -3194,8 +3193,8 @@ export default function App() {
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <button 
-                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} 
+                    <button
+                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
                       className="action-btn urgent"
                     >
                       IMMEDIATE RESPONSE
@@ -3231,8 +3230,8 @@ export default function App() {
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <button 
-                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} 
+                    <button
+                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
                       className="action-btn high"
                     >
                       ACCEPT & ASSIGN
@@ -3268,8 +3267,8 @@ export default function App() {
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <button 
-                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")} 
+                    <button
+                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
                       className="action-btn standard"
                     >
                       ASSIGN CREW
@@ -3305,8 +3304,8 @@ export default function App() {
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <button 
-                      onClick={() => handleServiceAction(requests.indexOf(request), "COMPLETED")} 
+                    <button
+                      onClick={() => handleServiceAction(requests.indexOf(request), "COMPLETED")}
                       className="action-btn complete"
                     >
                       MARK COMPLETE
@@ -3360,7 +3359,7 @@ export default function App() {
               <h3>GROUND COMMUNICATIONS</h3>
               <div className="comm-status">ONLINE</div>
             </div>
-            <div 
+            <div
               className="comm-minimized-indicator"
               onClick={() => setCommMinimized(false)}
             >
@@ -3371,12 +3370,22 @@ export default function App() {
               <span>M</span>
               <span>S</span>
             </div>
-            <button 
-              className="comm-minimize-btn"
+            <button
               onClick={() => setCommMinimized(!commMinimized)}
+              className="comm-minimize-btn"
               title={commMinimized ? "Expand Communications" : "Minimize Communications"}
             >
-              {commMinimized ? '▶' : '◀'}
+              {commMinimized ? (
+                <>
+                  <span>📱</span>
+                  <span>EXPAND</span>
+                </>
+              ) : (
+                <>
+                  <span>📩</span>
+                  <span>MINIMIZE</span>
+                </>
+              )}
             </button>
           </div>
 
