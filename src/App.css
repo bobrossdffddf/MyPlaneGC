@@ -5098,6 +5098,41 @@ body {
 
 
 /* Modern Airport Selection */
+.airport-search-section {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.airport-search-bar {
+  width: 100%;
+  max-width: 500px;
+}
+
+.airport-search-input {
+  width: 100%;
+  background: rgba(45, 55, 72, 0.9);
+  border: 2px solid rgba(255, 149, 0, 0.3);
+  border-radius: 15px;
+  padding: 15px 20px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.airport-search-input:focus {
+  outline: none;
+  border-color: rgba(255, 149, 0, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.airport-search-input::placeholder {
+  color: #6b7280;
+}
+
 .airport-grid-modern {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

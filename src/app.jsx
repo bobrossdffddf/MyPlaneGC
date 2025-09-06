@@ -326,36 +326,29 @@ export default function App() {
   });
   const [checklists, setChecklists] = useState({
     preflight: [
-      { item: "Aircraft Documents Review - Check airworthiness certificate, registration, weight & balance", checked: false, category: "Documentation" },
-      { item: "Weather & NOTAM Brief - Review current and forecast weather, NOTAMs for departure and destination", checked: false, category: "Documentation" },
-      { item: "Flight Plan Filed - Ensure flight plan is filed with ATC and route is loaded in FMS", checked: false, category: "Documentation" },
-      { item: "Weight & Balance Calculated - Verify passenger/cargo loading within limits", checked: false, category: "Documentation" },
-      { item: "External Visual Inspection - Walk around aircraft checking for damage, leaks, obstructions", checked: false, category: "External" },
-      { item: "Fuel Quantity & Quality Check - Verify fuel quantity matches flight plan, check for contamination", checked: false, category: "External" },
-      { item: "Control Surface Movement - Check ailerons, elevators, rudder move freely and correctly", checked: false, category: "External" },
-      { item: "Tire & Landing Gear Inspection - Check tire condition, strut extension, gear pins removed", checked: false, category: "External" },
-      { item: "Engine Intake Inspection - Check for foreign objects, cover removal, fan blade condition", checked: false, category: "External" },
-      { item: "Static Port & Pitot Tube Check - Ensure covers removed and ports clear", checked: false, category: "External" },
-      { item: "Navigation Light Test - Verify all exterior lights operational", checked: false, category: "External" },
-      { item: "Cockpit Preparation - Seat adjustment, harness check, oxygen mask test", checked: false, category: "Cockpit" },
-      { item: "Navigation Systems Test - Test GPS, VOR, ILS, autopilot systems", checked: false, category: "Cockpit" },
-      { item: "Communication Radio Check - Test VHF, ATC, company frequency radios", checked: false, category: "Cockpit" },
-      { item: "Instrument Panel Check - Verify all instruments operational and within limits", checked: false, category: "Cockpit" },
-      { item: "Emergency Equipment Check - Locate and test emergency exits, life vests, oxygen", checked: false, category: "Cockpit" },
-      { item: "Transponder & TCAS Check - Set squawk code and verify TCAS operational", checked: false, category: "Avionics" },
-      { item: "Ground Proximity Warning Test - Test GPWS and terrain awareness systems", checked: false, category: "Avionics" }
+      { item: "Flight Documents - Review flight plan, weather, NOTAMs, MEL", checked: false, category: "Documentation" },
+      { item: "Weight & Balance - Verify loadsheet and CG within limits", checked: false, category: "Documentation" },
+      { item: "Performance Data - Calculate V-speeds, runway analysis complete", checked: false, category: "Documentation" },
+      { item: "External Inspection - Complete walk-around inspection", checked: false, category: "External" },
+      { item: "Fuel Quantity - Verify fuel quantity and quality", checked: false, category: "External" },
+      { item: "Oxygen - Check quantity and pressure", checked: false, category: "Cockpit" },
+      { item: "Circuit Breakers - All in and no flags", checked: false, category: "Cockpit" },
+      { item: "Emergency Equipment - Check location and serviceability", checked: false, category: "Cockpit" },
+      { item: "Flight Controls - Check freedom and correct movement", checked: false, category: "Systems" },
+      { item: "Navigation Equipment - IRS align, GPS, radios set", checked: false, category: "Systems" },
+      { item: "Transponder - Set to STBY, code entered", checked: false, category: "Systems" },
+      { item: "Weather Radar - Test and set to appropriate range", checked: false, category: "Systems" }
     ],
     beforestart: [
-      { item: "Seat Belts & Harnesses", checked: false, category: "Safety" },
-      { item: "Circuit Breakers Check", checked: false, category: "Electrical" },
-      { item: "Fuel Pumps ON", checked: false, category: "Fuel" },
-      { item: "Mixture Rich", checked: false, category: "Engine" },
-      { item: "Propeller High RPM", checked: false, category: "Engine" },
-      { item: "Landing Light ON", checked: false, category: "Lights" },
-      { item: "Beacon Light ON", checked: false, category: "Lights" },
-      { item: "Transponder STBY", checked: false, category: "Avionics" },
-      { item: "Flaps Set for Takeoff", checked: false, category: "Controls" },
-      { item: "Controls Free & Correct", checked: false, category: "Controls" }
+      { item: "Parking Brake - SET", checked: false, category: "Safety" },
+      { item: "Seat Belts - FASTENED", checked: false, category: "Safety" },
+      { item: "Fuel Pumps - ON", checked: false, category: "Systems" },
+      { item: "Beacon - ON", checked: false, category: "Lights" },
+      { item: "APU - START (if required)", checked: false, category: "Power" },
+      { item: "Engine Start Switches - OFF", checked: false, category: "Engine" },
+      { item: "Thrust Levers - IDLE", checked: false, category: "Engine" },
+      { item: "Speed Brake - DOWN", checked: false, category: "Controls" },
+      { item: "Parking Brake - RELEASE", checked: false, category: "Controls" }
     ],
     beforetakeoff: [
       { item: "Engine Parameters Check", checked: false, category: "Engine" },
@@ -418,10 +411,12 @@ export default function App() {
   });
 
   const ptfsAirports = [
-    "IRFD", "IORE", "IZOL", "ICYP", "IPPH", "IGRV", "ISAU", "IBTH", "ISKP",
-    "IGAR", "IBLT", "IMLR", "ITRC", "IDCS", "ITKO", "IJAF", "ISCM", "IBAR",
-    "IHEN", "ILAR", "IIAB", "IPAP", "ILKL", "IUFO"
+    "IRFD", "IZOL", "IPPH", "IGRV", "ISAU", "IBTH", "ISKP",
+    "IGAR", "IBLT", "IMLR", "ITRC", "IDCS", "ITKO", "IJAF", "ISCM",
+    "IHEN", "ILAR", "IIAB", "IPAP"
   ];
+
+  const [airportSearchTerm, setAirportSearchTerm] = useState("");
 
   const aircraftTypes = [
     "A-10 Warthog", "A6M Zero", "Airbus A220", "Airbus A320", "Airbus A330", "Airbus A340",
@@ -1295,15 +1290,26 @@ export default function App() {
     socket.emit("userMode", { mode, airport, userId: user?.id });
   };
 
+  const validateFlightNumber = (flightNum) => {
+    // ICAO format: 3-letter airline code + flight number (e.g., AAL123, UAL456)
+    const icaoRegex = /^[A-Z]{3}[0-9]{1,4}[A-Z]?$/;
+    return icaoRegex.test(flightNum.toUpperCase());
+  };
+
   const claimStand = () => {
     if (selectedStand && flightNumber && aircraft && selectedAirport) {
+      if (!validateFlightNumber(flightNumber)) {
+        alert("Please enter a valid ICAO flight number (e.g., AAL123, UAL456, BAW100)");
+        return;
+      }
+      
       // Use flight number as callsign for pilots
-      const callsign = flightNumber;
+      const callsign = flightNumber.toUpperCase();
       setAssignedCallsign(callsign);
 
       socket.emit("claimStand", {
         stand: selectedStand,
-        flightNumber,
+        flightNumber: callsign,
         aircraft,
         pilot: user?.username,
         userId: user?.id,
@@ -1312,6 +1318,11 @@ export default function App() {
         callsign: callsign
       });
     }
+  };
+
+  const getZuluTime = () => {
+    const now = new Date();
+    return now.toISOString().substring(11, 19) + "Z";
   };
 
   const sendMessage = () => {
@@ -1326,7 +1337,7 @@ export default function App() {
 
     if (userMode === "pilot") {
       if (!assignedCallsign && flightNumber) {
-        callsign = flightNumber;
+        callsign = flightNumber.toUpperCase();
         setAssignedCallsign(callsign);
       }
       senderName = `${callsign || user?.username} (${user?.username})`;
@@ -1342,7 +1353,7 @@ export default function App() {
       sender: senderName,
       stand: userMode === "pilot" ? selectedStand : "GROUND",
       airport: selectedAirport,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: getZuluTime(),
       mode: userMode,
       userId: user?.id,
       callsign: callsign
@@ -1393,22 +1404,28 @@ export default function App() {
     socket.emit("serviceAction", { requestId, action, crewMember: user?.username });
   };
 
+  const generatePermitId = (permitType) => {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    return `${permitType.substring(0, 3).toUpperCase()}${timestamp.toString().slice(-6)}${random}`;
+  };
+
   const submitPermit = (permitType, formData) => {
     if (!flightNumber || !selectedStand) {
       alert("Please ensure flight number and stand are selected before submitting permits");
       return;
     }
 
-    const currentCallsign = assignedCallsign || flightNumber;
-    const permitId = `${permitType}_${Date.now()}`;
+    const currentCallsign = assignedCallsign || flightNumber.toUpperCase();
+    const permitId = generatePermitId(permitType);
 
     const newPermit = {
       id: permitId,
       type: permitType,
       data: { ...formData },
       status: "SUBMITTED",
-      submittedAt: new Date().toLocaleTimeString(),
-      submittedDate: new Date().toLocaleDateString(),
+      submittedAt: getZuluTime(),
+      submittedDate: new Date().toISOString().substring(0, 10),
       callsign: currentCallsign,
       submittedBy: user?.username,
       airport: selectedAirport,
@@ -1826,7 +1843,7 @@ export default function App() {
       <div className="tablet-login">
         <div className="login-content">
           <div className="brand-header">
-            <div className="brand-icon">✈️</div>
+            <div className="brand-icon">🛩️</div>
             <h1>MyPlane</h1>
             <div className="brand-subtitle">Professional Aviation Ground Operations</div>
             <div className="system-version">Version 3.1.0 | Build 2024</div>
@@ -1865,8 +1882,24 @@ export default function App() {
               <div className="network-status">24 AIRPORTS ONLINE</div>
             </div>
 
+            <div className="airport-search-section">
+              <div className="airport-search-bar">
+                <input
+                  type="text"
+                  className="airport-search-input"
+                  placeholder="Search airports... (e.g., IRFD, IZOL)"
+                  value={airportSearchTerm}
+                  onChange={(e) => setAirportSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+
             <div className="airport-grid-modern">
-              {ptfsAirports.map((airport) => (
+              {ptfsAirports
+                .filter(airport => 
+                  airport.toLowerCase().includes(airportSearchTerm.toLowerCase())
+                )
+                .map((airport) => (
                 <button
                   key={airport}
                   className="airport-card"
@@ -2584,9 +2617,10 @@ export default function App() {
                     <input
                       type="text"
                       value={flightNumber}
-                      onChange={(e) => setFlightNumber(e.target.value)}
-                      placeholder="AA1234"
+                      onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
+                      placeholder="AAL123"
                       className="modern-input"
+                      maxLength="7"
                     />
                   </div>
                   <div className="input-field">
