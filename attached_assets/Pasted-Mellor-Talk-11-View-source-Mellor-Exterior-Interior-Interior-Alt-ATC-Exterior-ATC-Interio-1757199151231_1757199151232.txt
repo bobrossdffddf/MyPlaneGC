@@ -1,0 +1,92 @@
+Mellor
+Talk
+11
+View source
+
+Mellor
+Exterior
+Interior
+Interior Alt
+ATC Exterior
+ATC Interior
+Exterior
+Type
+Minor International
+Island
+Greater Rockford
+Airport Code
+IMLR
+Planes Available
+All except Airbus A380, Boeing 747 and Concorde
+Specifications
+Spawner Count
+5
+Runway Count
+1
+Fuel Station Count
+1
+Gate Count
+4
+Ground Vehicle Spawner
+Yes
+ATC
+Yes
+Mellor International or simply Mellor (ICAO: IMLR) is a medium sized airport located on the North West Island of Greater Rockford. It features a single runway (7-25), a thin passenger terminal with 4 gates, a singular helipad and hangar. The airport and terminal are based on the Bristol Airport an airport located 11 kilometers from Bristol, United Kingdom.
+Prior to the May 18th, 2024 update, Mellor was fairly inactive due to its close proximity to the Old Greater Rockford Airport. The May 18th update increased the distance between the two airports with Mellor being located in the North West region whilst Greater Rockford Airport is located on the Eastern region.
+
+
+Contents
+1	Missions Available
+2	Aircraft Spawn List
+3	Airport Chart
+4	Trivia
+Missions Available
+Mission Name	Check Points	Time Limit	Aircraft Required
+Flight To Perth	3	No Limit	Any Aircraft
+Race Pylons	10	2:10	Extra 300s
+Flight To Izolirani	3	No Limit	Any Aircraft
+Flight To Paphos	3	No Limit	Any Aircraft
+Flight To Sauthemptona	3	No Limit	Any Aircraft
+Return Flight To Grindavik	5	No Limit	Any Aircraft
+Aircraft Spawn List
+List of aircraft that can be spawned at Mellor Airport
+
+Aircraft Category	Aircraft
+Airliners	ATR-72
+Airbus A220
+Airbus A320
+Airbus A330
+Boeing 727
+Boeing 737
+Boeing 757
+Boeing 767
+Boeing 777
+Boeing 787
+Bombardier CRJ700
+Bombardier Q400
+McDonnell Douglas MD-11
+McDonnell Douglas MD-90
+Amphibious
+All Amphibious
+Cargo
+ATR 72F
+Airbus Beluga
+Antonov An-22
+Boeing 727
+Boeing 737-BCF
+Boeing 757
+Boeing 767
+Boeing 777
+McDonnell Douglas MD-11
+Helicopters
+All Helicopters
+Light Aircraft
+All Light Aircraft
+Modern Military
+All Modern Military
+Old Military
+All Old Military
+Miscellaneous
+All Miscellaneous
+Tankers
+All Tankers
