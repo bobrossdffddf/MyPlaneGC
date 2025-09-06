@@ -4491,19 +4491,19 @@ body {
   background: linear-gradient(135deg, rgba(255, 149, 0, 0.3), rgba(255, 149, 0, 0.2));
   border: 2px solid rgba(255, 149, 0, 0.4);
   border-radius: 12px;
-  padding: 12px 18px;
+  padding: 8px 12px;
   color: #ff9500;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  min-width: 50px;
+  min-width: 40px;
   text-align: center;
   box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  height: 40px;
 }
 
 .comm-minimize-btn:hover {
@@ -4514,14 +4514,15 @@ body {
 }
 
 .comm-panel.minimized .comm-minimize-btn {
-  writing-mode: vertical-rl;
+  writing-mode: horizontal-tb;
   text-orientation: mixed;
   transform: none;
   min-width: 40px;
-  padding: 20px 8px;
+  padding: 12px 8px;
   margin: auto 0;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
+  height: 40px;
 }
 
 .comm-panel.minimized .comm-minimize-btn:hover {
@@ -4589,7 +4590,8 @@ body {
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .message:hover {
@@ -4646,12 +4648,13 @@ body {
   font-size: 0.9rem;
   line-height: 1.4;
   word-wrap: break-word;
-  word-break: break-word;
+  word-break: break-all;
   overflow-wrap: break-word;
   max-width: 100%;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   hyphens: auto;
+  width: 100%;
 }
 
 .input-area {

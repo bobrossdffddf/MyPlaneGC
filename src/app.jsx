@@ -3375,17 +3375,7 @@ export default function App() {
               className="comm-minimize-btn"
               title={commMinimized ? "Expand Communications" : "Minimize Communications"}
             >
-              {commMinimized ? (
-                <>
-                  <span>📱</span>
-                  <span>EXPAND</span>
-                </>
-              ) : (
-                <>
-                  <span>📩</span>
-                  <span>MINIMIZE</span>
-                </>
-              )}
+              {commMinimized ? "◀" : "▶"}
             </button>
           </div>
 
