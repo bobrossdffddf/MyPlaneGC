@@ -3007,13 +3007,6 @@ body {
   gap: 8px;
 }
 
-.status-light {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-
 .status-light.occupied {
   background: #22c55e;
   box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
@@ -3512,7 +3505,7 @@ body {
 .metric-label {
   font-size: 0.8rem;
   color: #a0a8b0;
-  font-weight: 500;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -4393,19 +4386,73 @@ body {
   justify-content: center;
 }
 
+.sound-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .sound-toggle.enabled {
   border-color: rgba(34, 197, 94, 0.5);
   background: rgba(34, 197, 94, 0.1);
 }
 
 .sound-toggle.disabled {
-  border-color: rgba(239, 68, 68, 0.5);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(45, 55, 72, 0.5);
+  color: #6b7280;
 }
 
-.sound-toggle:hover {
+.filter-toggle {
+  background: rgba(45, 55, 72, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #ffffff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-toggle:hover {
+  border-color: rgba(255, 149, 0, 0.6);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.filter-toggle.enabled {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #22c55e;
+}
+
+.filter-toggle.disabled {
+  background: rgba(45, 55, 72, 0.5);
+  color: #6b7280;
+}
+
+.wb-certification {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 149, 0, 0.1);
+  border: 1px solid rgba(255, 149, 0, 0.3);
+  border-radius: 8px;
+}
+
+.certification-text {
+  font-size: 0.85rem;
+  color: #e5e7eb;
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.certification-date {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-weight: 600;
+  text-align: right;
 }
 
 .comm-panel {
@@ -5730,6 +5777,10 @@ body {
   padding-bottom: 20px;
   margin-bottom: 30px;
   position: relative;
+  background: transparent;
+  padding: 30px;
+  margin: -30px -30px 50px -30px;
+  border-top: 3px solid #000000;
 }
 
 .permit-header h2 {
@@ -5801,7 +5852,7 @@ body {
   border-top: 1px solid #ccc;
 }
 
-.submit-permit, .cancel-permit {
+..submit-permit, .cancel-permit {
   padding: 12px 30px;
   border: 2px solid #000;
   background: #fff;
@@ -7002,7 +7053,7 @@ body {
 
   .comm-panel {
     width: 100%;
-    height: 380px;
+    height: 300px;
     min-width: unset;
     max-width: unset;
     border-left: none;

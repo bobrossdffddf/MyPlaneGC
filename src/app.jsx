@@ -61,6 +61,31 @@ export default function App() {
   const [mouseTimer, setMouseTimer] = useState(null);
   const [chatFilter, setChatFilter] = useState("all");
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [badWordsFilter, setBadWordsFilter] = useState(true);
+  
+  // Static permit document ID to prevent it from changing
+  const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
+  
+  // Bad words list for filtering
+  const badWords = [
+    'fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap', 'piss', 'cock', 'dick', 'pussy', 'tits', 'boobs', 'sex', 'porn', 'nude', 'naked', 'kill', 'die', 'murder', 'suicide', 'rape', 'nazi', 'hitler', 'terrorist', 'bomb', 'gun', 'weapon', 'drug', 'cocaine', 'weed', 'marijuana', 'alcohol', 'beer', 'wine', 'drunk', 'stupid', 'idiot', 'moron', 'retard', 'gay', 'lesbian', 'homo', 'faggot', 'nigger', 'nigga', 'spic', 'chink', 'kike', 'wetback', 'towelhead', 'sand nigger', 'cracker', 'honkey', 'whitey', 'blackie'
+  ];
+  
+  const containsBadWords = (text) => {
+    if (!badWordsFilter) return false;
+    const lowerText = text.toLowerCase();
+    return badWords.some(word => lowerText.includes(word.toLowerCase()));
+  };
+  
+  const filterBadWords = (text) => {
+    if (!badWordsFilter) return text;
+    let filteredText = text;
+    badWords.forEach(word => {
+      const regex = new RegExp(word, 'gi');
+      filteredText = filteredText.replace(regex, '*'.repeat(word.length));
+    });
+    return filteredText;
+  };
 
   const handleMcduKey = (key) => {
     setMcduDisplay(prev => {
@@ -1250,10 +1275,19 @@ export default function App() {
 
     socket.on("chatUpdate", (msg) => {
       if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
-        setMessages((prev) => [...prev, msg]);
+        // Filter bad words in incoming messages
+        const filteredMsg = {
+          ...msg,
+          text: filterBadWords(msg.text)
+        };
+        setMessages((prev) => [...prev, filteredMsg]);
         if (soundEnabled && msg.sender !== user?.username && msg.mode !== 'system' && msg.mode !== 'checklist') {
-          const audio = new Audio('/alert.mp3'); // Make sure to have an alert.mp3 file
-          audio.play();
+          try {
+            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmE');
+            audio.play().catch(e => console.log('Audio play failed:', e));
+          } catch (e) {
+            console.log('Audio creation failed:', e);
+          }
         }
       }
     });
@@ -1335,6 +1369,12 @@ export default function App() {
     if (input.trim() === "") return;
     if (userMode === "pilot" && !selectedStand) {
       alert("Please select a stand first to send messages");
+      return;
+    }
+    
+    // Check for bad words
+    if (containsBadWords(input)) {
+      alert("Message contains inappropriate language and cannot be sent.");
       return;
     }
 
@@ -2047,7 +2087,7 @@ export default function App() {
                     <div className="permit-header">
                       <h2>{activePermitForm.toUpperCase()} PERMIT APPLICATION</h2>
                       <div className="permit-subtitle">Official Aviation Document</div>
-                      <div className="permit-number">Doc #{Date.now().toString().slice(-6)}</div>
+                      <div className="permit-number">Doc #{permitDocumentId}</div>
                       <button onClick={() => setActivePermitForm(null)} className="close-permit">×</button>
                     </div>
 
@@ -2262,12 +2302,26 @@ export default function App() {
 
                               <div className="wb-signatures">
                                 <div className="wb-signature">
-                                  <div className="signature-line"></div>
+                                  <div className="signature-line">
+                                    {user?.username ? `✓ ${user.username}` : ''}
+                                  </div>
                                   <div>Captain Signature</div>
                                 </div>
                                 <div className="wb-signature">
-                                  <div className="signature-line"></div>
+                                  <div className="signature-line">
+                                    ✓ Ground Operations
+                                  </div>
                                   <div>Load Master Signature</div>
+                                </div>
+                              </div>
+                              
+                              <div className="wb-certification">
+                                <div className="certification-text">
+                                  I certify that this aircraft is loaded and balanced in accordance with 
+                                  applicable regulations and the manufacturer's specifications.
+                                </div>
+                                <div className="certification-date">
+                                  Date: {new Date().toLocaleDateString()} | Time: {getZuluTime()}
                                 </div>
                               </div>
                             </div>
@@ -3463,6 +3517,13 @@ export default function App() {
                 title={soundEnabled ? 'Sounds ON' : 'Sounds OFF'}
               >
                 {soundEnabled ? '🔊' : '🔇'}
+              </button>
+              <button
+                onClick={() => setBadWordsFilter(!badWordsFilter)}
+                className={`filter-toggle ${badWordsFilter ? 'enabled' : 'disabled'}`}
+                title={badWordsFilter ? 'Bad Words Filter ON' : 'Bad Words Filter OFF'}
+              >
+                {badWordsFilter ? '🚫' : '💬'}
               </button>
             </div>
           </div>
