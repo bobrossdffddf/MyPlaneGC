@@ -1662,6 +1662,12 @@ body {
   font-size: 0.9rem;
 }
 
+.filter-select option {
+  background: rgba(45, 55, 72, 0.98);
+  color: #ffffff;
+  padding: 8px;
+}
+
 .passenger-list {
   max-height: 400px;
   overflow-y: auto;
@@ -2224,6 +2230,12 @@ body {
   font-family: 'SF Mono', monospace;
   backdrop-filter: blur(10px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modern-select option {
+  background: rgba(45, 55, 72, 0.98);
+  color: #ffffff;
+  padding: 10px;
 }
 
 .modern-input:focus, .modern-select:focus {
@@ -3362,6 +3374,12 @@ body {
   transition: all 0.3s ease;
 }
 
+.professional-select option {
+  background: rgba(31, 41, 55, 0.98);
+  color: #ffffff;
+  padding: 8px;
+}
+
 .professional-input:focus,
 .professional-select:focus {
   outline: none;
@@ -4437,6 +4455,12 @@ body {
   color: #ffffff;
   font-size: 0.85rem;
   transition: all 0.3s ease;
+}
+
+.chat-filter-select option {
+  background: rgba(45, 55, 72, 0.98);
+  color: #ffffff;
+  padding: 8px;
 }
 
 .chat-filter-select:focus {
@@ -5544,6 +5568,12 @@ body {
   padding: 8px 10px;
   color: #ffffff;
   font-size: 0.9rem;
+}
+
+.quick-select option {
+  background: rgba(45, 55, 72, 0.98);
+  color: #ffffff;
+  padding: 8px;
 }
 
 .quick-input:focus, .quick-select:focus {
