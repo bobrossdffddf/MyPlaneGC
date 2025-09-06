@@ -639,6 +639,60 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("removeFromStand", (data) => {
+    const { stand, removedBy, airport } = data;
+
+    if (!airport || !airportData[airport]) {
+      socket.emit("error", { message: "Invalid airport selected" });
+      return;
+    }
+
+    const standData = airportData[airport].stands[stand];
+    if (standData) {
+      const flightNumber = standData.flight;
+      const pilot = standData.pilot;
+      
+      delete airportData[airport].stands[stand];
+      io.to(airport).emit("standUpdate", airportData[airport].stands);
+
+      io.to(airport).emit("chatUpdate", {
+        text: `${removedBy} has removed ${flightNumber} from ${stand} (was piloted by ${pilot})`,
+        sender: "GROUND CONTROL",
+        stand: stand,
+        airport: airport,
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "system"
+      });
+    }
+  });
+
+  socket.on("assignCrewToTask", (data) => {
+    const { requestId, assignedCrew, assignedBy, airport } = data;
+
+    if (!airport || !airportData[airport]) {
+      socket.emit("error", { message: "Invalid airport selected" });
+      return;
+    }
+
+    if (airportData[airport].requests[requestId]) {
+      airportData[airport].requests[requestId].assignedCrew = assignedCrew;
+      airportData[airport].requests[requestId].assignedBy = assignedBy;
+      airportData[airport].requests[requestId].assignedAt = new Date().toLocaleTimeString();
+
+      io.to(airport).emit("serviceUpdate", airportData[airport].requests);
+
+      const request = airportData[airport].requests[requestId];
+      io.to(airport).emit("chatUpdate", {
+        text: `${assignedBy} assigned ${request.service} for ${request.flight} to ${assignedCrew}`,
+        sender: "GROUND SUPERVISOR",
+        stand: request.stand,
+        airport: airport,
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "groundcrew"
+      });
+    }
+  });
+
   socket.on("disconnect", () => {
     const userInfo = connectedUsers.get(socket.id);
 

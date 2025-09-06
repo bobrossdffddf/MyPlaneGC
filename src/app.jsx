@@ -662,7 +662,7 @@ export default function App() {
       sections: [
         {
           title: "Standard Marshalling Positions",
-          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop",
+          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop&crop=center",
           steps: [
             "Marshaller positions directly in front of aircraft nose, minimum 15 feet",
             "Wing walkers position at wingtips during taxi operations in congested areas",
@@ -675,7 +675,7 @@ export default function App() {
         },
         {
           title: "Hand Signals - Movement Control",
-          image: "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=400&h=300&fit=crop",
+          image: "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=400&h=300&fit=crop&crop=center",
           steps: [
             "COME FORWARD: Both arms raised above head, palms facing forward, wave toward your body with deliberate motion",
             "MOVE BACK: Both arms raised above head, palms facing outward, wave aircraft away from you",
@@ -688,7 +688,7 @@ export default function App() {
         },
         {
           title: "Engine and System Signals",
-          image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop",
+          image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop&crop=center",
           steps: [
             "START ENGINES: Circular motion with right hand above head, pointing to specific engine",
             "SHUT DOWN ENGINES: Hand drawn across throat in decisive cutting motion",
@@ -841,7 +841,7 @@ export default function App() {
       sections: [
         {
           title: "Weight and Balance Calculations",
-          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop",
+          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop&crop=center",
           steps: [
             "Verify total baggage weight does not exceed aircraft cargo limits",
             "Calculate center of gravity based on baggage compartment loading",
@@ -902,7 +902,7 @@ export default function App() {
         },
         {
           title: "Service Flow by Aircraft Configuration",
-          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop",
+          image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=300&fit=crop&crop=center",
           steps: [
             "Single-aisle aircraft: Service through forward galley door only",
             "Wide-body aircraft: Multiple service doors - coordinate timing",
@@ -1098,6 +1098,16 @@ export default function App() {
     // No state update here, as the socket event will handle it
     socket.emit("requestGroundCallsign", { userId: user?.id, airport: selectedAirport });
     return newCallsign; // Return a temporary callsign until confirmed
+  };
+
+  // Function to assign crew to a task
+  const assignCrewToTask = (requestIndex, assignedCrewCallsign) => {
+    if (requestIndex === -1) return;
+    socket.emit("assignCrewToTask", {
+      requestIndex: requestIndex,
+      assignedCrewCallsign: assignedCrewCallsign,
+      airport: selectedAirport
+    });
   };
 
   const generatePassengerManifest = (aircraftType) => {
@@ -1679,7 +1689,7 @@ export default function App() {
     const remainingCapacity = maxTakeoffWeight - operatingEmptyWeight - passengerWeight;
 
     // Use a fixed percentage based on aircraft type for consistency
-    const fuelPercentage = aircraft.includes('A380') ? 0.75 : aircraft.includes('747') ? 0.72 : aircraft.includes('777') ? 0.78 : aircraft.includes('A350') ? 0.78 : 0.78; // Use a more consistent fuel percentage
+    const fuelPercentage = aircraft.includes('A380') ? 0.75 : aircraft.includes('747') ? 0.72 : aircraft.includes('777') ? 0.78 : aircraft.includes('A350') ? 0.78 : aircraft.includes('A380') ? 0.75 : aircraft.includes('747') ? 0.72 : aircraft.includes('777') ? 0.78 : aircraft.includes('A350') ? 0.78 : 0.78; // Use a more consistent fuel percentage
     const fuelWeight = Math.round(remainingCapacity * fuelPercentage);
     const cargoWeight = Math.round(Math.min(2000, remainingCapacity * 0.08)); // Small cargo load
 
@@ -1839,6 +1849,11 @@ export default function App() {
     }
   };
 
+  const removeFlightFromStand = (standId) => {
+    // Emit an event to remove the flight from the stand
+    socket.emit("removeFlightFromStand", { standId, airport: selectedAirport });
+  };
+
   const toggleChecklistItem = (category, index) => {
     setChecklists(prev => ({
       ...prev,
@@ -1886,7 +1901,7 @@ export default function App() {
       "DHC-6 Twin Otter": "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=500&h=300&fit=crop&crop=center",
       "Cessna 172": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
       "Concorde": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center",
-      "F-16 Fighting Falcon": "https://images.unsplash.com/photo-1583053209265-239b29c822d3?w=500&h=300&fit=crop&crop=center",
+      "F-16 Fighting Falcon": "https://images.unsplash.com/photo-1583053209265-239b283b2d3?w=500&h=300&fit=crop&crop=center",
       "F/A-18 Super Hornet": "https://images.unsplash.com/photo-1587560699334-cc4ff634909a?w=500&h=300&fit=crop&crop=center",
       "C-130 Hercules": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center"
     };
@@ -3090,6 +3105,15 @@ export default function App() {
                               <span className="pilot-label">PILOT:</span>
                               <span className="pilot-name">{occupiedBy.pilot}</span>
                             </div>
+                            {standManagementMode && (
+                              <button
+                                className="remove-flight-btn"
+                                onClick={() => removeFlightFromStand(stand.id)}
+                                title="Remove flight from stand"
+                              >
+                                REMOVE FLIGHT
+                              </button>
+                            )}
                           </div>
 
                           <div className="service-management-section">
@@ -3369,12 +3393,42 @@ export default function App() {
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <button
-                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
-                      className="action-btn urgent"
-                    >
-                      IMMEDIATE RESPONSE
-                    </button>
+                    {groundCrewCallsign === "Ground 1" ? (
+                      <div className="crew-assignment-controls">
+                        <select 
+                          className="crew-assignment-select"
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              assignCrewToTask(requests.indexOf(request), e.target.value);
+                              e.target.value = "";
+                            }
+                          }}
+                        >
+                          <option value="">Assign to crew...</option>
+                          <option value="Ground 2">Ground 2</option>
+                          <option value="Ground 3">Ground 3</option>
+                          <option value="Ground 4">Ground 4</option>
+                          <option value="Ground 5">Ground 5</option>
+                          <option value="Fuel Team">Fuel Team</option>
+                          <option value="Catering Team">Catering Team</option>
+                          <option value="Baggage Team">Baggage Team</option>
+                          <option value="Maintenance Team">Maintenance Team</option>
+                        </select>
+                        <button
+                          onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                          className="action-btn urgent small"
+                        >
+                          TAKE TASK
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                        className="action-btn urgent"
+                      >
+                        IMMEDIATE RESPONSE
+                      </button>
+                    )}
                   </div>
                 ))}
                 {criticalPriorityRequests.length === 0 && (
@@ -3406,12 +3460,42 @@ export default function App() {
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <button
-                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
-                      className="action-btn high"
-                    >
-                      ACCEPT & ASSIGN
-                    </button>
+                    {groundCrewCallsign === "Ground 1" ? (
+                      <div className="crew-assignment-controls">
+                        <select 
+                          className="crew-assignment-select"
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              assignCrewToTask(requests.indexOf(request), e.target.value);
+                              e.target.value = "";
+                            }
+                          }}
+                        >
+                          <option value="">Assign to crew...</option>
+                          <option value="Ground 2">Ground 2</option>
+                          <option value="Ground 3">Ground 3</option>
+                          <option value="Ground 4">Ground 4</option>
+                          <option value="Ground 5">Ground 5</option>
+                          <option value="Fuel Team">Fuel Team</option>
+                          <option value="Catering Team">Catering Team</option>
+                          <option value="Baggage Team">Baggage Team</option>
+                          <option value="Maintenance Team">Maintenance Team</option>
+                        </select>
+                        <button
+                          onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                          className="action-btn high small"
+                        >
+                          TAKE TASK
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                        className="action-btn high"
+                      >
+                        ACCEPT & ASSIGN
+                      </button>
+                    )}
                   </div>
                 ))}
                 {highPriorityRequests.length === 0 && (
@@ -3443,12 +3527,42 @@ export default function App() {
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
                     </div>
-                    <button
-                      onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
-                      className="action-btn standard"
-                    >
-                      ASSIGN CREW
-                    </button>
+                    {groundCrewCallsign === "Ground 1" ? (
+                      <div className="crew-assignment-controls">
+                        <select 
+                          className="crew-assignment-select"
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              assignCrewToTask(requests.indexOf(request), e.target.value);
+                              e.target.value = "";
+                            }
+                          }}
+                        >
+                          <option value="">Assign to crew...</option>
+                          <option value="Ground 2">Ground 2</option>
+                          <option value="Ground 3">Ground 3</option>
+                          <option value="Ground 4">Ground 4</option>
+                          <option value="Ground 5">Ground 5</option>
+                          <option value="Fuel Team">Fuel Team</option>
+                          <option value="Catering Team">Catering Team</option>
+                          <option value="Baggage Team">Baggage Team</option>
+                          <option value="Maintenance Team">Maintenance Team</option>
+                        </select>
+                        <button
+                          onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                          className="action-btn standard small"
+                        >
+                          TAKE TASK
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                        className="action-btn standard"
+                      >
+                        ASSIGN CREW
+                      </button>
+                    )}
                   </div>
                 ))}
                 {mediumPriorityRequests.length + lowPriorityRequests.length === 0 && (
