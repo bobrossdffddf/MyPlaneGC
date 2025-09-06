@@ -56,6 +56,8 @@ export default function App() {
   const [quickAircraft, setQuickAircraft] = useState("");
   const [activeServiceRequests, setActiveServiceRequests] = useState({});
   const [commMinimized, setCommMinimized] = useState(false);
+  const [bottomNavHidden, setBottomNavHidden] = useState(false);
+  const [mouseTimer, setMouseTimer] = useState(null);
 
   const handleMcduKey = (key) => {
     setMcduDisplay(prev => {
@@ -252,6 +254,67 @@ export default function App() {
   useEffect(() => {
     updateMcduDisplay();
   }, [mcduDisplay.currentPage, selectedAirport, flightNumber, passengerManifest.length]);
+
+  // Auto-hide bottom navigation logic
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const windowHeight = window.innerHeight;
+      const mouseY = e.clientY;
+      const bottomThreshold = windowHeight - 80; // Show when mouse is within 80px of bottom
+
+      // Clear existing timer
+      if (mouseTimer) {
+        clearTimeout(mouseTimer);
+      }
+
+      if (mouseY >= bottomThreshold) {
+        // Mouse is near bottom, show nav
+        setBottomNavHidden(false);
+      } else {
+        // Mouse is away from bottom, hide after delay
+        const timer = setTimeout(() => {
+          setBottomNavHidden(true);
+        }, 2000); // Hide after 2 seconds
+        setMouseTimer(timer);
+      }
+    };
+
+    const handleMouseEnterNav = () => {
+      // Keep nav visible when hovering over it
+      if (mouseTimer) {
+        clearTimeout(mouseTimer);
+      }
+      setBottomNavHidden(false);
+    };
+
+    const handleMouseLeaveNav = () => {
+      // Hide nav when leaving it
+      const timer = setTimeout(() => {
+        setBottomNavHidden(true);
+      }, 1000); // Hide after 1 second
+      setMouseTimer(timer);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    
+    // Add event listeners to nav when it exists
+    const navElement = document.querySelector('.bottom-nav');
+    if (navElement) {
+      navElement.addEventListener('mouseenter', handleMouseEnterNav);
+      navElement.addEventListener('mouseleave', handleMouseLeaveNav);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      if (navElement) {
+        navElement.removeEventListener('mouseenter', handleMouseEnterNav);
+        navElement.removeEventListener('mouseleave', handleMouseLeaveNav);
+      }
+      if (mouseTimer) {
+        clearTimeout(mouseTimer);
+      }
+    };
+  }, [mouseTimer]);
   const [atisData, setAtisData] = useState({
     info: 'INFO BRAVO',
     wind: '270°/08KT',
@@ -3153,7 +3216,8 @@ export default function App() {
         </div>
       </div>
 
-      <div className="bottom-nav">
+      <>
+      <div className={`bottom-nav ${bottomNavHidden ? 'hidden' : ''}`}>
         {userMode === "pilot" && (
           <>
             <button
@@ -3212,6 +3276,13 @@ export default function App() {
           </>
         )}
       </div>
+      
+      {/* Invisible trigger area to show nav when mouse approaches bottom */}
+      <div 
+        className="bottom-nav-trigger"
+        onMouseEnter={() => setBottomNavHidden(false)}
+      ></div>
+      </>
     </div>
   );
 }
