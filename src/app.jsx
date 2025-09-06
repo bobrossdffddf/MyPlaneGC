@@ -1015,25 +1015,25 @@ export default function App() {
     "narrow": {
       maxWingspan: 36,
       maxLength: 50,
-      categories: ["regional", "turboprop", "narrow-body"],
+      categories: ["regional", "turboprop", "narrow-body", "general-aviation"],
       maxWeightClass: ["light", "medium"]
     },
     "medium": {
       maxWingspan: 52,
       maxLength: 70,
-      categories: ["regional", "turboprop", "narrow-body"],
+      categories: ["regional", "turboprop", "narrow-body", "business"],
       maxWeightClass: ["light", "medium", "heavy"]
     },
     "wide": {
       maxWingspan: 80,
       maxLength: 80,
-      categories: ["regional", "turboprop", "narrow-body", "wide-body", "super-heavy"],
+      categories: ["regional", "turboprop", "narrow-body", "wide-body", "super-heavy", "military"],
       maxWeightClass: ["light", "medium", "heavy", "super"]
     },
     "cargo": {
-      maxWingspan: 80,
-      maxLength: 80,
-      categories: ["regional", "turboprop", "narrow-body", "wide-body", "super-heavy"],
+      maxWingspan: 100,
+      maxLength: 90,
+      categories: ["cargo", "military-cargo", "wide-body", "super-heavy", "turboprop", "narrow-body"],
       maxWeightClass: ["light", "medium", "heavy", "super"]
     }
   };
