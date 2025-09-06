@@ -50,34 +50,48 @@ export default function App() {
   const [equipmentStatus, setEquipmentStatus] = useState({});
   const [activeIncidents, setActiveIncidents] = useState([]);
   const [maintenanceLog, setMaintenanceLog] = useState([]);
+  const [standManagementMode, setStandManagementMode] = useState(false);
+  const [selectedStandForManagement, setSelectedStandForManagement] = useState("");
+  const [quickFlightNumber, setQuickFlightNumber] = useState("");
+  const [quickAircraft, setQuickAircraft] = useState("");
+  const [activeServiceRequests, setActiveServiceRequests] = useState({});
 
   const handleMcduKey = (key) => {
     setMcduDisplay(prev => {
       let newState = { ...prev };
       
       if (key >= 'A' && key <= 'Z') {
-        newState.scratchpad = prev.scratchpad + key;
+        if (prev.scratchpad.length < 12) {
+          newState.scratchpad = prev.scratchpad + key;
+        }
       } else if (key >= '0' && key <= '9') {
-        newState.scratchpad = prev.scratchpad + key;
+        if (prev.scratchpad.length < 12) {
+          newState.scratchpad = prev.scratchpad + key;
+        }
       } else if (key === 'CLR') {
         if (prev.scratchpad.length > 0) {
           newState.scratchpad = prev.scratchpad.slice(0, -1);
-        } else {
-          newState.scratchpad = '';
         }
       } else if (key === 'SP') {
-        newState.scratchpad = prev.scratchpad + ' ';
+        if (prev.scratchpad.length < 12) {
+          newState.scratchpad = prev.scratchpad + ' ';
+        }
       } else if (key === '/') {
-        newState.scratchpad = prev.scratchpad + '/';
+        if (prev.scratchpad.length < 12) {
+          newState.scratchpad = prev.scratchpad + '/';
+        }
       } else if (key === '.') {
-        newState.scratchpad = prev.scratchpad + '.';
+        if (prev.scratchpad.length < 12) {
+          newState.scratchpad = prev.scratchpad + '.';
+        }
       } else if (key === '-') {
-        newState.scratchpad = prev.scratchpad + '-';
+        if (prev.scratchpad.length < 12) {
+          newState.scratchpad = prev.scratchpad + '-';
+        }
       } else if (key.startsWith('LSK')) {
         const lineNumber = parseInt(key.replace(/LSK(\d+)[LR]/, '$1'));
         const side = key.includes('L') ? 'L' : 'R';
-        handleLineSelect(lineNumber, side);
-        return newState; // Don't update display here
+        return handleLineSelect(lineNumber, side, prev);
       } else if (key === 'INIT') {
         newState.currentPage = 'INIT';
         newState.scratchpad = '';
@@ -95,50 +109,48 @@ export default function App() {
         newState.scratchpad = '';
       }
       
-      // Update display based on new state
       return updateMcduDisplayState(newState);
     });
   };
 
-  const handleLineSelect = (lineNumber, side) => {
-    setMcduDisplay(prev => {
-      if (prev.scratchpad) {
-        // Handle specific line selections based on page
-        let newState = { ...prev };
-        
-        switch (prev.currentPage) {
-          case 'INIT':
-            if (lineNumber === 2 && side === 'L') {
-              // FROM airport
-              if (prev.scratchpad.length === 4) {
-                newState.fromAirport = prev.scratchpad;
-                newState.scratchpad = '';
-              }
-            } else if (lineNumber === 2 && side === 'R') {
-              // TO airport
-              if (prev.scratchpad.length === 4) {
-                newState.toAirport = prev.scratchpad;
-                newState.scratchpad = '';
-              }
-            } else if (lineNumber === 3 && side === 'L') {
-              // Flight number
-              newState.flightNumberMcdu = prev.scratchpad;
+  const handleLineSelect = (lineNumber, side, currentState) => {
+    if (currentState.scratchpad) {
+      let newState = { ...currentState };
+      
+      switch (currentState.currentPage) {
+        case 'INIT':
+          if (lineNumber === 2 && side === 'L') {
+            // FROM airport
+            if (currentState.scratchpad.length === 4) {
+              newState.fromAirport = currentState.scratchpad;
               newState.scratchpad = '';
             }
-            break;
-          case 'PERF':
-            if (lineNumber === 2 && side === 'L') {
-              // Gross weight input
-              newState.grossWeight = prev.scratchpad;
+          } else if (lineNumber === 2 && side === 'R') {
+            // TO airport
+            if (currentState.scratchpad.length === 4) {
+              newState.toAirport = currentState.scratchpad;
               newState.scratchpad = '';
             }
-            break;
-        }
-        
-        return updateMcduDisplayState(newState);
+          } else if (lineNumber === 3 && side === 'L') {
+            // Flight number
+            newState.flightNumberMcdu = currentState.scratchpad;
+            newState.scratchpad = '';
+          }
+          break;
+        case 'PERF':
+          if (lineNumber === 1 && side === 'L') {
+            // Gross weight input
+            if (!isNaN(parseFloat(currentState.scratchpad))) {
+              newState.grossWeight = currentState.scratchpad;
+              newState.scratchpad = '';
+            }
+          }
+          break;
       }
-      return prev;
-    });
+      
+      return updateMcduDisplayState(newState);
+    }
+    return currentState;
   };
 
   const updateMcduDisplayState = (state) => {
@@ -1414,6 +1426,60 @@ export default function App() {
       date: new Date().toLocaleDateString()
     };
     setGroundCrewSchedule(prev => [newSchedule, ...prev]);
+  };
+
+  const assignFlightToStand = (standId, flightNumber, aircraft) => {
+    if (!flightNumber || !aircraft) return;
+    
+    socket.emit("claimStand", {
+      stand: standId,
+      flightNumber,
+      aircraft,
+      pilot: "Ground Assigned",
+      userId: `ground_${user?.id}`,
+      airport: selectedAirport,
+      allowSwitch: true,
+      callsign: flightNumber,
+      groundAssigned: true
+    });
+
+    // Clear the form
+    setQuickFlightNumber("");
+    setQuickAircraft("");
+    setSelectedStandForManagement("");
+  };
+
+  const addServiceRequest = (standId, service) => {
+    const standOccupant = stands[standId];
+    if (!standOccupant) return;
+
+    socket.emit("serviceRequest", {
+      service,
+      stand: standId,
+      flight: standOccupant.flight,
+      pilot: "Ground Requested",
+      airport: selectedAirport,
+      timestamp: new Date().toLocaleTimeString(),
+      status: "REQUESTED",
+      groundRequested: true
+    });
+  };
+
+  const removeServiceRequest = (standId, service) => {
+    // Find and remove the specific service request
+    const requestIndex = requests.findIndex(r => 
+      r.stand === standId && 
+      r.service === service && 
+      r.status === "REQUESTED"
+    );
+    
+    if (requestIndex !== -1) {
+      socket.emit("serviceAction", { 
+        requestId: requestIndex, 
+        action: "CANCELLED", 
+        crewMember: user?.username 
+      });
+    }
   };
 
   const toggleChecklistItem = (category, index) => {
@@ -2923,6 +2989,133 @@ export default function App() {
         );
       }
 
+      if (activeTab === "stands") {
+        return (
+          <div className="stand-management-container">
+            <div className="stand-management-header">
+              <h2>STAND MANAGEMENT</h2>
+              <div className="quick-assignment-controls">
+                <button 
+                  className={`toggle-btn ${standManagementMode ? 'active' : ''}`}
+                  onClick={() => setStandManagementMode(!standManagementMode)}
+                >
+                  {standManagementMode ? 'EXIT MANAGEMENT' : 'ENTER MANAGEMENT'}
+                </button>
+              </div>
+            </div>
+
+            <div className="stands-overview">
+              <div className="stands-grid-management">
+                {getCurrentAirportStands().map(stand => {
+                  const occupiedBy = stands[stand.id];
+                  const standRequests = requests.filter(r => r.stand === stand.id && r.status === "REQUESTED");
+                  
+                  return (
+                    <div 
+                      key={stand.id} 
+                      className={`stand-card ${occupiedBy ? 'occupied' : 'available'} ${standManagementMode ? 'manageable' : ''}`}
+                      onClick={() => standManagementMode && setSelectedStandForManagement(stand.id)}
+                    >
+                      <div className="stand-card-header">
+                        <span className="stand-id">{stand.id}</span>
+                        <span className="stand-type">{stand.type.toUpperCase()}</span>
+                      </div>
+                      
+                      {occupiedBy ? (
+                        <div className="stand-occupied-info">
+                          <div className="flight-info">
+                            <span className="flight-number">{occupiedBy.flight}</span>
+                            <span className="aircraft-type">{occupiedBy.aircraft}</span>
+                          </div>
+                          
+                          {standRequests.length > 0 && (
+                            <div className="active-requests">
+                              <span className="requests-count">{standRequests.length} SERVICE{standRequests.length > 1 ? 'S' : ''}</span>
+                              <div className="requests-list">
+                                {standRequests.slice(0, 3).map((req, i) => (
+                                  <span key={i} className="service-tag">{req.service}</span>
+                                ))}
+                                {standRequests.length > 3 && <span className="more-services">+{standRequests.length - 3}</span>}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {standManagementMode && (
+                            <div className="quick-service-buttons">
+                              <button 
+                                className="quick-service-btn fuel"
+                                onClick={(e) => { e.stopPropagation(); addServiceRequest(stand.id, "Fuel Service"); }}
+                              >
+                                ⛽
+                              </button>
+                              <button 
+                                className="quick-service-btn catering"
+                                onClick={(e) => { e.stopPropagation(); addServiceRequest(stand.id, "Catering"); }}
+                              >
+                                🍽️
+                              </button>
+                              <button 
+                                className="quick-service-btn pushback"
+                                onClick={(e) => { e.stopPropagation(); addServiceRequest(stand.id, "Pushback"); }}
+                              >
+                                🚛
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="stand-available">
+                          <span className="availability-status">AVAILABLE</span>
+                          {standManagementMode && selectedStandForManagement === stand.id && (
+                            <div className="quick-assignment-form" onClick={e => e.stopPropagation()}>
+                              <input
+                                type="text"
+                                placeholder="Flight Number"
+                                value={quickFlightNumber}
+                                onChange={(e) => setQuickFlightNumber(e.target.value.toUpperCase())}
+                                className="quick-input"
+                              />
+                              <select
+                                value={quickAircraft}
+                                onChange={(e) => setQuickAircraft(e.target.value)}
+                                className="quick-select"
+                              >
+                                <option value="">Select Aircraft</option>
+                                {aircraftTypes.filter(type => isStandCompatible(stand.type, type)).map(type => (
+                                  <option key={type} value={type}>{type}</option>
+                                ))}
+                              </select>
+                              <button
+                                className="assign-btn"
+                                onClick={() => assignFlightToStand(stand.id, quickFlightNumber, quickAircraft)}
+                                disabled={!quickFlightNumber || !quickAircraft}
+                              >
+                                ASSIGN
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {standManagementMode && (
+              <div className="management-help">
+                <h3>MANAGEMENT MODE ACTIVE</h3>
+                <ul>
+                  <li>Click on available stands to assign flights</li>
+                  <li>Use quick service buttons (⛽🍽️🚛) on occupied stands</li>
+                  <li>View active service requests on each stand</li>
+                </ul>
+              </div>
+            )}
+          </div>
+        );
+      }
+
       return (
         <div className="groundcrew-main">
           <div className="queue-header">
@@ -3203,6 +3396,13 @@ export default function App() {
             >
               <span className="nav-icon">🏠</span>
               <span>OPERATIONS</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'stands' ? 'active' : ''}`}
+              onClick={() => setActiveTab('stands')}
+            >
+              <span className="nav-icon">🅿️</span>
+              <span>STANDS</span>
             </button>
             <button
               className={`nav-btn ${activeTab === 'maintenance' ? 'active' : ''}`}
