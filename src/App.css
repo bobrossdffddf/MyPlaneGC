@@ -2212,22 +2212,25 @@ body {
 }
 
 .modern-input, .modern-select {
-  background: rgba(45, 55, 72, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 15px;
+  background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(55, 65, 82, 0.9));
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 16px 18px;
   color: #ffffff;
   font-size: 1rem;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
   font-family: 'SF Mono', monospace;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .modern-input:focus, .modern-select:focus {
   outline: none;
-  border-color: rgba(255, 149, 0, 0.6);
-  box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
-  transform: translateY(-1px);
+  border-color: rgba(255, 149, 0, 0.7);
+  box-shadow: 0 0 0 4px rgba(255, 149, 0, 0.15), 0 4px 12px rgba(255, 149, 0, 0.1);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(55, 65, 82, 0.98), rgba(75, 85, 99, 0.95));
 }
 
 .modern-input::placeholder {
@@ -2530,16 +2533,18 @@ body {
 }
 
 .service-card {
-  background: rgba(45, 55, 72, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px;
+  background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(55, 65, 82, 0.9));
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 22px;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-align: center;
   position: relative;
   overflow: hidden;
   transform: translateZ(0);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .service-card::before {
@@ -4746,13 +4751,13 @@ body {
 }
 
 .message {
-  background: rgba(45, 55, 72, 0.9);
-  border-radius: 12px;
-  padding: 15px;
-  border-left: 3px solid rgba(255, 255, 255, 0.3);
-  animation: slideInRight 0.3s ease-out;
-  transition: all 0.3s ease;
-  margin-bottom: 8px;
+  background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(55, 65, 82, 0.9));
+  border-radius: 14px;
+  padding: 16px 18px;
+  border-left: 4px solid rgba(255, 255, 255, 0.3);
+  animation: slideInRight 0.4s ease-out;
+  transition: all 0.4s ease;
+  margin-bottom: 10px;
   min-height: auto;
   height: auto;
   display: flex;
@@ -4762,6 +4767,8 @@ body {
   overflow-wrap: break-word;
   word-wrap: break-word;
   overflow: visible;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
 .message:hover {
@@ -6529,7 +6536,7 @@ body {
   background: rgba(59, 130, 246, 0.1);
 }
 
-/* Enhanced Aircraft Display */
+/* Enhanced Aircraft Display with Real Photos */
 .aircraft-display {
   background: linear-gradient(135deg, rgba(0, 20, 40, 0.8), rgba(0, 30, 60, 0.6));
   border: 2px solid rgba(255, 149, 0, 0.3);
@@ -6549,6 +6556,68 @@ body {
   bottom: 0;
   background: radial-gradient(circle at 30% 30%, rgba(255, 149, 0, 0.1) 0%, transparent 50%);
   pointer-events: none;
+}
+
+.aircraft-photo-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  transition: all 0.5s ease;
+}
+
+.aircraft-photo-container:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(255, 149, 0, 0.3);
+}
+
+.aircraft-photo {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: all 0.5s ease;
+  filter: brightness(0.9) contrast(1.1);
+}
+
+.aircraft-photo:hover {
+  filter: brightness(1) contrast(1.2);
+}
+
+.aircraft-photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.6), transparent);
+  padding: 30px 25px 20px;
+}
+
+.aircraft-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, rgba(45, 55, 72, 0.9), rgba(55, 65, 82, 0.8));
+  border-radius: 20px;
+  border: 2px dashed rgba(255, 149, 0, 0.4);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.aircraft-placeholder:hover {
+  border-color: rgba(255, 149, 0, 0.6);
+  background: linear-gradient(135deg, rgba(55, 65, 82, 0.95), rgba(75, 85, 99, 0.9));
+}
+
+.placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.7;
+  animation: float 3s ease-in-out infinite;
 }
 
 /* Stand Validation Alert */

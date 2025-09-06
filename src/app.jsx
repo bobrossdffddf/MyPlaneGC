@@ -1298,9 +1298,17 @@ export default function App() {
           text: filterBadWords(msg.text)
         };
         setMessages((prev) => [...prev, filteredMsg]);
-        if (soundEnabled && msg.sender !== user?.username && msg.mode !== 'system' && msg.mode !== 'checklist') {
+        
+        // Play sound only for specific message types and not for own messages
+        const shouldPlaySound = soundEnabled && msg.sender !== user?.username && (
+          msg.mode === 'system' || // System messages
+          (msg.mode === 'groundcrew' && userMode === 'pilot') || // Ground crew to pilot
+          (msg.mode === 'pilot' && userMode === 'groundcrew') // Pilot to ground crew
+        );
+
+        if (shouldPlaySound) {
           try {
-            // Create a better quality notification sound
+            // Create different sounds for different message types
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -1308,25 +1316,30 @@ export default function App() {
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
 
-            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-            oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+            // Different tones for different message types
+            if (msg.mode === 'system') {
+              // System message - alert tone
+              oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+              oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
+              oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.2);
+            } else if (msg.mode === 'groundcrew') {
+              // Ground crew message - lower frequency
+              oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+              oscillator.frequency.setValueAtTime(500, audioContext.currentTime + 0.15);
+            } else if (msg.mode === 'pilot') {
+              // Pilot message - higher frequency
+              oscillator.frequency.setValueAtTime(900, audioContext.currentTime);
+              oscillator.frequency.setValueAtTime(750, audioContext.currentTime + 0.15);
+            }
 
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
 
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
+            oscillator.stop(audioContext.currentTime + 0.4);
           } catch (e) {
             console.log('Audio creation failed:', e);
-            // Fallback to simple beep
-            try {
-              const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmE');
-              audio.volume = 0.3;
-              audio.play().catch(e => console.log('Audio play failed:', e));
-            } catch (fallbackError) {
-              console.log('Fallback audio failed:', fallbackError);
-            }
           }
         }
       }
@@ -1806,134 +1819,71 @@ export default function App() {
 
 
 
+  const getAircraftImageUrl = (aircraftType) => {
+    // Map aircraft types to real aircraft photos
+    const aircraftImageMap = {
+      "Airbus A220": "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=500&h=300&fit=crop&crop=center",
+      "Airbus A320": "https://images.unsplash.com/photo-1543198126-a8ad8e47fb22?w=500&h=300&fit=crop&crop=center",
+      "Airbus A330": "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&h=300&fit=crop&crop=center",
+      "Airbus A340": "https://images.unsplash.com/photo-1525624286412-4099c83c1bc8?w=500&h=300&fit=crop&crop=center",
+      "Airbus A350": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
+      "Airbus A380": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=300&fit=crop&crop=center",
+      "Boeing 737": "https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?w=500&h=300&fit=crop&crop=center",
+      "Boeing 747": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center",
+      "Boeing 757": "https://images.unsplash.com/photo-1588073845925-7d5d4827e0fa?w=500&h=300&fit=crop&crop=center",
+      "Boeing 767": "https://images.unsplash.com/photo-1541971875076-8f970d573be6?w=500&h=300&fit=crop&crop=center",
+      "Boeing 777": "https://images.unsplash.com/photo-1520637736862-4d197d17c7a4?w=500&h=300&fit=crop&crop=center",
+      "Boeing 787": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=300&fit=crop&crop=center",
+      "Bombardier CRJ700": "https://images.unsplash.com/photo-1542718610-a1d656d1884c?w=500&h=300&fit=crop&crop=center",
+      "Embraer E190": "https://images.unsplash.com/photo-1585956048631-7a1d3b07cdb9?w=500&h=300&fit=crop&crop=center",
+      "ATR-72": "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=300&fit=crop&crop=center",
+      "DHC-6 Twin Otter": "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=500&h=300&fit=crop&crop=center",
+      "Cessna 172": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
+      "Concorde": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center",
+      "F-16 Fighting Falcon": "https://images.unsplash.com/photo-1583053209265-239b29c822d3?w=500&h=300&fit=crop&crop=center",
+      "F/A-18 Super Hornet": "https://images.unsplash.com/photo-1587560699334-cc4ff634909a?w=500&h=300&fit=crop&crop=center",
+      "C-130 Hercules": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center"
+    };
+
+    return aircraftImageMap[aircraftType] || "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&h=300&fit=crop&crop=center";
+  };
+
   const renderAircraftDisplay = () => {
-    if (aircraftModel) {
+    if (aircraft && aircraftData) {
+      const imageUrl = getAircraftImageUrl(aircraft);
+      
       return (
         <div className="aircraft-display-3d">
-          <div className="aircraft-3d-container">
-            <div className="aircraft-3d-viewer">
-              <model-viewer
-                src={aircraftModel}
-                alt={`${aircraft} 3D model`}
-                auto-rotate
-                camera-controls
-                environment-image="neutral"
-                shadow-intensity="1"
-                style={{
-                  width: '100%',
-                  height: '400px',
-                  background: 'transparent'
-                }}
-              ></model-viewer>
+          <div className="aircraft-photo-container">
+            <img 
+              src={imageUrl}
+              alt={`${aircraft} aircraft`}
+              className="aircraft-photo"
+              onError={(e) => {
+                e.target.src = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&h=300&fit=crop&crop=center";
+              }}
+            />
+            <div className="aircraft-photo-overlay">
+              <div className="aircraft-label">
+                <div className="aircraft-type">{aircraftData.type}</div>
+                <div className="aircraft-manufacturer">{aircraftData.manufacturer}</div>
+                <div className="aircraft-category">{aircraftData.category.toUpperCase()}</div>
+              </div>
             </div>
-            <div className="aircraft-shadow"></div>
           </div>
-          {aircraftData && (
-            <div className="aircraft-label">
-              <div className="aircraft-type">{aircraftData.type}</div>
-              <div className="aircraft-manufacturer">{aircraftData.manufacturer}</div>
-              <div className="aircraft-category">{aircraftData.category.toUpperCase()}</div>
-            </div>
-          )}
         </div>
       );
     }
 
-    // Enhanced 3D fallback SVG with realistic aircraft design
+    // Fallback when no aircraft is selected
     return (
       <div className="aircraft-display-3d">
-        <div className="aircraft-3d-container">
-          <svg viewBox="0 0 600 350" className="aircraft-svg rotating-3d">
-            <defs>
-              <linearGradient id="fuselage3d" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="20%" stopColor="#f0f8ff" />
-                <stop offset="40%" stopColor="#e6f3ff" />
-                <stop offset="60%" stopColor="#b3d9ff" />
-                <stop offset="80%" stopColor="#80bfff" />
-                <stop offset="100%" stopColor="#4d9fff" />
-              </linearGradient>
-              <linearGradient id="wing3d" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#f8f9fa" />
-                <stop offset="30%" stopColor="#e9ecef" />
-                <stop offset="60%" stopColor="#dee2e6" />
-                <stop offset="100%" stopColor="#adb5bd" />
-              </linearGradient>
-              <linearGradient id="engine3d" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#495057" />
-                <stop offset="50%" stopColor="#343a40" />
-                <stop offset="100%" stopColor="#212529" />
-              </linearGradient>
-              <filter id="shadow3d" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="4" dy="6" stdDeviation="3" floodColor="#000000" floodOpacity="0.4"/>
-              </filter>
-              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="#ff9500" floodOpacity="0.3"/>
-              </filter>
-            </defs>
-
-            {/* Main Fuselage with 3D perspective */}
-            <ellipse cx="300" cy="175" rx="180" ry="30" fill="url(#fuselage3d)" stroke="#0066cc" strokeWidth="2" filter="url(#shadow3d)"/>
-            <ellipse cx="300" cy="170" rx="175" ry="25" fill="url(#fuselage3d)" stroke="#0088ff" strokeWidth="1"/>
-
-            {/* Wings with 3D depth */}
-            <path d="M180 175 L180 125 L250 115 L250 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-            <path d="M180 175 L180 225 L250 235 L250 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-            <path d="M350 175 L350 140 L420 130 L420 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-            <path d="M350 175 L350 210 L420 220 L420 175 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-
-            {/* Wing tips */}
-            <path d="M250 115 L250 100 L260 102 L260 117 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="1"/>
-            <path d="M250 235 L250 250 L260 248 L260 233 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="1"/>
-
-            {/* Engines with 3D effects */}
-            <ellipse cx="200" cy="145" rx="20" ry="12" fill="url(#engine3d)" stroke="#000" strokeWidth="2" filter="url(#shadow3d)"/>
-            <ellipse cx="200" cy="205" rx="20" ry="12" fill="url(#engine3d)" stroke="#000" strokeWidth="2" filter="url(#shadow3d)"/>
-            <circle cx="200" cy="145" r="8" fill="#1e40af" stroke="#1d4ed8" strokeWidth="1"/>
-            <circle cx="200" cy="205" r="8" fill="#1e40af" stroke="#1d4ed8" strokeWidth="1"/>
-
-            {/* Cockpit windows */}
-            <ellipse cx="480" cy="175" rx="15" ry="10" fill="#000080" stroke="#0066cc" strokeWidth="2" opacity="0.8"/>
-            <ellipse cx="465" cy="170" rx="8" ry="6" fill="#000080" stroke="#0066cc" strokeWidth="1" opacity="0.6"/>
-            <ellipse cx="465" cy="180" rx="8" ry="6" fill="#000080" stroke="#0066cc" strokeWidth="1" opacity="0.6"/>
-
-            {/* Passenger windows */}
-            <circle cx="420" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="400" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="380" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="360" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="340" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="320" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="280" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="260" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="240" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-            <circle cx="220" cy="165" r="4" fill="#87ceeb" stroke="#4682b4" strokeWidth="1" opacity="0.8"/>
-
-            {/* Tail */}
-            <path d="M120 175 L80 155 L85 175 L80 195 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-            <path d="M110 175 L90 145 L100 175 L90 140 Z" fill="url(#wing3d)" stroke="#666" strokeWidth="2" filter="url(#shadow3d)"/>
-
-            {/* Landing gear (if applicable) */}
-            <rect x="280" y="200" width="8" height="15" fill="#333" stroke="#000" strokeWidth="1"/>
-            <rect x="320" y="200" width="8" height="15" fill="#333" stroke="#000" strokeWidth="1"/>
-            <circle cx="284" cy="220" r="6" fill="#222" stroke="#000" strokeWidth="1"/>
-            <circle cx="324" cy="220" r="6" fill="#222" stroke="#000" strokeWidth="1"/>
-
-            {/* Navigation lights */}
-            <circle cx="250" cy="115" r="3" fill="#ff0000" filter="url(#glow)"/>
-            <circle cx="250" cy="235" r="3" fill="#00ff00" filter="url(#glow)"/>
-            <circle cx="480" cy="175" r="3" fill="#ffffff" filter="url(#glow)"/>
-            <circle cx="80" cy="175" r="3" fill="#ffffff" filter="url(#glow)"/>
-          </svg>
-          <div className="aircraft-shadow"></div>
-        </div>
-        <div className="aircraft-label">
-          <div className="aircraft-type">{aircraft || "SELECT AIRCRAFT"}</div>
-          <div className="aircraft-manufacturer">
-            {aircraftData ? aircraftData.manufacturer : "Select an aircraft type"}
-          </div>
-          <div className="aircraft-category">
-            {aircraftData ? aircraftData.category.toUpperCase() : "AIRCRAFT TYPE"}
+        <div className="aircraft-placeholder">
+          <div className="placeholder-icon">✈️</div>
+          <div className="aircraft-label">
+            <div className="aircraft-type">SELECT AIRCRAFT</div>
+            <div className="aircraft-manufacturer">Choose an aircraft type</div>
+            <div className="aircraft-category">AIRCRAFT TYPE</div>
           </div>
         </div>
       </div>
