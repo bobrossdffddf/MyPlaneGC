@@ -1031,10 +1031,11 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   background: rgba(15, 20, 25, 0.7);
-  height: calc(100vh - 130px);
-  min-height: calc(100vh - 130px);
-  max-height: calc(100vh - 130px);
+  height: calc(100vh - 200px);
+  min-height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
   transition: all 0.3s ease;
+  margin-bottom: 70px;
 }
 
 .main-area::-webkit-scrollbar {
@@ -3410,22 +3411,25 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 25px;
-  height: calc(100vh - 350px);
-  min-height: 550px;
-  max-height: calc(100vh - 350px);
+  height: calc(100vh - 420px);
+  min-height: 480px;
+  max-height: calc(100vh - 420px);
   overflow: visible;
   transition: all 0.3s ease;
 }
 
 /* Dynamic adjustment when comm panel is minimized */
 .tablet-content:has(.comm-panel.minimized) .service-management-board {
-  height: calc(100vh - 300px);
-  max-height: calc(100vh - 300px);
+  height: calc(100vh - 370px);
+  max-height: calc(100vh - 370px);
 }
 
 .tablet-content:has(.comm-panel.minimized) .main-area {
   margin-right: 0px;
   padding-right: 25px;
+  height: calc(100vh - 270px);
+  min-height: calc(100vh - 270px);
+  max-height: calc(100vh - 270px);
 }
 
 @media (max-width: 1600px) {
@@ -3826,9 +3830,9 @@ body {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 15px;
-  height: calc(100vh - 300px);
-  min-height: calc(100vh - 300px);
-  max-height: calc(100vh - 300px);
+  height: calc(100vh - 370px);
+  min-height: calc(100vh - 370px);
+  max-height: calc(100vh - 370px);
   overflow: visible;
 }
 
@@ -4465,20 +4469,7 @@ body {
   min-height: 70px;
 }
 
-.bottom-nav.hidden {
-  transform: translateY(100%);
-}
 
-.bottom-nav-trigger {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 25px;
-  background: transparent;
-  z-index: 101;
-  pointer-events: all;
-}
 
 .nav-btn {
   background: rgba(45, 55, 72, 0.9);
@@ -6043,9 +6034,7 @@ body {
 /* Fixed Bottom Navigation Overlap */
 
 
-.main-area {
-  padding-bottom: 20px; /* Reduced padding since nav auto-hides */
-}
+
 
 /* Enhanced Guide Images */
 .guide-image {
