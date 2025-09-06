@@ -3425,6 +3425,7 @@ body {
 
 .tablet-content:has(.comm-panel.minimized) .main-area {
   margin-right: 0px;
+  padding-right: 25px;
 }
 
 @media (max-width: 1600px) {
@@ -4165,7 +4166,8 @@ body {
 }
 
 .comm-panel.minimized {
-  width: 80px;
+  width: 60px;
+  min-width: 60px;
   overflow: hidden;
   border-radius: 15px 0 0 15px;
 }
@@ -4180,6 +4182,21 @@ body {
 
 .comm-panel.minimized .input-area {
   display: none;
+}
+
+.comm-panel.minimized .comm-header {
+  padding: 15px 10px;
+  justify-content: center;
+  min-height: 100vh;
+  border-bottom: none;
+}
+
+.comm-panel.minimized .comm-minimize-btn {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  min-width: 40px;
+  padding: 15px 8px;
 }
 
 .comm-header {
@@ -4269,29 +4286,10 @@ body {
 
 .comm-minimized-indicator {
   display: none;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  color: #ff9500;
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-align: center;
-  padding: 20px 0;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .comm-panel.minimized .comm-minimized-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  justify-content: center;
-}
-
-.comm-minimized-indicator:hover {
-  color: #ffb340;
-  transform: scale(1.1);
+  display: none;
 }
 
 .messages-area {
