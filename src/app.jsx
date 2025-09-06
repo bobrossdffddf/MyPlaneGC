@@ -25,6 +25,7 @@ export default function App() {
   const [passengerManifest, setPassengerManifest] = useState([]);
   const [permits, setPermits] = useState([]);
   const [activePermitForm, setActivePermitForm] = useState(null);
+  const [permitFormData, setPermitFormData] = useState({});
   const [flightDocuments, setFlightDocuments] = useState({
     flightPlan: { filed: false, route: "", altitude: "", departure: "", destination: "" },
     weightBalance: { completed: false, totalWeight: 0, cg: 0, fuel: 0 },
@@ -1341,25 +1342,35 @@ export default function App() {
     }
 
     const currentCallsign = assignedCallsign || flightNumber;
+    const permitId = `${permitType}_${Date.now()}`;
+    
     const newPermit = {
-      id: Date.now(),
+      id: permitId,
       type: permitType,
-      data: formData,
+      data: { ...formData },
       status: "SUBMITTED",
       submittedAt: new Date().toLocaleTimeString(),
       submittedDate: new Date().toLocaleDateString(),
       callsign: currentCallsign,
       submittedBy: user?.username,
       airport: selectedAirport,
-      stand: selectedStand
+      stand: selectedStand,
+      aircraft: aircraft,
+      passengers: passengerManifest.length
     };
     
-    setPermits(prev => [...prev, newPermit]);
+    setPermits(prev => {
+      const updated = [...prev, newPermit];
+      console.log("Updated permits:", updated);
+      return updated;
+    });
+    
     setActivePermitForm(null);
+    setPermitFormData({});
     
     // Send system message about permit submission
     socket.emit("chatMessage", {
-      text: `📋 ${permitType.replace(/([A-Z])/g, ' $1').trim().toUpperCase()} PERMIT submitted by ${currentCallsign}`,
+      text: `📋 ${permitType.replace(/([A-Z])/g, ' $1').trim().toUpperCase()} PERMIT submitted by ${currentCallsign} - ID: ${permitId}`,
       sender: "PERMITS OFFICE",
       stand: selectedStand,
       airport: selectedAirport,
@@ -1367,8 +1378,30 @@ export default function App() {
       mode: "system"
     });
 
-    // Show success message
-    alert(`${permitType.replace(/([A-Z])/g, ' $1').trim().toUpperCase()} permit submitted successfully!`);
+    // Simulate permit processing
+    setTimeout(() => {
+      setPermits(prev => prev.map(permit => 
+        permit.id === permitId 
+          ? { ...permit, status: "APPROVED", approvedAt: new Date().toLocaleTimeString() }
+          : permit
+      ));
+      
+      socket.emit("chatMessage", {
+        text: `✅ ${permitType.replace(/([A-Z])/g, ' $1').trim().toUpperCase()} PERMIT APPROVED for ${currentCallsign}`,
+        sender: "PERMITS OFFICE",
+        stand: selectedStand,
+        airport: selectedAirport,
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "system"
+      });
+    }, 3000 + Math.random() * 5000); // Random approval time 3-8 seconds
+  };
+
+  const updatePermitFormData = (field, value) => {
+    setPermitFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const [weightBalanceData, setWeightBalanceData] = useState(null);
@@ -1924,19 +1957,43 @@ export default function App() {
                       <div className="permit-fields">
                         <div className="permit-field">
                           <label>Aircraft Registration:</label>
-                          <input type="text" className="permit-input" placeholder="N123AB" />
+                          <input 
+                            type="text" 
+                            className="permit-input" 
+                            placeholder="N123AB"
+                            value={permitFormData.registration || ''}
+                            onChange={(e) => updatePermitFormData('registration', e.target.value)}
+                          />
                         </div>
                         <div className="permit-field">
                           <label>Total Weight (kg):</label>
-                          <input type="number" className="permit-input" placeholder="75000" />
+                          <input 
+                            type="number" 
+                            className="permit-input" 
+                            placeholder="75000"
+                            value={permitFormData.totalWeight || ''}
+                            onChange={(e) => updatePermitFormData('totalWeight', e.target.value)}
+                          />
                         </div>
                         <div className="permit-field">
                           <label>Standard MTOW (kg):</label>
-                          <input type="number" className="permit-input" placeholder="70000" />
+                          <input 
+                            type="number" 
+                            className="permit-input" 
+                            placeholder="70000"
+                            value={permitFormData.standardMTOW || ''}
+                            onChange={(e) => updatePermitFormData('standardMTOW', e.target.value)}
+                          />
                         </div>
                         <div className="permit-field">
                           <label>Reason for Overweight:</label>
-                          <input type="text" className="permit-input" placeholder="Additional fuel for weather diversion" />
+                          <input 
+                            type="text" 
+                            className="permit-input" 
+                            placeholder="Additional fuel for weather diversion"
+                            value={permitFormData.reason || ''}
+                            onChange={(e) => updatePermitFormData('reason', e.target.value)}
+                          />
                         </div>
                       </div>
                     )}
@@ -1945,19 +2002,36 @@ export default function App() {
                       <div className="permit-fields">
                         <div className="permit-field">
                           <label>Diplomatic Mission:</label>
-                          <input type="text" className="permit-input" placeholder="Embassy of..." />
+                          <input 
+                            type="text" 
+                            className="permit-input" 
+                            placeholder="Embassy of..."
+                            value={permitFormData.mission || ''}
+                            onChange={(e) => updatePermitFormData('mission', e.target.value)}
+                          />
                         </div>
                         <div className="permit-field">
                           <label>Official Purpose:</label>
-                          <input type="text" className="permit-input" placeholder="State visit" />
+                          <input 
+                            type="text" 
+                            className="permit-input" 
+                            placeholder="State visit"
+                            value={permitFormData.purpose || ''}
+                            onChange={(e) => updatePermitFormData('purpose', e.target.value)}
+                          />
                         </div>
                         <div className="permit-field">
                           <label>VIP Level:</label>
-                          <select className="permit-input">
-                            <option>Head of State</option>
-                            <option>Government Minister</option>
-                            <option>Ambassador</option>
-                            <option>Diplomatic Staff</option>
+                          <select 
+                            className="permit-input"
+                            value={permitFormData.vipLevel || ''}
+                            onChange={(e) => updatePermitFormData('vipLevel', e.target.value)}
+                          >
+                            <option value="">Select VIP Level</option>
+                            <option value="head-of-state">Head of State</option>
+                            <option value="government-minister">Government Minister</option>
+                            <option value="ambassador">Ambassador</option>
+                            <option value="diplomatic-staff">Diplomatic Staff</option>
                           </select>
                         </div>
                       </div>
@@ -1967,21 +2041,38 @@ export default function App() {
                       <div className="permit-fields">
                         <div className="permit-field">
                           <label>Special Request Type:</label>
-                          <select className="permit-input">
-                            <option>Medical Emergency</option>
-                            <option>Hazardous Cargo</option>
-                            <option>Oversized Cargo</option>
-                            <option>Military Flight</option>
-                            <option>Search and Rescue</option>
+                          <select 
+                            className="permit-input"
+                            value={permitFormData.requestType || ''}
+                            onChange={(e) => updatePermitFormData('requestType', e.target.value)}
+                          >
+                            <option value="">Select Request Type</option>
+                            <option value="medical-emergency">Medical Emergency</option>
+                            <option value="hazardous-cargo">Hazardous Cargo</option>
+                            <option value="oversized-cargo">Oversized Cargo</option>
+                            <option value="military-flight">Military Flight</option>
+                            <option value="search-rescue">Search and Rescue</option>
                           </select>
                         </div>
                         <div className="permit-field">
                           <label>Details:</label>
-                          <input type="text" className="permit-input" placeholder="Describe special requirements" />
+                          <input 
+                            type="text" 
+                            className="permit-input" 
+                            placeholder="Describe special requirements"
+                            value={permitFormData.details || ''}
+                            onChange={(e) => updatePermitFormData('details', e.target.value)}
+                          />
                         </div>
                         <div className="permit-field">
                           <label>Authority Contact:</label>
-                          <input type="text" className="permit-input" placeholder="Contact person/department" />
+                          <input 
+                            type="text" 
+                            className="permit-input" 
+                            placeholder="Contact person/department"
+                            value={permitFormData.authorityContact || ''}
+                            onChange={(e) => updatePermitFormData('authorityContact', e.target.value)}
+                          />
                         </div>
                       </div>
                     )}
@@ -2093,13 +2184,17 @@ export default function App() {
                     <div className="permit-actions">
                       <button 
                         className="submit-permit"
-                        onClick={() => submitPermit(activePermitForm, {})}
+                        onClick={() => submitPermit(activePermitForm, permitFormData)}
+                        disabled={!permitFormData || Object.keys(permitFormData).length === 0}
                       >
                         SUBMIT PERMIT
                       </button>
                       <button 
                         className="cancel-permit"
-                        onClick={() => setActivePermitForm(null)}
+                        onClick={() => {
+                          setActivePermitForm(null);
+                          setPermitFormData({});
+                        }}
                       >
                         CANCEL
                       </button>
@@ -2191,40 +2286,60 @@ export default function App() {
                     <h3>SUBMITTED PERMITS ({permits.length})</h3>
                     {permits.length === 0 ? (
                       <div className="no-permits">
-                        <div style={{ fontSize: '2rem', marginBottom: '10px' }}>📋</div>
+                        <div style={{ fontSize: '3rem', marginBottom: '15px' }}>📋</div>
                         <div>No permits submitted yet</div>
-                        <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '5px' }}>
+                        <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '8px' }}>
                           Submit permits using the buttons above
                         </div>
                       </div>
                     ) : (
-                      permits.map(permit => (
-                        <div key={permit.id} className="permit-item">
-                          <div className="permit-header">
-                            <span className="permit-type">
-                              {permit.type === 'overweight' && '⚖️ OVERWEIGHT PERMIT'}
-                              {permit.type === 'diplomatic' && '🏛️ DIPLOMATIC PERMIT'}
-                              {permit.type === 'special' && '🚨 SPECIAL OPERATIONS PERMIT'}
-                              {permit.type === 'weightBalance' && '📊 WEIGHT & BALANCE MANIFEST'}
-                            </span>
-                            <span className={`permit-status ${permit.status.toLowerCase()}`}>{permit.status}</span>
-                          </div>
-                          <div className="permit-details">
-                            <span><strong>Submitted:</strong> {permit.submittedDate} at {permit.submittedAt}</span>
-                            <span><strong>Callsign:</strong> {permit.callsign}</span>
-                          </div>
-                          <div className="permit-details">
-                            <span><strong>Pilot:</strong> {permit.submittedBy}</span>
-                            <span><strong>Stand:</strong> {permit.stand || 'N/A'}</span>
-                          </div>
-                          {permit.type === 'weightBalance' && (
-                            <div className="permit-additional-info">
-                              <span><strong>Aircraft:</strong> {aircraft || 'N/A'}</span>
-                              <span><strong>Passengers:</strong> {passengerManifest.length}</span>
+                      <div className="permits-scroll-container">
+                        {permits.map(permit => (
+                          <div key={permit.id} className="permit-item">
+                            <div className="permit-header">
+                              <span className="permit-type">
+                                {permit.type === 'overweight' && '⚖️ OVERWEIGHT PERMIT'}
+                                {permit.type === 'diplomatic' && '🏛️ DIPLOMATIC PERMIT'}
+                                {permit.type === 'special' && '🚨 SPECIAL OPERATIONS PERMIT'}
+                                {permit.type === 'weightBalance' && '📊 WEIGHT & BALANCE MANIFEST'}
+                              </span>
+                              <span className={`permit-status ${permit.status.toLowerCase()}`}>
+                                {permit.status}
+                                {permit.status === 'APPROVED' && permit.approvedAt && (
+                                  <div className="permit-approval-time">
+                                    Approved: {permit.approvedAt}
+                                  </div>
+                                )}
+                              </span>
                             </div>
-                          )}
-                        </div>
-                      ))
+                            <div className="permit-details">
+                              <span><strong>Submitted:</strong> {permit.submittedDate} at {permit.submittedAt}</span>
+                              <span><strong>Callsign:</strong> {permit.callsign}</span>
+                            </div>
+                            <div className="permit-details">
+                              <span><strong>Pilot:</strong> {permit.submittedBy}</span>
+                              <span><strong>Stand:</strong> {permit.stand || 'N/A'}</span>
+                            </div>
+                            <div className="permit-details">
+                              <span><strong>Aircraft:</strong> {permit.aircraft || 'N/A'}</span>
+                              <span><strong>Permit ID:</strong> {permit.id.split('_')[1]}</span>
+                            </div>
+                            {permit.data && Object.keys(permit.data).length > 0 && (
+                              <div className="permit-form-data">
+                                <strong>Form Data:</strong>
+                                <div className="form-data-grid">
+                                  {Object.entries(permit.data).map(([key, value]) => (
+                                    <div key={key} className="form-data-item">
+                                      <span className="form-data-label">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</span>
+                                      <span className="form-data-value">{value || 'N/A'}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </>
@@ -3151,6 +3266,17 @@ export default function App() {
               <h3>GROUND COMMUNICATIONS</h3>
               <div className="comm-status">ONLINE</div>
             </div>
+            <div 
+              className="comm-minimized-indicator"
+              onClick={() => setCommMinimized(false)}
+            >
+              <span>💬</span>
+              <span>C</span>
+              <span>O</span>
+              <span>M</span>
+              <span>M</span>
+              <span>S</span>
+            </div>
             <button 
               className="comm-minimize-btn"
               onClick={() => setCommMinimized(!commMinimized)}
@@ -3158,18 +3284,6 @@ export default function App() {
             >
               {commMinimized ? '▶' : '◀'}
             </button>
-          </div>
-
-          <div 
-            className="comm-minimized-indicator"
-            onClick={() => setCommMinimized(false)}
-          >
-            <span>💬</span>
-            <span>C</span>
-            <span>O</span>
-            <span>M</span>
-            <span>M</span>
-            <span>S</span>
           </div>
 
           <div className="messages-area">
