@@ -1890,7 +1890,7 @@ export default function App() {
       "Airbus A330": "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&h=300&fit=crop&crop=center",
       "Airbus A340": "https://images.unsplash.com/photo-1525624286412-40990003b8c8?w=500&h=300&fit=crop&crop=center",
       "Airbus A350": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
-      "Airbus A380": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=300&fit=crop&crop=center",
+      "Airbus A380": "https://images.unsplash.com/photo-1543005513-94ddf0286df2?w=500&h=300&fit=crop&crop=center",
       "Boeing 737": "https://images.unsplash.com/photo-1517479149777-5f3b1511d5ad?w=500&h=300&fit=crop&crop=center",
       "Boeing 747": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center",
       "Boeing 757": "https://images.unsplash.com/photo-1588073845925-7d5d4827e0fa?w=500&h=300&fit=crop&crop=center",
@@ -2426,7 +2426,7 @@ export default function App() {
 
                               <div className="wb-certification">
                                 <div className="certification-text">
-                                  I certify that this aircraft is loaded and balanced in accordance with 
+                                  I certify that this aircraft is loaded and balanced in accordance with
                                   applicable regulations and the manufacturer's specifications.
                                 </div>
                                 <div className="certification-date">
@@ -2818,6 +2818,43 @@ export default function App() {
                 </div>
               </div>
 
+              <div className="services-section">
+                <h2>GROUND SERVICES</h2>
+                <div className="services-grid">
+                  {[
+                    { name: "Full Service", icon: "🛠️", code: "FULL", priority: "high", category: "complete" },
+                    { name: "Ground Power", icon: "🔌", code: "GPU", priority: "high", category: "power" },
+                    { name: "Fuel Service", icon: "⛽", code: "FUEL", priority: "high", category: "fuel" },
+                    { name: "Pushback", icon: "🚛", code: "PUSH", priority: "high", category: "movement" },
+                    { name: "De-icing", icon: "❄️", code: "DEICE", priority: "high", category: "safety" },
+                    { name: "Catering", icon: "🍽️", code: "CAT", priority: "medium", category: "service" },
+                    { name: "Passenger Stairs", icon: "🪜", code: "STAIRS", priority: "medium", category: "access" },
+                    { name: "Baggage", icon: "🧳", code: "BAG", priority: "medium", category: "cargo" },
+                    { name: "Cleaning", icon: "🧹", code: "CLEAN", priority: "low", category: "maintenance" },
+                    { name: "Water Service", icon: "💧", code: "H2O", priority: "low", category: "maintenance" },
+                    { name: "Lavatory Service", icon: "🚽", code: "LAV", priority: "low", category: "maintenance" },
+                    { name: "Cargo Loading", icon: "📦", code: "CARGO", priority: "medium", category: "cargo" },
+                    { name: "Aircraft Maintenance", icon: "🔧", code: "MAINT", priority: "high", category: "safety" },
+                    { name: "Security Check", icon: "🛡️", code: "SEC", priority: "high", category: "safety" },
+                    { name: "Documentation", icon: "📋", code: "DOC", priority: "medium", category: "admin" }
+                  ].map((service) => (
+                    <button
+                      key={service.name}
+                      className={`service-card ${service.priority} ${service.category}`}
+                      onClick={() => requestService(service.name)}
+                      disabled={!selectedStand}
+                    >
+                      <div className="service-icon">{service.icon}</div>
+                      <div className="service-name">{service.name}</div>
+                      <div className="service-details">
+                        <div className="service-code">{service.code}</div>
+                        <div className="service-priority">{service.priority.toUpperCase()}</div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="aircraft-section">
                 <h2>AIRCRAFT STATUS</h2>
                 <div className="aircraft-display">
@@ -2928,47 +2965,6 @@ export default function App() {
                   )}
                 </div>
               </div>
-
-
-
-              <div className="services-section">
-                <h2>GROUND SERVICES</h2>
-                <div className="services-grid">
-                  {[
-                    { name: "Full Service", icon: "🛠️", code: "FULL", priority: "high", category: "complete" },
-                    { name: "Ground Power", icon: "🔌", code: "GPU", priority: "high", category: "power" },
-                    { name: "Fuel Service", icon: "⛽", code: "FUEL", priority: "high", category: "fuel" },
-                    { name: "Pushback", icon: "🚛", code: "PUSH", priority: "high", category: "movement" },
-                    { name: "De-icing", icon: "❄️", code: "DEICE", priority: "high", category: "safety" },
-                    { name: "Catering", icon: "🍽️", code: "CAT", priority: "medium", category: "service" },
-                    { name: "Passenger Stairs", icon: "🪜", code: "STAIRS", priority: "medium", category: "access" },
-                    { name: "Baggage", icon: "🧳", code: "BAG", priority: "medium", category: "cargo" },
-                    { name: "Cleaning", icon: "🧹", code: "CLEAN", priority: "low", category: "maintenance" },
-                    { name: "Water Service", icon: "💧", code: "H2O", priority: "low", category: "maintenance" },
-                    { name: "Lavatory Service", icon: "🚽", code: "LAV", priority: "low", category: "maintenance" },
-                    { name: "Cargo Loading", icon: "📦", code: "CARGO", priority: "medium", category: "cargo" },
-                    { name: "Aircraft Maintenance", icon: "🔧", code: "MAINT", priority: "high", category: "safety" },
-                    { name: "Security Check", icon: "🛡️", code: "SEC", priority: "high", category: "safety" },
-                    { name: "Documentation", icon: "📋", code: "DOC", priority: "medium", category: "admin" }
-                  ].map((service) => (
-                    <button
-                      key={service.name}
-                      className={`service-card ${service.priority} ${service.category}`}
-                      onClick={() => requestService(service.name)}
-                      disabled={!selectedStand}
-                    >
-                      <div className="service-icon">{service.icon}</div>
-                      <div className="service-name">{service.name}</div>
-                      <div className="service-details">
-                        <div className="service-code">{service.code}</div>
-                        <div className="service-priority">{service.priority.toUpperCase()}</div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-
             </div>
           );
       }
@@ -3383,7 +3379,7 @@ export default function App() {
                     </div>
                     {groundCrewCallsign === "Ground 1" ? (
                       <div className="crew-assignment-controls">
-                        <select 
+                        <select
                           className="crew-assignment-select"
                           onChange={(e) => {
                             if (e.target.value) {
@@ -3450,7 +3446,7 @@ export default function App() {
                     </div>
                     {groundCrewCallsign === "Ground 1" ? (
                       <div className="crew-assignment-controls">
-                        <select 
+                        <select
                           className="crew-assignment-select"
                           onChange={(e) => {
                             if (e.target.value) {
@@ -3517,7 +3513,7 @@ export default function App() {
                     </div>
                     {groundCrewCallsign === "Ground 1" ? (
                       <div className="crew-assignment-controls">
-                        <select 
+                        <select
                           className="crew-assignment-select"
                           onChange={(e) => {
                             if (e.target.value) {
@@ -3620,7 +3616,7 @@ export default function App() {
             <button onClick={toggleSound} className={`sound-toggle ${soundEnabled ? 'enabled' : 'disabled'}`}>
               {soundEnabled ? '🔊' : '🔇'}
             </button>
-            <button 
+            <button
               onClick={() => {
                 setUserMode(null);
                 setSelectedStand("");
@@ -3628,7 +3624,7 @@ export default function App() {
                 setAircraft("");
                 setAssignedCallsign("");
                 setGroundCrewCallsign(""); // Ensure ground callsign is also reset
-              }} 
+              }}
               className="switch-role-btn"
             >
               SWITCH ROLE
@@ -3677,12 +3673,12 @@ export default function App() {
               .filter(msg => {
                 // Filter messages by airport
                 if (msg.airport && msg.airport !== selectedAirport) return false;
-                
+
                 // Filter private checklist messages to only the user who created them
                 if (msg.mode === 'checklist' && msg.privateMessage && msg.userId !== user?.id) {
                   return false;
                 }
-                
+
                 // Filter messages based on user mode and relevant contexts
                 if (userMode === "groundcrew") {
                   // Ground crew sees all messages at the airport except private checklist messages
