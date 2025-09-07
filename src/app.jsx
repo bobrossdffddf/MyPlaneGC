@@ -52,7 +52,7 @@ export default function App() {
   const [equipmentStatus, setEquipmentStatus] = useState({});
   const [activeIncidents, setActiveIncidents] = useState([]);
   const [maintenanceLog, setMaintenanceLog] = useState([]);
-  const [standManagementMode, setStandManagementMode] = useState(false);
+  const [standManagementMode, setStandManagementMode] = useState(true); // Always enabled
   const [selectedStandForManagement, setSelectedStandForManagement] = useState("");
   const [quickFlightNumber, setQuickFlightNumber] = useState("");
   const [quickAircraft, setQuickAircraft] = useState("");
@@ -2733,22 +2733,22 @@ export default function App() {
                   </div>
                   <div className="airport-stats">
                     <div className="stat-item available">
-                      <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length || 'ZERO'}</span>
+                      <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length || '0'}</span>
                       <span className="stat-label">AVAILABLE</span>
                       <div className="stat-indicator"></div>
                     </div>
                     <div className="stat-item occupied">
-                      <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length || 'ZERO'}</span>
+                      <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length || '0'}</span>
                       <span className="stat-label">OCCUPIED</span>
                       <div className="stat-indicator"></div>
                     </div>
                     <div className="stat-item total">
-                      <span className="stat-value">{getCurrentAirportStands().length || 'ZERO'}</span>
+                      <span className="stat-value">{getCurrentAirportStands().length || '0'}</span>
                       <span className="stat-label">TOTAL</span>
                       <div className="stat-indicator"></div>
                     </div>
                     <div className="stat-item requests">
-                      <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length || 'ZERO'}</span>
+                      <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length || '0'}</span>
                       <span className="stat-label">PENDING</span>
                       <div className="stat-indicator"></div>
                     </div>
@@ -3034,26 +3034,23 @@ export default function App() {
               <div className="management-controls">
                 <div className="control-group">
                   <label className="control-label">MANAGEMENT MODE:</label>
-                  <button
-                    className={`management-toggle ${standManagementMode ? 'active' : 'inactive'}`}
-                    onClick={() => setStandManagementMode(!standManagementMode)}
-                  >
-                    <span className="toggle-icon">{standManagementMode ? '🔓' : '🔒'}</span>
-                    <span className="toggle-text">{standManagementMode ? 'ENABLED' : 'DISABLED'}</span>
-                  </button>
+                  <div className="management-toggle active">
+                    <span className="toggle-icon">🔓</span>
+                    <span className="toggle-text">ENABLED</span>
+                  </div>
                 </div>
 
                 <div className="stand-stats">
                   <div className="stat-item">
-                    <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length || 'ZERO'}</span>
+                    <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length || '0'}</span>
                     <span className="stat-label">AVAILABLE</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length || 'ZERO'}</span>
+                    <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length || '0'}</span>
                     <span className="stat-label">OCCUPIED</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length || 'ZERO'}</span>
+                    <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length || '0'}</span>
                     <span className="stat-label">PENDING</span>
                   </div>
                 </div>
@@ -3333,21 +3330,21 @@ export default function App() {
               <div className="metric-card pending">
                 <div className="metric-icon">⏳</div>
                 <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "REQUESTED").length || 'ZERO'}</span>
+                  <span className="metric-value">{requests.filter(r => r.status === "REQUESTED").length || '0'}</span>
                   <span className="metric-label">PENDING REQUESTS</span>
                 </div>
               </div>
               <div className="metric-card active">
                 <div className="metric-icon">🔄</div>
                 <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "ACCEPTED").length || 'ZERO'}</span>
+                  <span className="metric-value">{requests.filter(r => r.status === "ACCEPTED").length || '0'}</span>
                   <span className="metric-label">ACTIVE SERVICES</span>
                 </div>
               </div>
               <div className="metric-card completed">
                 <div className="metric-icon">✅</div>
                 <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "COMPLETED").length || 'ZERO'}</span>
+                  <span className="metric-value">{requests.filter(r => r.status === "COMPLETED").length || '0'}</span>
                   <span className="metric-label">COMPLETED TODAY</span>
                 </div>
               </div>
@@ -3368,7 +3365,7 @@ export default function App() {
                   <span className="priority-icon">🚨</span>
                   <h3>URGENT</h3>
                 </div>
-                <div className="request-count critical">{criticalPriorityRequests.length}</div>
+                <div className="request-count critical">{criticalPriorityRequests.length || '0'}</div>
               </div>
               <div className="service-requests">
                 {criticalPriorityRequests.map((request, i) => (
@@ -3435,7 +3432,7 @@ export default function App() {
                   <span className="priority-icon">⚡</span>
                   <h3>HIGH PRIORITY</h3>
                 </div>
-                <div className="request-count high">{highPriorityRequests.length}</div>
+                <div className="request-count high">{highPriorityRequests.length || '0'}</div>
               </div>
               <div className="service-requests">
                 {highPriorityRequests.map((request, i) => (
@@ -3502,7 +3499,7 @@ export default function App() {
                   <span className="priority-icon">📋</span>
                   <h3>STANDARD</h3>
                 </div>
-                <div className="request-count standard">{mediumPriorityRequests.length + lowPriorityRequests.length}</div>
+                <div className="request-count standard">{mediumPriorityRequests.length + lowPriorityRequests.length || '0'}</div>
               </div>
               <div className="service-requests">
                 {[...mediumPriorityRequests, ...lowPriorityRequests].map((request, i) => (
@@ -3569,7 +3566,7 @@ export default function App() {
                   <span className="priority-icon">🔄</span>
                   <h3>IN PROGRESS</h3>
                 </div>
-                <div className="request-count active">{inProgressRequests.length}</div>
+                <div className="request-count active">{inProgressRequests.length || '0'}</div>
               </div>
               <div className="service-requests">
                 {inProgressRequests.map((request, i) => (
