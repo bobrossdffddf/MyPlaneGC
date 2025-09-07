@@ -49,7 +49,44 @@ passport.deserializeUser((user, done) => {
 
 // In-memory storage for demo (use database in production)
 let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {}, groundCrewCallsigns: new Map() } }
-let connectedUsers = new Map();
+// Store user data with callsigns
+const connectedUsers = new Map();
+
+// Function to get user counts for all airports
+const getUserCounts = () => {
+  const counts = {};
+
+  // Initialize all airports with zero counts
+  const allAirports = ["IRFD", "IZOL", "IPPH", "IGRV", "ISAU", "IBTH", "ISKP", "IGAR", "IBLT", "IMLR", "ITRC", "IDCS", "ITKO", "IJAF", "ISCM", "IHEN", "ILAR", "IIAB", "IPAP"];
+  allAirports.forEach(airport => {
+    counts[airport] = { pilots: 0, groundCrew: 0 };
+  });
+
+  // Count users by airport and mode
+  for (const [socketId, userData] of connectedUsers) {
+    if (userData.airport && userData.mode) {
+      if (!counts[userData.airport]) {
+        counts[userData.airport] = { pilots: 0, groundCrew: 0 };
+      }
+
+      if (userData.mode === 'pilot') {
+        counts[userData.airport].pilots++;
+      } else if (userData.mode === 'groundcrew') {
+        counts[userData.airport].groundCrew++;
+      }
+    }
+  }
+
+  return counts;
+};
+
+// Function to broadcast user counts to all clients
+const broadcastUserCounts = () => {
+  const counts = getUserCounts();
+  io.emit("userCountUpdate", counts);
+};
+
+
 let ptfsAtisData = {}; // Store real ATIS data from PTFS
 const claimedCallsigns = {}; // Store callsign data
 
@@ -102,12 +139,12 @@ const releaseGroundCrewCallsign = (airport, userId) => {
   remainingAssignments.forEach(([oldCallsign, assignedUserId], index) => {
     const newCallsign = `GROUND ${index + 1}`;
     airportData[airport].groundCrewCallsigns.set(newCallsign, assignedUserId);
-    
+
     // Notify the user of their new callsign if it changed
     if (oldCallsign !== newCallsign) {
       const userSocket = Array.from(io.sockets.sockets.values())
         .find(socket => connectedUsers.get(socket.id)?.userId === assignedUserId);
-      
+
       if (userSocket) {
         userSocket.emit("callsignUpdate", { newCallsign });
       }
@@ -467,48 +504,24 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("✅ User connected:", socket.id);
 
-  socket.on("userMode", (data) => {
-    connectedUsers.set(socket.id, data);
+  // Send current state to new client
+  socket.emit("standUpdate", airportData);
+  socket.emit("serviceUpdate", serviceRequests);
 
-    // Initialize airport data if not exists
-    if (data.airport && !airportData[data.airport]) {
-      airportData[data.airport] = {
-        stands: {},
-        requests: [],
-        users: new Map(),
-        groundCrewCallsigns: new Map(),
-        atis: ptfsAtisData[data.airport] || {
-          airport: data.airport,
-          info: 'INFO ALPHA',
-          wind: 'CALM',
-          qnh: '1013',
-          runway: 'UNKNOWN',
-          conditions: 'CAVOK',
-          temperature: 'N/A',
-          timestamp: new Date().toLocaleTimeString()
-        }
-      };
-    }
+  // Send current user counts
+  socket.emit("userCountUpdate", getUserCounts());
 
-    // Add user to airport-specific data
-    if (data.airport) {
-      // Assign ground crew callsign if user is ground crew
-      if (data.mode === 'groundcrew') {
-        const callsign = assignGroundCrewCallsign(data.airport, data.userId);
-        data.callsign = callsign;
-        socket.emit("callsignAssigned", { callsign });
-      }
+  socket.on("userMode", ({ mode, airport, userId }) => {
+    const userData = connectedUsers.get(socket.id) || {};
+    userData.mode = mode;
+    userData.airport = airport;
+    userData.userId = userId;
+    connectedUsers.set(socket.id, userData);
 
-      airportData[data.airport].users.set(socket.id, data);
-      socket.join(data.airport); // Join airport-specific room
+    console.log(`User ${userData.username || userId} set mode to ${mode} at ${airport}`);
 
-      // Send airport-specific data
-      socket.emit("standUpdate", airportData[data.airport].stands);
-      socket.emit("serviceUpdate", airportData[data.airport].requests);
-      socket.emit("atisUpdate", airportData[data.airport].atis);
-
-      console.log(`👤 User joined: ${data.userId} (Discord ID) → ${data.airport} as ${data.mode.toUpperCase()}${data.callsign ? ` (${data.callsign})` : ''}`);
-    }
+    // Broadcast updated user counts
+    broadcastUserCounts();
   });
 
   socket.on("claimStand", (data) => {
@@ -651,7 +664,7 @@ io.on("connection", (socket) => {
     if (standData) {
       const flightNumber = standData.flight;
       const pilot = standData.pilot;
-      
+
       delete airportData[airport].stands[stand];
       io.to(airport).emit("standUpdate", airportData[airport].stands);
 
@@ -695,9 +708,17 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     const userInfo = connectedUsers.get(socket.id);
+    if (userInfo) {
+      // Release ground crew callsign if assigned
+      if (userInfo.airport && userInfo.mode === 'groundcrew') {
+        releaseGroundCrewCallsign(userInfo.airport, userInfo.userId);
+      }
 
-    if (userInfo && userInfo.userId) {
-      console.log(`❌ User disconnected: ${userInfo.userId} (Discord ID) from ${userInfo.airport || 'unknown airport'} - was ${userInfo.mode || 'unknown role'}`);
+      connectedUsers.delete(socket.id);
+      console.log(`User ${userInfo.username || 'Unknown'} disconnected`);
+
+      // Broadcast updated user counts
+      broadcastUserCounts();
     } else {
       console.log("❌ Unknown user disconnected:", socket.id);
     }
@@ -722,16 +743,9 @@ io.on("connection", (socket) => {
         }
       }
 
-      // Release ground crew callsign if user was ground crew
-      if (userInfo.mode === 'groundcrew') {
-        releaseGroundCrewCallsign(userInfo.airport, userInfo.userId);
-      }
-
       // Remove user from airport data
       airportData[userInfo.airport].users.delete(socket.id);
     }
-
-    connectedUsers.delete(socket.id);
   });
 });
 

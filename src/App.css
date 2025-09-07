@@ -5381,7 +5381,7 @@ body {
   }
 }
 
-/* Main Area Improvements */
+/* Main Content Area */
 .content-wrapper {
   padding: 20px;
   max-width: 100%;
@@ -5898,13 +5898,33 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .stands-count {
   font-size: 0.9rem;
-  color: #a0a8b0;
   font-weight: 500;
+}
+
+.user-counts {
+  display: flex;
+  gap: 15px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.pilot-count {
+  color: #3b82f6;
+}
+
+.gc-count {
+  color: #ff9500;
+}
+
+.status-text {
+  font-size: 0.8rem;
+  color: #22c55e;
+  font-weight: 600;
 }
 
 .frequency {
@@ -5934,7 +5954,6 @@ body {
   padding: 15px;
   background: rgba(0, 0, 0, 0.3);
   border-radius: 12px;
-  border: 1px solid rgba(255, 149, 0, 0.2);
 }
 
 /* Airport Stats Responsive */
@@ -6061,6 +6080,7 @@ body {
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(10px);
+  animation: fadeIn 0.3s ease-out;
 }
 
 .permit-form-container {
@@ -7395,6 +7415,7 @@ body {
 .position-info {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 3px;
   text-align: center;
   font-family: 'SF Mono', monospace;

@@ -64,6 +64,7 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [badWordsFilter, setBadWordsFilter] = useState(true);
   const [lastServiceRequest, setLastServiceRequest] = useState({});
+  const [airportUserCounts, setAirportUserCounts] = useState({});
 
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
@@ -1404,6 +1405,10 @@ export default function App() {
       alert(error.message || "An error occurred");
     });
 
+    socket.on("userCountUpdate", (counts) => {
+      setAirportUserCounts(counts);
+    });
+
     return () => {
       socket.off("standUpdate");
       socket.off("chatUpdate");
@@ -1412,6 +1417,7 @@ export default function App() {
       socket.off("callsignAssigned"); // Remove listener
       socket.off("callsignUpdate"); // Remove listener
       socket.off("error");
+      socket.off("userCountUpdate");
     };
   }, [selectedAirport, soundEnabled, user]);
 
@@ -2025,19 +2031,26 @@ export default function App() {
                 .filter(airport =>
                   airport.toLowerCase().includes(airportSearchTerm.toLowerCase())
                 )
-                .map((airport) => (
-                <button
-                  key={airport}
-                  className="airport-card"
-                  onClick={() => setSelectedAirport(airport)}
-                >
-                  <div className="airport-code">{airport}</div>
-                  <div className="airport-info">
-                      <div className="stands-count">{getAirportConfig(airport).stands.length} Stands</div>
-                      <div className="status-text">OPERATIONAL</div>
-                    </div>
-                </button>
-              ))}
+                .map((airport) => {
+                  const counts = airportUserCounts[airport] || { pilots: 0, groundCrew: 0 };
+                  return (
+                    <button
+                      key={airport}
+                      className="airport-card"
+                      onClick={() => setSelectedAirport(airport)}
+                    >
+                      <div className="airport-code">{airport}</div>
+                      <div className="airport-info">
+                        <div className="stands-count">{getAirportConfig(airport).stands.length} Stands</div>
+                        <div className="user-counts">
+                          <span className="pilot-count">👨‍✈️ {counts.pilots}</span>
+                          <span className="gc-count">👷‍♂️ {counts.groundCrew}</span>
+                        </div>
+                        <div className="status-text">OPERATIONAL</div>
+                      </div>
+                    </button>
+                  );
+                })}
             </div>
           </div>
         </div>
@@ -3282,79 +3295,7 @@ export default function App() {
 
       return (
         <div className="groundcrew-main">
-          <div className="ground-operations-instructions">
-            <div className="instructions-banner">
-              <div className="instructions-icon">📋</div>
-              <div className="instructions-content">
-                <h3>GROUND OPERATIONS INSTRUCTIONS</h3>
-                <div className="instructions-list">
-                  <div className="instruction-item">
-                    <span className="instruction-icon">🚨</span>
-                    <span>Handle URGENT requests immediately (De-icing, Maintenance, Security, Pushback)</span>
-                  </div>
-                  <div className="instruction-item">
-                    <span className="instruction-icon">⚡</span>
-                    <span>Process HIGH priority requests next (Ground Power, Fuel, Documentation)</span>
-                  </div>
-                  <div className="instruction-item">
-                    <span className="instruction-icon">📋</span>
-                    <span>Complete STANDARD requests in order (Catering, Baggage, Stairs, Cargo)</span>
-                  </div>
-                  <div className="instruction-item">
-                    <span className="instruction-icon">🔄</span>
-                    <span>Click "ACCEPT & ASSIGN" to take responsibility, then "MARK COMPLETE" when finished</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="ground-operations-header">
-            <div className="header-content">
-              <div className="header-left">
-                <h1>GROUND OPERATIONS CONTROL</h1>
-                <div className="airport-designation">{selectedAirport} - GROUND FREQUENCY 121.9</div>
-              </div>
-              <div className="header-right">
-                <div className="operational-status">
-                  <div className="status-indicator online"></div>
-                  <span>ALL SYSTEMS OPERATIONAL</span>
-                </div>
-                <div className="current-time">{new Date().toLocaleTimeString()}</div>
-              </div>
-            </div>
-
-            <div className="operations-metrics">
-              <div className="metric-card pending">
-                <div className="metric-icon">⏳</div>
-                <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "REQUESTED").length || '0'}</span>
-                  <span className="metric-label">PENDING REQUESTS</span>
-                </div>
-              </div>
-              <div className="metric-card active">
-                <div className="metric-icon">🔄</div>
-                <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "ACCEPTED").length || '0'}</span>
-                  <span className="metric-label">ACTIVE SERVICES</span>
-                </div>
-              </div>
-              <div className="metric-card completed">
-                <div className="metric-icon">✅</div>
-                <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "COMPLETED").length || '0'}</span>
-                  <span className="metric-label">COMPLETED TODAY</span>
-                </div>
-              </div>
-              <div className="metric-card efficiency">
-                <div className="metric-icon">📊</div>
-                <div className="metric-data">
-                  <span className="metric-value">98%</span>
-                  <span className="metric-label">EFFICIENCY</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           <div className="service-management-board">
             <div className="service-column critical">
