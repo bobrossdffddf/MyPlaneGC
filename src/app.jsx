@@ -65,6 +65,12 @@ export default function App() {
   const [badWordsFilter, setBadWordsFilter] = useState(true);
   const [lastServiceRequest, setLastServiceRequest] = useState({});
   const [airportUserCounts, setAirportUserCounts] = useState({});
+  const [showPushbackForm, setShowPushbackForm] = useState(false);
+  const [pushbackFormData, setPushbackFormData] = useState({
+    tugSize: '',
+    clearedByGround: false,
+    tailDirection: ''
+  });
 
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
@@ -1544,6 +1550,12 @@ export default function App() {
       return;
     }
 
+    // Show pushback form for pushback service
+    if (service === "Pushback") {
+      setShowPushbackForm(true);
+      return;
+    }
+
     // Rate limiting - prevent spam (except for Full Service)
     if (service !== "Full Service") {
       const now = Date.now();
@@ -1591,6 +1603,41 @@ export default function App() {
         status: "REQUESTED"
       });
     }
+  };
+
+  const submitPushbackRequest = () => {
+    if (!pushbackFormData.tugSize || pushbackFormData.clearedByGround === null) {
+      alert("Please fill out all required fields");
+      return;
+    }
+
+    if (pushbackFormData.clearedByGround && !pushbackFormData.tailDirection) {
+      alert("Please specify the tail direction cleared by ground");
+      return;
+    }
+
+    socket.emit("serviceRequest", {
+      service: "Pushback",
+      stand: selectedStand,
+      flight: flightNumber,
+      pilot: user?.username,
+      airport: selectedAirport,
+      timestamp: new Date().toLocaleTimeString(),
+      status: "REQUESTED",
+      pushbackSettings: {
+        tugSize: pushbackFormData.tugSize,
+        clearedByGround: pushbackFormData.clearedByGround,
+        tailDirection: pushbackFormData.clearedByGround ? pushbackFormData.tailDirection : 'N/A'
+      }
+    });
+
+    // Reset form
+    setPushbackFormData({
+      tugSize: '',
+      clearedByGround: false,
+      tailDirection: ''
+    });
+    setShowPushbackForm(false);
   };
 
   const handleServiceAction = (requestId, action) => {
@@ -3317,6 +3364,17 @@ export default function App() {
                       </div>
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
+                      {request.pushbackSettings && (
+                        <div className="pushback-details">
+                          <div className="pushback-info">
+                            <span><strong>Tug:</strong> {request.pushbackSettings.tugSize}</span>
+                            <span><strong>Cleared:</strong> {request.pushbackSettings.clearedByGround ? 'Yes' : 'No'}</span>
+                            {request.pushbackSettings.clearedByGround && (
+                              <span><strong>Direction:</strong> {request.pushbackSettings.tailDirection}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {groundCrewCallsign === "Ground 1" ? (
                       <div className="crew-assignment-controls">
@@ -3384,6 +3442,17 @@ export default function App() {
                       </div>
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
+                      {request.pushbackSettings && (
+                        <div className="pushback-details">
+                          <div className="pushback-info">
+                            <span><strong>Tug:</strong> {request.pushbackSettings.tugSize}</span>
+                            <span><strong>Cleared:</strong> {request.pushbackSettings.clearedByGround ? 'Yes' : 'No'}</span>
+                            {request.pushbackSettings.clearedByGround && (
+                              <span><strong>Direction:</strong> {request.pushbackSettings.tailDirection}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {groundCrewCallsign === "Ground 1" ? (
                       <div className="crew-assignment-controls">
@@ -3451,6 +3520,17 @@ export default function App() {
                       </div>
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
+                      {request.pushbackSettings && (
+                        <div className="pushback-details">
+                          <div className="pushback-info">
+                            <span><strong>Tug:</strong> {request.pushbackSettings.tugSize}</span>
+                            <span><strong>Cleared:</strong> {request.pushbackSettings.clearedByGround ? 'Yes' : 'No'}</span>
+                            {request.pushbackSettings.clearedByGround && (
+                              <span><strong>Direction:</strong> {request.pushbackSettings.tailDirection}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {groundCrewCallsign === "Ground 1" ? (
                       <div className="crew-assignment-controls">
@@ -3518,6 +3598,17 @@ export default function App() {
                       </div>
                       <div className="service-type">{request.service}</div>
                       <div className="request-time">{request.timestamp}</div>
+                      {request.pushbackSettings && (
+                        <div className="pushback-details">
+                          <div className="pushback-info">
+                            <span><strong>Tug:</strong> {request.pushbackSettings.tugSize}</span>
+                            <span><strong>Cleared:</strong> {request.pushbackSettings.clearedByGround ? 'Yes' : 'No'}</span>
+                            {request.pushbackSettings.clearedByGround && (
+                              <span><strong>Direction:</strong> {request.pushbackSettings.tailDirection}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => handleServiceAction(requests.indexOf(request), "COMPLETED")}
@@ -3543,6 +3634,100 @@ export default function App() {
 
   return (
     <div className="tablet-interface">
+      {showPushbackForm && (
+        <div className="pushback-modal-overlay">
+          <div className="pushback-modal">
+            <div className="pushback-modal-header">
+              <h3>PUSHBACK REQUEST</h3>
+              <button 
+                className="close-modal-btn" 
+                onClick={() => setShowPushbackForm(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="pushback-form-content">
+              <div className="form-group">
+                <label>What tug do you need?</label>
+                <select
+                  value={pushbackFormData.tugSize}
+                  onChange={(e) => setPushbackFormData(prev => ({ ...prev, tugSize: e.target.value }))}
+                  className="pushback-select"
+                >
+                  <option value="">Select tug size</option>
+                  <option value="Small">Small</option>
+                  <option value="Small Long">Small Long</option>
+                  <option value="Large">Large</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Have you been cleared by ground?</label>
+                <div className="radio-group">
+                  <label className="radio-option">
+                    <input
+                      type="radio"
+                      name="cleared"
+                      checked={pushbackFormData.clearedByGround === true}
+                      onChange={() => setPushbackFormData(prev => ({ ...prev, clearedByGround: true }))}
+                    />
+                    Yes
+                  </label>
+                  <label className="radio-option">
+                    <input
+                      type="radio"
+                      name="cleared"
+                      checked={pushbackFormData.clearedByGround === false}
+                      onChange={() => setPushbackFormData(prev => ({ ...prev, clearedByGround: false }))}
+                    />
+                    No
+                  </label>
+                </div>
+              </div>
+              {pushbackFormData.clearedByGround && (
+                <div className="form-group">
+                  <label>Which direction did ground clear your tail for?</label>
+                  <div className="radio-group">
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="direction"
+                        value="Left"
+                        checked={pushbackFormData.tailDirection === 'Left'}
+                        onChange={(e) => setPushbackFormData(prev => ({ ...prev, tailDirection: e.target.value }))}
+                      />
+                      Left
+                    </label>
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="direction"
+                        value="Right"
+                        checked={pushbackFormData.tailDirection === 'Right'}
+                        onChange={(e) => setPushbackFormData(prev => ({ ...prev, tailDirection: e.target.value }))}
+                      />
+                      Right
+                    </label>
+                  </div>
+                </div>
+              )}
+              <div className="pushback-form-actions">
+                <button 
+                  className="submit-pushback-btn"
+                  onClick={submitPushbackRequest}
+                >
+                  SUBMIT REQUEST
+                </button>
+                <button 
+                  className="cancel-pushback-btn"
+                  onClick={() => setShowPushbackForm(false)}
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="tablet-header">
         <div className="header-left">
           <div className="app-title">MyPlane</div>

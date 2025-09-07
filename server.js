@@ -49,6 +49,19 @@ passport.deserializeUser((user, done) => {
 
 // In-memory storage for demo (use database in production)
 let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {}, groundCrewCallsigns: new Map() } }
+
+// Initialize airport data when needed
+const initializeAirportData = (airport) => {
+  if (!airportData[airport]) {
+    airportData[airport] = {
+      stands: {},
+      requests: [],
+      users: new Map(),
+      atis: {},
+      groundCrewCallsigns: new Map()
+    };
+  }
+};
 // Store user data with callsigns
 const connectedUsers = new Map();
 
@@ -506,19 +519,30 @@ io.on("connection", (socket) => {
 
   // Send current state to new client
   socket.emit("standUpdate", airportData);
-  socket.emit("serviceUpdate", serviceRequests);
+  // Send empty array initially as serviceRequests will be handled per airport
+  socket.emit("serviceUpdate", []);
 
   // Send current user counts
   socket.emit("userCountUpdate", getUserCounts());
 
   socket.on("userMode", ({ mode, airport, userId }) => {
+    // Initialize airport data if needed
+    initializeAirportData(airport);
+    
     const userData = connectedUsers.get(socket.id) || {};
     userData.mode = mode;
     userData.airport = airport;
     userData.userId = userId;
     connectedUsers.set(socket.id, userData);
 
+    // Join the airport room
+    socket.join(airport);
+
     console.log(`User ${userData.username || userId} set mode to ${mode} at ${airport}`);
+
+    // Send current airport data to the user
+    socket.emit("standUpdate", airportData[airport].stands);
+    socket.emit("serviceUpdate", airportData[airport].requests);
 
     // Broadcast updated user counts
     broadcastUserCounts();
@@ -527,10 +551,13 @@ io.on("connection", (socket) => {
   socket.on("claimStand", (data) => {
     const { stand, flightNumber, aircraft, pilot, userId, airport, allowSwitch } = data;
 
-    if (!airport || !airportData[airport]) {
+    if (!airport) {
       socket.emit("error", { message: "Invalid airport selected" });
       return;
     }
+
+    // Initialize airport data if needed
+    initializeAirportData(airport);
 
     // Check if stand is available or if user is switching their own stand
     if (airportData[airport].stands[stand] &&
@@ -593,10 +620,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("serviceRequest", (req) => {
-    if (!req.airport || !airportData[req.airport]) {
+    if (!req.airport) {
       socket.emit("error", { message: "Invalid airport selected" });
       return;
     }
+
+    // Initialize airport data if needed
+    initializeAirportData(req.airport);
 
     const requestId = airportData[req.airport].requests.length;
     const serviceRequest = {
