@@ -1862,7 +1862,7 @@ export default function App() {
       )
     }));
 
-    // Send system message when checklist item is completed
+    // Send system message when checklist item is completed - only to current user
     const item = checklists[category][index];
     if (!item.checked && selectedStand) {
       socket.emit("chatMessage", {
@@ -1871,7 +1871,9 @@ export default function App() {
         stand: selectedStand,
         airport: selectedAirport,
         timestamp: new Date().toLocaleTimeString(),
-        mode: "checklist"
+        mode: "checklist",
+        userId: user?.id, // Add user ID to make it user-specific
+        privateMessage: true // Mark as private message
       });
     }
   };
@@ -3675,12 +3677,18 @@ export default function App() {
               .filter(msg => {
                 // Filter messages by airport
                 if (msg.airport && msg.airport !== selectedAirport) return false;
+                
+                // Filter private checklist messages to only the user who created them
+                if (msg.mode === 'checklist' && msg.privateMessage && msg.userId !== user?.id) {
+                  return false;
+                }
+                
                 // Filter messages based on user mode and relevant contexts
                 if (userMode === "groundcrew") {
-                  // Ground crew sees all messages at the airport
+                  // Ground crew sees all messages at the airport except private checklist messages
                   return true;
                 } else if (userMode === "pilot") {
-                  // Pilots see system messages, checklist updates, and messages related to their stand or general ground comms
+                  // Pilots see system messages, their own checklist updates, and messages related to their stand or general ground comms
                   return msg.mode === 'system' || msg.mode === 'checklist' || !selectedStand || msg.stand === selectedStand || msg.stand === "GROUND";
                 }
                 // Default to showing messages if no specific filtering is needed
