@@ -2733,22 +2733,22 @@ export default function App() {
                   </div>
                   <div className="airport-stats">
                     <div className="stat-item available">
-                      <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length}</span>
+                      <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length || 'ZERO'}</span>
                       <span className="stat-label">AVAILABLE</span>
                       <div className="stat-indicator"></div>
                     </div>
                     <div className="stat-item occupied">
-                      <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length}</span>
+                      <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length || 'ZERO'}</span>
                       <span className="stat-label">OCCUPIED</span>
                       <div className="stat-indicator"></div>
                     </div>
                     <div className="stat-item total">
-                      <span className="stat-value">{getCurrentAirportStands().length}</span>
+                      <span className="stat-value">{getCurrentAirportStands().length || 'ZERO'}</span>
                       <span className="stat-label">TOTAL</span>
                       <div className="stat-indicator"></div>
                     </div>
                     <div className="stat-item requests">
-                      <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length}</span>
+                      <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length || 'ZERO'}</span>
                       <span className="stat-label">PENDING</span>
                       <div className="stat-indicator"></div>
                     </div>
@@ -3045,15 +3045,15 @@ export default function App() {
 
                 <div className="stand-stats">
                   <div className="stat-item">
-                    <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length}</span>
+                    <span className="stat-value">{getCurrentAirportStands().filter(s => !stands[s.id]).length || 'ZERO'}</span>
                     <span className="stat-label">AVAILABLE</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length}</span>
+                    <span className="stat-value">{getCurrentAirportStands().filter(s => stands[s.id]).length || 'ZERO'}</span>
                     <span className="stat-label">OCCUPIED</span>
                   </div>
                   <div className="stat-item">
-                    <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length}</span>
+                    <span className="stat-value">{requests.filter(r => r.status === "REQUESTED").length || 'ZERO'}</span>
                     <span className="stat-label">PENDING</span>
                   </div>
                 </div>
@@ -3333,21 +3333,21 @@ export default function App() {
               <div className="metric-card pending">
                 <div className="metric-icon">⏳</div>
                 <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "REQUESTED").length}</span>
+                  <span className="metric-value">{requests.filter(r => r.status === "REQUESTED").length || 'ZERO'}</span>
                   <span className="metric-label">PENDING REQUESTS</span>
                 </div>
               </div>
               <div className="metric-card active">
                 <div className="metric-icon">🔄</div>
                 <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "ACCEPTED").length}</span>
+                  <span className="metric-value">{requests.filter(r => r.status === "ACCEPTED").length || 'ZERO'}</span>
                   <span className="metric-label">ACTIVE SERVICES</span>
                 </div>
               </div>
               <div className="metric-card completed">
                 <div className="metric-icon">✅</div>
                 <div className="metric-data">
-                  <span className="metric-value">{requests.filter(r => r.status === "COMPLETED").length}</span>
+                  <span className="metric-value">{requests.filter(r => r.status === "COMPLETED").length || 'ZERO'}</span>
                   <span className="metric-label">COMPLETED TODAY</span>
                 </div>
               </div>

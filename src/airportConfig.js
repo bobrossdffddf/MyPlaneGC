@@ -154,6 +154,41 @@ const airportConfigs = {
       // 1 helipad
       { id: "H01", type: "helipad", capacity: "helicopter", terminal: "Helipad Area" }
     ]
+  },
+  "ITKO": {
+    stands: [
+      // Terminal Gates (18 total)
+      // All planes gates (10 total)
+      { id: "001", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "002", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "008", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "009", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "010", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "011", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "012", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "016", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "017", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+      { id: "018", type: "wide", capacity: "super-heavy", terminal: "Main Terminal", hasJetway: true },
+
+      // Bus-only gates (2 total)
+      { id: "003", type: "narrow", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: false, busRequired: true, restrictions: ["Boeing 747", "Airbus A380", "Boeing 777", "Airbus A350", "Airbus A330", "Boeing 767"] },
+      { id: "004", type: "narrow", capacity: "narrow-body", terminal: "Main Terminal", hasJetway: false, busRequired: true, restrictions: ["Boeing 747", "Airbus A380", "Boeing 777", "Airbus A350", "Airbus A330", "Boeing 767"] },
+
+      // Short-medium haul gates (6 total)
+      { id: "005", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Airbus A380"] },
+      { id: "006", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Airbus A380"] },
+      { id: "007", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Airbus A380"] },
+      { id: "013", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Airbus A380"] },
+      { id: "014", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Airbus A380"] },
+      { id: "015", type: "medium", capacity: "wide-body", terminal: "Main Terminal", hasJetway: true, restrictions: ["Boeing 747", "Airbus A380"] },
+
+      // Cargo Terminal (5 spaces)
+      { id: "C01", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
+      { id: "C02", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
+      { id: "C03", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
+      { id: "C04", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" },
+      { id: "C05", type: "cargo", capacity: "cargo", terminal: "Cargo Terminal" }
+    ]
   }
 };
 
