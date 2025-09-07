@@ -6658,14 +6658,55 @@ body {
 }
 
 /* Enhanced Aircraft Display with Real Photos */
-.aircraft-display {
+.aircraft-display-simple {
   background: linear-gradient(135deg, rgba(0, 20, 40, 0.8), rgba(0, 30, 60, 0.6));
   border: 2px solid rgba(255, 149, 0, 0.3);
   border-radius: 20px;
-  padding: 40px;
+  padding: 30px;
   margin-bottom: 25px;
-  position: relative;
-  overflow: hidden;
+  text-align: center;
+}
+
+.aircraft-info-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.aircraft-icon {
+  font-size: 3rem;
+  color: #ff9500;
+}
+
+.aircraft-details {
+  text-align: left;
+}
+
+.aircraft-type {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+.aircraft-manufacturer {
+  font-size: 1rem;
+  color: #ff9500;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.aircraft-category {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .aircraft-display::before {

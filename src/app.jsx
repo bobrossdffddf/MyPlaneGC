@@ -1851,7 +1851,7 @@ export default function App() {
 
   const removeFlightFromStand = (standId) => {
     // Emit an event to remove the flight from the stand
-    socket.emit("removeFlightFromStand", { standId, airport: selectedAirport });
+    socket.emit("removeFromStand", { stand: standId, removedBy: user?.username, airport: selectedAirport });
   };
 
   const toggleChecklistItem = (category, index) => {
@@ -1911,25 +1911,14 @@ export default function App() {
 
   const renderAircraftDisplay = () => {
     if (aircraft && aircraftData) {
-      const imageUrl = getAircraftImageUrl(aircraft);
-
       return (
-        <div className="aircraft-display-3d">
-          <div className="aircraft-photo-container">
-            <img 
-              src={imageUrl}
-              alt={`${aircraft} aircraft`}
-              className="aircraft-photo"
-              onError={(e) => {
-                e.target.src = "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500&h=300&fit=crop&crop=center";
-              }}
-            />
-            <div className="aircraft-photo-overlay">
-              <div className="aircraft-label">
-                <div className="aircraft-type">{aircraftData.type}</div>
-                <div className="aircraft-manufacturer">{aircraftData.manufacturer}</div>
-                <div className="aircraft-category">{aircraftData.category.toUpperCase()}</div>
-              </div>
+        <div className="aircraft-display-simple">
+          <div className="aircraft-info-card">
+            <div className="aircraft-icon">✈️</div>
+            <div className="aircraft-details">
+              <div className="aircraft-type">{aircraftData.type}</div>
+              <div className="aircraft-manufacturer">{aircraftData.manufacturer}</div>
+              <div className="aircraft-category">{aircraftData.category.toUpperCase()}</div>
             </div>
           </div>
         </div>
@@ -1938,7 +1927,7 @@ export default function App() {
 
     // Fallback when no aircraft is selected
     return (
-      <div className="aircraft-display-3d">
+      <div className="aircraft-display-simple">
         <div className="aircraft-placeholder">
           <div className="placeholder-icon">✈️</div>
           <div className="aircraft-label">
@@ -1981,7 +1970,7 @@ export default function App() {
             <div className="brand-icon">🛩️</div>
             <h1>MyPlane</h1>
             <div className="brand-subtitle">Professional Aviation Ground Operations</div>
-            <div className="system-version">Version 3.1.0 | Build 2024</div>
+            <div className="system-version">Version 1.1.1 | Made by @justawacko_</div>
           </div>
           <div className="auth-section">
             <button onClick={handleLogin} className="discord-auth-btn">
