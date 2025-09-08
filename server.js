@@ -777,6 +777,34 @@ io.on("connection", (socket) => {
     console.log(`📋 EFS Update: ${flightPlanId} by ${updatedBy} at ${airport}`);
   });
 
+  socket.on("efsTransfer", (transferData) => {
+    const { flightPlanId, fromPosition, toPosition, transferredBy, airport } = transferData;
+    
+    // Broadcast EFS transfer to all ATC controllers at the same airport
+    io.to(airport).emit("efsTransfer", {
+      flightPlanId,
+      fromPosition,
+      toPosition,
+      transferredBy,
+      timestamp: new Date().toISOString()
+    });
+
+    console.log(`📋 EFS Transfer: ${flightPlanId} from ${fromPosition} to ${toPosition} by ${transferredBy} at ${airport}`);
+  });
+
+  socket.on("efsRemove", (removeData) => {
+    const { flightPlanId, removedBy, airport } = removeData;
+    
+    // Broadcast EFS removal to all ATC controllers at the same airport
+    io.to(airport).emit("efsRemove", {
+      flightPlanId,
+      removedBy,
+      timestamp: new Date().toISOString()
+    });
+
+    console.log(`📋 EFS Removed: ${flightPlanId} by ${removedBy} at ${airport}`);
+  });
+
   socket.on("atcAnnouncement", (announcement) => {
     const { message, from, airport } = announcement;
     

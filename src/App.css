@@ -4026,6 +4026,28 @@ body {
   gap: 15px;
 }
 
+.efs-lookup {
+  flex: 1;
+  max-width: 300px;
+}
+
+.efs-lookup-input {
+  width: 100%;
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-family: 'SF Mono', monospace;
+}
+
+.efs-lookup-input:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
 .notification-indicator {
   position: relative;
 }
@@ -4058,13 +4080,50 @@ body {
 }
 
 .efs-strip {
-  background: rgba(26, 31, 46, 0.95);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 15px;
+  background: linear-gradient(135deg, rgba(240, 248, 255, 0.95), rgba(248, 250, 252, 0.95));
+  border: 2px solid rgba(75, 85, 99, 0.3);
+  border-radius: 8px;
+  padding: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #1f2937;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+.efs-strip-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.strip-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.transfer-btn,
+.remove-btn {
+  background: rgba(55, 65, 82, 0.1);
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: #374151;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.transfer-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.remove-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .efs-strip.pending {
@@ -4106,37 +4165,45 @@ body {
 }
 
 .field-label {
-  font-size: 0.7rem;
-  color: #9ca3af;
-  font-weight: 600;
+  font-size: 0.65rem;
+  color: #4b5563;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
+  font-family: 'Arial', sans-serif;
 }
 
 .field-value {
-  font-size: 0.9rem;
-  color: #ffffff;
+  font-size: 0.85rem;
+  color: #1f2937;
   font-weight: 600;
-  font-family: 'SF Mono', monospace;
-  padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  min-height: 32px;
+  font-family: 'Courier New', monospace;
+  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  border: 1px solid rgba(75, 85, 99, 0.2);
+  min-height: 24px;
   display: flex;
   align-items: center;
+  border-bottom: 1px solid #000000;
 }
 
 .field-value.editable {
-  cursor: pointer;
+  cursor: text;
   transition: all 0.3s ease;
 }
 
 .field-value.editable:hover {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #60a5fa;
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.field-value.editable:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
 .callsign-squawk {

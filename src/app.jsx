@@ -82,6 +82,8 @@ export default function App() {
   const [atcAnnouncements, setAtcAnnouncements] = useState([]);
   const [atcCallsign, setAtcCallsign] = useState("");
   const [speechSynthesis, setSpeechSynthesis] = useState(null);
+  const [efsLookupCallsign, setEfsLookupCallsign] = useState("");
+  const [editingField, setEditingField] = useState(null);
 
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
@@ -1342,7 +1344,7 @@ export default function App() {
       }
     }));
 
-    // Broadcast EFS update to other ATC controllers
+    // Broadcast EFS update to other ATC controllers (no chat message)
     socket.emit("efsUpdate", {
       flightPlanId,
       updates,
@@ -1352,9 +1354,47 @@ export default function App() {
     });
   };
 
-  // Play ATIS audio using TTS
+  // Handle EFS transfer
+  const transferEFS = (flightPlanId, fromPosition, toPosition) => {
+    socket.emit("efsTransfer", {
+      flightPlanId,
+      fromPosition,
+      toPosition,
+      transferredBy: atcCallsign,
+      airport: selectedAirport,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  // Remove EFS
+  const removeEFS = (flightPlanId) => {
+    setEfsUpdates(prev => {
+      const updated = { ...prev };
+      delete updated[flightPlanId];
+      return updated;
+    });
+
+    socket.emit("efsRemove", {
+      flightPlanId,
+      removedBy: atcCallsign,
+      airport: selectedAirport,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  // Handle inline editing
+  const handleInlineEdit = (flightPlanId, field, value) => {
+    if (field === 'squawk' && value.length > 4) {
+      return; // Limit squawk to 4 digits
+    }
+    
+    updateEFS(flightPlanId, { [field]: value });
+    setEditingField(null);
+  };
+
+  // Play ATIS audio using TTS (for pilots only)
   const playATISAudio = () => {
-    if (!speechSynthesis || !atisData.raw) return;
+    if (!speechSynthesis || !atisData.raw || userMode !== 'pilot') return;
     
     speechSynthesis.cancel(); // Stop any current speech
     
@@ -1534,13 +1574,26 @@ export default function App() {
           ...prev,
           [updateData.flightPlanId]: updateData.updates
         }));
-        
-        // Add chat notification about EFS update
+      }
+    });
+
+    socket.on("efsTransfer", (transferData) => {
+      if (userMode === 'atc') {
         addChatMessage({
-          text: `EFS Updated: ${updateData.flightPlanId} by ${updateData.updatedBy}`,
+          text: `📋 ${transferData.fromPosition} transferred EFS ${transferData.flightPlanId} to ${transferData.toPosition}`,
           sender: "ATC SYSTEM",
           timestamp: new Date().toLocaleTimeString(),
           mode: "atc"
+        });
+      }
+    });
+
+    socket.on("efsRemove", (removeData) => {
+      if (userMode === 'atc') {
+        setEfsUpdates(prev => {
+          const updated = { ...prev };
+          delete updated[removeData.flightPlanId];
+          return updated;
         });
       }
     });
@@ -2367,9 +2420,15 @@ export default function App() {
               <div className="efs-header">
                 <h2>ELECTRONIC FLIGHT STRIPS - {atcCallsign}</h2>
                 <div className="efs-controls">
-                  <button onClick={playATISAudio} className="atis-audio-btn" disabled={!atisData.raw}>
-                    🔊 PLAY ATIS AUDIO
-                  </button>
+                  <div className="efs-lookup">
+                    <input
+                      type="text"
+                      placeholder="Lookup EFS by callsign..."
+                      value={efsLookupCallsign}
+                      onChange={(e) => setEfsLookupCallsign(e.target.value.toUpperCase())}
+                      className="efs-lookup-input"
+                    />
+                  </div>
                   <div className="notification-indicator">
                     {pendingFlightPlans.length > 0 && (
                       <div className="notification-badge blinking">
@@ -2382,7 +2441,11 @@ export default function App() {
 
               <div className="flight-plans-grid">
                 {flightPlans
-                  .filter(fp => fp.departing === selectedAirport || fp.arriving === selectedAirport)
+                  .filter(fp => {
+                    const isRelevant = fp.departing === selectedAirport || fp.arriving === selectedAirport;
+                    const matchesLookup = !efsLookupCallsign || fp.callsign.includes(efsLookupCallsign);
+                    return isRelevant && matchesLookup;
+                  })
                   .map((flightPlan, index) => {
                     const efsData = efsUpdates[flightPlan.callsign] || {};
                     const isPending = pendingFlightPlans.some(p => p.callsign === flightPlan.callsign);
@@ -2393,6 +2456,34 @@ export default function App() {
                         className={`efs-strip ${isPending ? 'pending' : ''} ${selectedFlightPlan?.callsign === flightPlan.callsign ? 'selected' : ''}`}
                         onClick={() => setSelectedFlightPlan(flightPlan)}
                       >
+                        <div className="efs-strip-header">
+                          <div className="strip-actions">
+                            <button 
+                              className="transfer-btn" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const toPosition = prompt("Transfer to position:", "GND");
+                                if (toPosition) transferEFS(flightPlan.callsign, atcPosition, toPosition);
+                              }}
+                              title="Transfer EFS"
+                            >
+                              ➡️
+                            </button>
+                            <button 
+                              className="remove-btn" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm(`Remove EFS for ${flightPlan.callsign}?`)) {
+                                  removeEFS(flightPlan.callsign);
+                                }
+                              }}
+                              title="Remove EFS"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+
                         <div className="efs-row-1">
                           <div className="efs-field type-wake">
                             <div className="field-label">TYPE</div>
@@ -2408,31 +2499,67 @@ export default function App() {
                           </div>
                           <div className="efs-field initial">
                             <div className="field-label">INITIAL</div>
-                            <div className="field-value editable" onClick={(e) => {
-                              e.stopPropagation();
-                              const newValue = prompt("Initial Heading:", efsData.initialHeading || "");
-                              if (newValue) updateEFS(flightPlan.callsign, { initialHeading: newValue });
-                            }}>
+                            <div 
+                              className="field-value editable"
+                              contentEditable={editingField === `${flightPlan.callsign}-initialHeading`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingField(`${flightPlan.callsign}-initialHeading`);
+                              }}
+                              onBlur={(e) => {
+                                handleInlineEdit(flightPlan.callsign, 'initialHeading', e.target.textContent);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  e.target.blur();
+                                }
+                              }}
+                            >
                               {efsData.initialHeading || "---"}
                             </div>
                           </div>
                           <div className="efs-field cruise">
                             <div className="field-label">CRUISE</div>
-                            <div className="field-value editable" onClick={(e) => {
-                              e.stopPropagation();
-                              const newValue = prompt("Cruise Heading:", efsData.cruiseHeading || "");
-                              if (newValue) updateEFS(flightPlan.callsign, { cruiseHeading: newValue });
-                            }}>
+                            <div 
+                              className="field-value editable"
+                              contentEditable={editingField === `${flightPlan.callsign}-cruiseHeading`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingField(`${flightPlan.callsign}-cruiseHeading`);
+                              }}
+                              onBlur={(e) => {
+                                handleInlineEdit(flightPlan.callsign, 'cruiseHeading', e.target.textContent);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  e.target.blur();
+                                }
+                              }}
+                            >
                               {efsData.cruiseHeading || "---"}
                             </div>
                           </div>
                           <div className="efs-field other-info">
                             <div className="field-label">OTHER INFO</div>
-                            <div className="field-value editable" onClick={(e) => {
-                              e.stopPropagation();
-                              const newValue = prompt("Other Info:", efsData.otherInfo || "");
-                              if (newValue !== null) updateEFS(flightPlan.callsign, { otherInfo: newValue });
-                            }}>
+                            <div 
+                              className="field-value editable"
+                              contentEditable={editingField === `${flightPlan.callsign}-otherInfo`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingField(`${flightPlan.callsign}-otherInfo`);
+                              }}
+                              onBlur={(e) => {
+                                handleInlineEdit(flightPlan.callsign, 'otherInfo', e.target.textContent);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  e.target.blur();
+                                }
+                              }}
+                            >
                               {efsData.otherInfo || "---"}
                             </div>
                           </div>
@@ -2444,11 +2571,37 @@ export default function App() {
                             <div className="field-value">{flightPlan.callsign}</div>
                             <div className="squawk-section">
                               <div className="squawk-label">SQUAWK</div>
-                              <div className="squawk-value editable" onClick={(e) => {
-                                e.stopPropagation();
-                                const newValue = prompt("Squawk Code:", efsData.squawk || "");
-                                if (newValue) updateEFS(flightPlan.callsign, { squawk: newValue });
-                              }}>
+                              <div 
+                                className="squawk-value editable"
+                                contentEditable={editingField === `${flightPlan.callsign}-squawk`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingField(`${flightPlan.callsign}-squawk`);
+                                }}
+                                onBlur={(e) => {
+                                  handleInlineEdit(flightPlan.callsign, 'squawk', e.target.textContent);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    e.target.blur();
+                                  }
+                                }}
+                                onInput={(e) => {
+                                  // Limit to 4 digits
+                                  const value = e.target.textContent.replace(/\D/g, '').slice(0, 4);
+                                  if (e.target.textContent !== value) {
+                                    e.target.textContent = value;
+                                    // Move cursor to end
+                                    const range = document.createRange();
+                                    const sel = window.getSelection();
+                                    range.selectNodeContents(e.target);
+                                    range.collapse(false);
+                                    sel.removeAllRanges();
+                                    sel.addRange(range);
+                                  }
+                                }}
+                              >
                                 {efsData.squawk || "----"}
                               </div>
                             </div>
@@ -2459,35 +2612,45 @@ export default function App() {
                           </div>
                           <div className="efs-field dep-rwy">
                             <div className="field-label">DEP RWY</div>
-                            <div className="field-value editable" onClick={(e) => {
-                              e.stopPropagation();
-                              const newValue = prompt("Departure Runway:", efsData.departureRunway || "");
-                              if (newValue) updateEFS(flightPlan.callsign, { departureRunway: newValue });
-                            }}>
+                            <div 
+                              className="field-value editable"
+                              contentEditable={editingField === `${flightPlan.callsign}-departureRunway`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingField(`${flightPlan.callsign}-departureRunway`);
+                              }}
+                              onBlur={(e) => {
+                                handleInlineEdit(flightPlan.callsign, 'departureRunway', e.target.textContent);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  e.target.blur();
+                                }
+                              }}
+                            >
                               {efsData.departureRunway || "---"}
                             </div>
                           </div>
-                          <div className="efs-field initial-fl">
-                            <div className="field-label">INITIAL FL</div>
-                            <div className="field-value editable" onClick={(e) => {
-                              e.stopPropagation();
-                              const newValue = prompt("Initial Flight Level:", efsData.initialFL || "");
-                              if (newValue) updateEFS(flightPlan.callsign, { initialFL: newValue });
-                            }}>
-                              {efsData.initialFL || "---"}
-                            </div>
-                          </div>
-                          <div className="efs-field cruise-fl">
-                            <div className="field-label">CRUISE FL</div>
-                            <div className="field-value">{flightPlan.flightlevel}</div>
-                          </div>
                           <div className="efs-field status">
                             <div className="field-label">STATUS</div>
-                            <div className="field-value editable" onClick={(e) => {
-                              e.stopPropagation();
-                              const newValue = prompt("Status:", efsData.status || "FILED");
-                              if (newValue) updateEFS(flightPlan.callsign, { status: newValue });
-                            }}>
+                            <div 
+                              className="field-value editable"
+                              contentEditable={editingField === `${flightPlan.callsign}-status`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingField(`${flightPlan.callsign}-status`);
+                              }}
+                              onBlur={(e) => {
+                                handleInlineEdit(flightPlan.callsign, 'status', e.target.textContent);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  e.target.blur();
+                                }
+                              }}
+                            >
                               {efsData.status || "FILED"}
                             </div>
                           </div>
@@ -2503,11 +2666,17 @@ export default function App() {
                   })}
               </div>
 
-              {flightPlans.filter(fp => fp.departing === selectedAirport || fp.arriving === selectedAirport).length === 0 && (
+              {flightPlans.filter(fp => {
+                const isRelevant = fp.departing === selectedAirport || fp.arriving === selectedAirport;
+                const matchesLookup = !efsLookupCallsign || fp.callsign.includes(efsLookupCallsign);
+                return isRelevant && matchesLookup;
+              }).length === 0 && (
                 <div className="no-flight-plans">
                   <div className="no-plans-icon">📋</div>
-                  <div>No active flight plans for {selectedAirport}</div>
-                  <div className="no-plans-subtitle">Flight plans will appear here when filed by pilots</div>
+                  <div>No flight plans found for {selectedAirport}</div>
+                  <div className="no-plans-subtitle">
+                    {efsLookupCallsign ? `No results for "${efsLookupCallsign}"` : "Flight plans will appear here when filed by pilots"}
+                  </div>
                 </div>
               )}
             </div>
@@ -2552,7 +2721,7 @@ export default function App() {
                       }
                     }}
                   >
-                    SEND
+                    ANNOUNCE
                   </button>
                 </div>
               </div>
@@ -2603,11 +2772,13 @@ export default function App() {
 
                 <div className="atis-section">
                   <h3>CURRENT ATIS - {atisData.info}</h3>
-                  <div className="atis-controls">
-                    <button onClick={playATISAudio} className="atis-audio-btn">
-                      🔊 PLAY ATIS
-                    </button>
-                  </div>
+                  {userMode === 'pilot' && (
+                    <div className="atis-controls">
+                      <button onClick={playATISAudio} className="atis-audio-btn">
+                        🔊 PLAY ATIS
+                      </button>
+                    </div>
+                  )}
                   <div className="atis-content">
                     <div className="atis-detail">
                       <span className="atis-label">WIND:</span>
