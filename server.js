@@ -101,6 +101,7 @@ const broadcastUserCounts = () => {
 
 
 let ptfsAtisData = {}; // Store real ATIS data from PTFS
+let ptfsFlightPlans = []; // Store real flight plan data from PTFS
 const claimedCallsigns = {}; // Store callsign data
 
 // Parse ATIS content to extract useful information
@@ -254,6 +255,25 @@ const connectToPTFSWebSocket = () => {
         }
 
         console.log(`📡 ATIS update for ${atisInfo.airport}: INFO ${atisInfo.letter}`);
+      } else if (message.t === 'FLIGHT_PLAN' || message.t === 'EVENT_FLIGHT_PLAN') {
+        const flightPlan = message.d;
+        
+        // Store flight plan and broadcast to all connected ATC controllers
+        ptfsFlightPlans.push({
+          ...flightPlan,
+          timestamp: new Date().toISOString(),
+          id: `${flightPlan.callsign}-${Date.now()}`
+        });
+
+        // Keep only last 100 flight plans to prevent memory issues
+        if (ptfsFlightPlans.length > 100) {
+          ptfsFlightPlans = ptfsFlightPlans.slice(-100);
+        }
+
+        // Broadcast to all ATC controllers
+        io.emit("flightPlanUpdate", ptfsFlightPlans);
+
+        console.log(`✈️ Flight Plan: ${flightPlan.callsign} ${flightPlan.departing} → ${flightPlan.arriving}`);
       }
     } catch (error) {
       console.error('Error parsing PTFS WebSocket message:', error);
@@ -525,7 +545,7 @@ io.on("connection", (socket) => {
   // Send current user counts
   socket.emit("userCountUpdate", getUserCounts());
 
-  socket.on("userMode", ({ mode, airport, userId }) => {
+  socket.on("userMode", ({ mode, airport, userId, position }) => {
     // Initialize airport data if needed
     initializeAirportData(airport);
     
@@ -533,16 +553,22 @@ io.on("connection", (socket) => {
     userData.mode = mode;
     userData.airport = airport;
     userData.userId = userId;
+    userData.position = position;
     connectedUsers.set(socket.id, userData);
 
     // Join the airport room
     socket.join(airport);
 
-    console.log(`User ${userData.username || userId} set mode to ${mode} at ${airport}`);
+    console.log(`User ${userData.username || userId} set mode to ${mode} at ${airport}${position ? ` (${position})` : ''}`);
 
     // Send current airport data to the user
     socket.emit("standUpdate", airportData[airport].stands);
     socket.emit("serviceUpdate", airportData[airport].requests);
+
+    // Send flight plans if user is ATC
+    if (mode === 'atc') {
+      socket.emit("flightPlanUpdate", ptfsFlightPlans);
+    }
 
     // Broadcast updated user counts
     broadcastUserCounts();
@@ -734,6 +760,35 @@ io.on("connection", (socket) => {
         mode: "groundcrew"
       });
     }
+  });
+
+  // ATC-specific socket handlers
+  socket.on("efsUpdate", (updateData) => {
+    const { flightPlanId, updates, updatedBy, airport } = updateData;
+    
+    // Broadcast EFS update to all ATC controllers at the same airport
+    io.to(airport).emit("efsUpdate", {
+      flightPlanId,
+      updates,
+      updatedBy,
+      timestamp: new Date().toISOString()
+    });
+
+    console.log(`📋 EFS Update: ${flightPlanId} by ${updatedBy} at ${airport}`);
+  });
+
+  socket.on("atcAnnouncement", (announcement) => {
+    const { message, from, airport } = announcement;
+    
+    // Broadcast announcement to all ground crew at the airport
+    io.to(airport).emit("atcAnnouncement", {
+      message,
+      from,
+      timestamp: new Date().toISOString(),
+      airport
+    });
+
+    console.log(`📢 ATC Announcement from ${from} at ${airport}: ${message}`);
   });
 
   socket.on("disconnect", () => {

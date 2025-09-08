@@ -72,6 +72,17 @@ export default function App() {
     tailDirection: ''
   });
 
+  // ATC Mode States
+  const [atcPosition, setAtcPosition] = useState("");
+  const [flightPlans, setFlightPlans] = useState([]);
+  const [selectedFlightPlan, setSelectedFlightPlan] = useState(null);
+  const [efsUpdates, setEfsUpdates] = useState({});
+  const [atisAudio, setAtisAudio] = useState(null);
+  const [pendingFlightPlans, setPendingFlightPlans] = useState([]);
+  const [atcAnnouncements, setAtcAnnouncements] = useState([]);
+  const [atcCallsign, setAtcCallsign] = useState("");
+  const [speechSynthesis, setSpeechSynthesis] = useState(null);
+
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
 
@@ -1305,6 +1316,68 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  // Initialize speech synthesis for ATIS audio
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      setSpeechSynthesis(window.speechSynthesis);
+    }
+  }, []);
+
+  // Handle ATC position assignment
+  const assignATCPosition = (airport, position) => {
+    const callsign = `${airport}_${position}`;
+    setAtcCallsign(callsign);
+    return callsign;
+  };
+
+  // Handle EFS updates
+  const updateEFS = (flightPlanId, updates) => {
+    setEfsUpdates(prev => ({
+      ...prev,
+      [flightPlanId]: {
+        ...prev[flightPlanId],
+        ...updates,
+        updatedBy: atcCallsign,
+        updatedAt: new Date().toISOString()
+      }
+    }));
+
+    // Broadcast EFS update to other ATC controllers
+    socket.emit("efsUpdate", {
+      flightPlanId,
+      updates,
+      updatedBy: atcCallsign,
+      airport: selectedAirport,
+      timestamp: new Date().toISOString()
+    });
+  };
+
+  // Play ATIS audio using TTS
+  const playATISAudio = () => {
+    if (!speechSynthesis || !atisData.raw) return;
+    
+    speechSynthesis.cancel(); // Stop any current speech
+    
+    const utterance = new SpeechSynthesisUtterance(atisData.raw);
+    utterance.rate = 0.8;
+    utterance.pitch = 1.0;
+    utterance.volume = 0.8;
+    
+    // Try to use a male voice for ATIS
+    const voices = speechSynthesis.getVoices();
+    const preferredVoice = voices.find(voice => 
+      voice.name.includes('Male') || 
+      voice.name.includes('Daniel') || 
+      voice.name.includes('David')
+    ) || voices[0];
+    
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+    
+    speechSynthesis.speak(utterance);
+  };
+
   // Auto-scroll messages to bottom
   useEffect(() => {
     const messagesArea = document.querySelector('.messages-area');
@@ -1415,15 +1488,87 @@ export default function App() {
       setAirportUserCounts(counts);
     });
 
+    // ATC-specific socket listeners
+    socket.on("flightPlanUpdate", (flightPlans) => {
+      setFlightPlans(flightPlans);
+      
+      // Check for new flight plans for this airport and notify ATC
+      if (userMode === 'atc') {
+        const newPlans = flightPlans.filter(fp => 
+          (fp.departing === selectedAirport || fp.arriving === selectedAirport) &&
+          !pendingFlightPlans.some(existing => existing.callsign === fp.callsign)
+        );
+        
+        if (newPlans.length > 0) {
+          setPendingFlightPlans(prev => [...prev, ...newPlans]);
+          // Visual/audio notification for new flight plans
+          if (soundEnabled) {
+            try {
+              const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+              const oscillator = audioContext.createOscillator();
+              const gainNode = audioContext.createGain();
+              
+              oscillator.connect(gainNode);
+              gainNode.connect(audioContext.destination);
+              
+              oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+              oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2);
+              
+              gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+              gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+              gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+              
+              oscillator.start(audioContext.currentTime);
+              oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+              console.log('Audio notification failed:', e);
+            }
+          }
+        }
+      }
+    });
+
+    socket.on("efsUpdate", (updateData) => {
+      if (userMode === 'atc') {
+        setEfsUpdates(prev => ({
+          ...prev,
+          [updateData.flightPlanId]: updateData.updates
+        }));
+        
+        // Add chat notification about EFS update
+        addChatMessage({
+          text: `EFS Updated: ${updateData.flightPlanId} by ${updateData.updatedBy}`,
+          sender: "ATC SYSTEM",
+          timestamp: new Date().toLocaleTimeString(),
+          mode: "atc"
+        });
+      }
+    });
+
+    socket.on("atcAnnouncement", (announcement) => {
+      if (userMode === 'groundcrew') {
+        setAtcAnnouncements(prev => [...prev, announcement]);
+        addChatMessage({
+          text: `🏗️ ATC ANNOUNCEMENT: ${announcement.message}`,
+          sender: announcement.from,
+          timestamp: new Date().toLocaleTimeString(),
+          mode: "atc"
+        });
+      }
+    });
+
     return () => {
       socket.off("standUpdate");
       socket.off("chatUpdate");
       socket.off("serviceUpdate");
       socket.off("atisUpdate");
-      socket.off("callsignAssigned"); // Remove listener
-      socket.off("callsignUpdate"); // Remove listener
+      socket.off("callsignAssigned");
+      socket.off("callsignUpdate");
       socket.off("error");
       socket.off("userCountUpdate");
+      socket.off("flightPlanUpdate");
+      socket.off("efsUpdate");
+      socket.off("atcAnnouncement");
     };
   }, [selectedAirport, soundEnabled, user]);
 
@@ -1431,17 +1576,23 @@ export default function App() {
     window.location.href = "/auth/discord";
   };
 
-  const selectMode = (mode, airport) => {
-    console.log('Selecting mode:', mode, 'for airport:', airport);
+  const selectMode = (mode, airport, position = "") => {
+    console.log('Selecting mode:', mode, 'for airport:', airport, 'position:', position);
     setUserMode(mode);
     setSelectedAirport(airport);
+    
+    if (mode === 'atc') {
+      setAtcPosition(position);
+      const callsign = assignATCPosition(airport, position);
+      setAssignedCallsign(callsign);
+    } else {
+      // Reset callsign when switching modes
+      setAssignedCallsign("");
+      setGroundCallsignCounter(1);
+      setGroundCrewCallsign("");
+    }
 
-    // Reset callsign when switching modes
-    setAssignedCallsign("");
-    setGroundCallsignCounter(1);
-    setGroundCrewCallsign(""); // Reset ground crew callsign as well
-
-    socket.emit("userMode", { mode, airport, userId: user?.id });
+    socket.emit("userMode", { mode, airport, userId: user?.id, position });
   };
 
   const validateFlightNumber = (flightNum) => {
@@ -2147,6 +2298,43 @@ export default function App() {
                   </div>
                 )}
               </button>
+              <div className="atc-role-section">
+                <div className="atc-header">
+                  <div className="role-icon">📡</div>
+                  <div className="role-title">AIR TRAFFIC CONTROL</div>
+                  <div className="role-description">Manage electronic flight strips & coordinate traffic</div>
+                </div>
+                <div className="atc-positions">
+                  <button
+                    onClick={() => selectMode("atc", selectedAirport, "GND")}
+                    className="atc-position-btn ground"
+                  >
+                    <div className="position-code">GND</div>
+                    <div className="position-name">Ground Control</div>
+                  </button>
+                  <button
+                    onClick={() => selectMode("atc", selectedAirport, "TWR")}
+                    className="atc-position-btn tower"
+                  >
+                    <div className="position-code">TWR</div>
+                    <div className="position-name">Tower Control</div>
+                  </button>
+                  <button
+                    onClick={() => selectMode("atc", selectedAirport, "APP")}
+                    className="atc-position-btn approach"
+                  >
+                    <div className="position-code">APP</div>
+                    <div className="position-name">Approach Control</div>
+                  </button>
+                  <button
+                    onClick={() => selectMode("atc", selectedAirport, "DEP")}
+                    className="atc-position-btn departure"
+                  >
+                    <div className="position-code">DEP</div>
+                    <div className="position-name">Departure Control</div>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2171,7 +2359,279 @@ export default function App() {
   }
 
   const renderContent = () => {
-    if (userMode === "pilot") {
+    if (userMode === "atc") {
+      switch (activeTab) {
+        case "efs":
+          return (
+            <div className="efs-container">
+              <div className="efs-header">
+                <h2>ELECTRONIC FLIGHT STRIPS - {atcCallsign}</h2>
+                <div className="efs-controls">
+                  <button onClick={playATISAudio} className="atis-audio-btn" disabled={!atisData.raw}>
+                    🔊 PLAY ATIS AUDIO
+                  </button>
+                  <div className="notification-indicator">
+                    {pendingFlightPlans.length > 0 && (
+                      <div className="notification-badge blinking">
+                        {pendingFlightPlans.length} NEW
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flight-plans-grid">
+                {flightPlans
+                  .filter(fp => fp.departing === selectedAirport || fp.arriving === selectedAirport)
+                  .map((flightPlan, index) => {
+                    const efsData = efsUpdates[flightPlan.callsign] || {};
+                    const isPending = pendingFlightPlans.some(p => p.callsign === flightPlan.callsign);
+                    
+                    return (
+                      <div 
+                        key={`${flightPlan.callsign}-${index}`}
+                        className={`efs-strip ${isPending ? 'pending' : ''} ${selectedFlightPlan?.callsign === flightPlan.callsign ? 'selected' : ''}`}
+                        onClick={() => setSelectedFlightPlan(flightPlan)}
+                      >
+                        <div className="efs-row-1">
+                          <div className="efs-field type-wake">
+                            <div className="field-label">TYPE</div>
+                            <div className="field-value">{flightPlan.aircraft}/{flightPlan.flightrules}</div>
+                          </div>
+                          <div className="efs-field departure">
+                            <div className="field-label">DEPARTURE</div>
+                            <div className="field-value">{flightPlan.departing}</div>
+                          </div>
+                          <div className="efs-field req-fl">
+                            <div className="field-label">REQ FL</div>
+                            <div className="field-value">{flightPlan.flightlevel}</div>
+                          </div>
+                          <div className="efs-field initial">
+                            <div className="field-label">INITIAL</div>
+                            <div className="field-value editable" onClick={(e) => {
+                              e.stopPropagation();
+                              const newValue = prompt("Initial Heading:", efsData.initialHeading || "");
+                              if (newValue) updateEFS(flightPlan.callsign, { initialHeading: newValue });
+                            }}>
+                              {efsData.initialHeading || "---"}
+                            </div>
+                          </div>
+                          <div className="efs-field cruise">
+                            <div className="field-label">CRUISE</div>
+                            <div className="field-value editable" onClick={(e) => {
+                              e.stopPropagation();
+                              const newValue = prompt("Cruise Heading:", efsData.cruiseHeading || "");
+                              if (newValue) updateEFS(flightPlan.callsign, { cruiseHeading: newValue });
+                            }}>
+                              {efsData.cruiseHeading || "---"}
+                            </div>
+                          </div>
+                          <div className="efs-field other-info">
+                            <div className="field-label">OTHER INFO</div>
+                            <div className="field-value editable" onClick={(e) => {
+                              e.stopPropagation();
+                              const newValue = prompt("Other Info:", efsData.otherInfo || "");
+                              if (newValue !== null) updateEFS(flightPlan.callsign, { otherInfo: newValue });
+                            }}>
+                              {efsData.otherInfo || "---"}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="efs-row-2">
+                          <div className="efs-field callsign-squawk">
+                            <div className="field-label">CALLSIGN</div>
+                            <div className="field-value">{flightPlan.callsign}</div>
+                            <div className="squawk-section">
+                              <div className="squawk-label">SQUAWK</div>
+                              <div className="squawk-value editable" onClick={(e) => {
+                                e.stopPropagation();
+                                const newValue = prompt("Squawk Code:", efsData.squawk || "");
+                                if (newValue) updateEFS(flightPlan.callsign, { squawk: newValue });
+                              }}>
+                                {efsData.squawk || "----"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="efs-field destination">
+                            <div className="field-label">DESTINATION</div>
+                            <div className="field-value">{flightPlan.arriving}</div>
+                          </div>
+                          <div className="efs-field dep-rwy">
+                            <div className="field-label">DEP RWY</div>
+                            <div className="field-value editable" onClick={(e) => {
+                              e.stopPropagation();
+                              const newValue = prompt("Departure Runway:", efsData.departureRunway || "");
+                              if (newValue) updateEFS(flightPlan.callsign, { departureRunway: newValue });
+                            }}>
+                              {efsData.departureRunway || "---"}
+                            </div>
+                          </div>
+                          <div className="efs-field initial-fl">
+                            <div className="field-label">INITIAL FL</div>
+                            <div className="field-value editable" onClick={(e) => {
+                              e.stopPropagation();
+                              const newValue = prompt("Initial Flight Level:", efsData.initialFL || "");
+                              if (newValue) updateEFS(flightPlan.callsign, { initialFL: newValue });
+                            }}>
+                              {efsData.initialFL || "---"}
+                            </div>
+                          </div>
+                          <div className="efs-field cruise-fl">
+                            <div className="field-label">CRUISE FL</div>
+                            <div className="field-value">{flightPlan.flightlevel}</div>
+                          </div>
+                          <div className="efs-field status">
+                            <div className="field-label">STATUS</div>
+                            <div className="field-value editable" onClick={(e) => {
+                              e.stopPropagation();
+                              const newValue = prompt("Status:", efsData.status || "FILED");
+                              if (newValue) updateEFS(flightPlan.callsign, { status: newValue });
+                            }}>
+                              {efsData.status || "FILED"}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {efsData.updatedBy && (
+                          <div className="efs-update-info">
+                            Last updated by {efsData.updatedBy} at {new Date(efsData.updatedAt).toLocaleTimeString()}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {flightPlans.filter(fp => fp.departing === selectedAirport || fp.arriving === selectedAirport).length === 0 && (
+                <div className="no-flight-plans">
+                  <div className="no-plans-icon">📋</div>
+                  <div>No active flight plans for {selectedAirport}</div>
+                  <div className="no-plans-subtitle">Flight plans will appear here when filed by pilots</div>
+                </div>
+              )}
+            </div>
+          );
+
+        case "announcements":
+          return (
+            <div className="atc-announcements-container">
+              <div className="announcements-header">
+                <h2>ATC ANNOUNCEMENTS TO GROUND CREW</h2>
+                <div className="announcement-form">
+                  <input
+                    type="text"
+                    placeholder="Type announcement to ground crew..."
+                    className="announcement-input"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && e.target.value.trim()) {
+                        const announcement = {
+                          message: e.target.value.trim(),
+                          from: atcCallsign,
+                          timestamp: new Date().toISOString(),
+                          airport: selectedAirport
+                        };
+                        socket.emit("atcAnnouncement", announcement);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <button 
+                    className="send-announcement-btn"
+                    onClick={(e) => {
+                      const input = e.target.previousElementSibling;
+                      if (input.value.trim()) {
+                        const announcement = {
+                          message: input.value.trim(),
+                          from: atcCallsign,
+                          timestamp: new Date().toISOString(),
+                          airport: selectedAirport
+                        };
+                        socket.emit("atcAnnouncement", announcement);
+                        input.value = '';
+                      }
+                    }}
+                  >
+                    SEND
+                  </button>
+                </div>
+              </div>
+              
+              <div className="announcements-list">
+                {atcAnnouncements.map((announcement, index) => (
+                  <div key={index} className="announcement-item">
+                    <div className="announcement-header">
+                      <span className="announcement-from">{announcement.from}</span>
+                      <span className="announcement-time">
+                        {new Date(announcement.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="announcement-message">{announcement.message}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+
+        default:
+          return (
+            <div className="atc-main">
+              <div className="atc-status-panel">
+                <div className="atc-header">
+                  <h2>{selectedAirport} {atcPosition} - {atcCallsign}</h2>
+                  <div className="position-status online">ONLINE</div>
+                </div>
+                
+                <div className="atc-statistics">
+                  <div className="stat-card">
+                    <div className="stat-value">{flightPlans.filter(fp => fp.departing === selectedAirport).length}</div>
+                    <div className="stat-label">DEPARTURES</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-value">{flightPlans.filter(fp => fp.arriving === selectedAirport).length}</div>
+                    <div className="stat-label">ARRIVALS</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-value">{pendingFlightPlans.length}</div>
+                    <div className="stat-label">PENDING</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-value">{Object.keys(efsUpdates).length}</div>
+                    <div className="stat-label">PROCESSED</div>
+                  </div>
+                </div>
+
+                <div className="atis-section">
+                  <h3>CURRENT ATIS - {atisData.info}</h3>
+                  <div className="atis-controls">
+                    <button onClick={playATISAudio} className="atis-audio-btn">
+                      🔊 PLAY ATIS
+                    </button>
+                  </div>
+                  <div className="atis-content">
+                    <div className="atis-detail">
+                      <span className="atis-label">WIND:</span>
+                      <span className="atis-value">{atisData.wind}</span>
+                    </div>
+                    <div className="atis-detail">
+                      <span className="atis-label">QNH:</span>
+                      <span className="atis-value">{atisData.qnh}</span>
+                    </div>
+                    <div className="atis-detail">
+                      <span className="atis-label">RUNWAY:</span>
+                      <span className="atis-value">{atisData.runway}</span>
+                    </div>
+                    <div className="atis-detail">
+                      <span className="atis-label">CONDITIONS:</span>
+                      <span className="atis-value">{atisData.conditions}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+      }
+    } else if (userMode === "pilot") {
       switch (activeTab) {
         case "checklists":
           return (
@@ -3903,6 +4363,31 @@ export default function App() {
             >
               <span className="nav-icon">📖</span>
               <span>GUIDES</span>
+            </button>
+          </>
+        )}
+        {userMode === "atc" && (
+          <>
+            <button
+              className={`nav-btn ${activeTab === 'main' ? 'active' : ''}`}
+              onClick={() => setActiveTab('main')}
+            >
+              <span className="nav-icon">🏠</span>
+              <span>CONTROL</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'efs' ? 'active' : ''}`}
+              onClick={() => setActiveTab('efs')}
+            >
+              <span className="nav-icon">📋</span>
+              <span>EFS</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'announcements' ? 'active' : ''}`}
+              onClick={() => setActiveTab('announcements')}
+            >
+              <span className="nav-icon">📢</span>
+              <span>ANNOUNCE</span>
             </button>
           </>
         )}
