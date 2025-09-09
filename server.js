@@ -789,6 +789,15 @@ io.on("connection", (socket) => {
       timestamp: new Date().toISOString()
     });
 
+    // Send chat message about the transfer
+    io.to(airport).emit("chatUpdate", {
+      text: `📋 ${transferredBy} transferred EFS ${flightPlanId} from ${fromPosition} to ${toPosition}`,
+      sender: "ATC SYSTEM",
+      airport: airport,
+      timestamp: new Date().toLocaleTimeString(),
+      mode: "atc"
+    });
+
     console.log(`📋 EFS Transfer: ${flightPlanId} from ${fromPosition} to ${toPosition} by ${transferredBy} at ${airport}`);
   });
 
