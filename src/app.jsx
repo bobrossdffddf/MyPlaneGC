@@ -84,7 +84,7 @@ export default function App() {
   const [speechSynthesis, setSpeechSynthesis] = useState(null);
   const [efsLookupCallsign, setEfsLookupCallsign] = useState("");
   const [editingField, setEditingField] = useState(null);
-  const [slotTimes, setSlotTimes] = useState({});
+  
   const [transferNotifications, setTransferNotifications] = useState([]);
 
   // Static permit document ID to prevent it from changing
@@ -1336,6 +1336,8 @@ export default function App() {
 
   // Handle EFS updates
   const updateEFS = (flightPlanId, updates) => {
+    if (!flightPlanId || !updates) return;
+    
     setEfsUpdates(prev => ({
       ...prev,
       [flightPlanId]: {
@@ -1457,7 +1459,7 @@ export default function App() {
 
   // Separate useEffect for socket listeners to prevent re-execution
   useEffect(() => {
-    if (!user) return; // Don't set up socket listeners until user is authenticated
+    if (!user || !socket.connected) return; // Don't set up socket listeners until user is authenticated and socket is connected
 
     socket.on("chatUpdate", (msg) => {
       if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
@@ -1682,21 +1684,26 @@ export default function App() {
   };
 
   const validateFlightNumber = (flightNum) => {
+    if (!flightNum || flightNum.length < 4) return false;
     // ICAO format: 3-letter airline code + flight number (e.g., AAL123, UAL456)
     const icaoRegex = /^[A-Z]{3}[0-9]{1,4}[A-Z]?$/;
-    return icaoRegex.test(flightNum.toUpperCase());
+    return icaoRegex.test(flightNum.toUpperCase().trim());
   };
 
   const claimStand = () => {
-    if (selectedStand && flightNumber && aircraft && selectedAirport) {
-      if (!validateFlightNumber(flightNumber)) {
-        alert("Please enter a valid ICAO flight number (e.g., AAL123, UAL456, BAW100)");
-        return;
-      }
+    if (!selectedStand || !flightNumber || !aircraft || !selectedAirport) {
+      alert("Please fill in all required fields");
+      return;
+    }
+    
+    if (!validateFlightNumber(flightNumber)) {
+      alert("Please enter a valid ICAO flight number (e.g., AAL123, UAL456, BAW100)");
+      return;
+    }
 
-      // Use flight number as callsign for pilots
-      const callsign = flightNumber.toUpperCase();
-      setAssignedCallsign(callsign);
+    // Use flight number as callsign for pilots
+    const callsign = flightNumber.toUpperCase().trim();
+    setAssignedCallsign(callsign);
 
       socket.emit("claimStand", {
         stand: selectedStand,
@@ -1717,7 +1724,7 @@ export default function App() {
   };
 
   const sendMessage = () => {
-    if (input.trim() === "") return;
+    if (!input || input.trim() === "") return;
 
     if (userMode === "pilot") {
       if (!selectedStand) {
@@ -2825,19 +2832,25 @@ export default function App() {
                                   <option value="LANDED">LANDED</option>
                                 </select>
                               </div>
-                              <div className="strip-field slot-field">
-                                <label>TAXI TIME</label>
+                              <div className="strip-field altitude-init-field">
+                                <label>INIT ALT</label>
                                 <input
-                                  type="time"
+                                  type="text"
                                   className="field-box editable-field"
-                                  value={efsData.slotTime || ""}
-                                  onChange={(e) => {
-                                    updateEFS(callsign, { slotTime: e.target.value });
-                                    setSlotTimes(prev => ({
-                                      ...prev,
-                                      [callsign]: e.target.value
-                                    }));
-                                  }}
+                                  value={efsData.initialAltitude || ""}
+                                  onChange={(e) => updateEFS(callsign, { initialAltitude: e.target.value })}
+                                  placeholder="FL350"
+                                />
+                              </div>
+                              <div className="strip-field heading-field">
+                                <label>INIT HDG</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.initialHeading || ""}
+                                  onChange={(e) => updateEFS(callsign, { initialHeading: e.target.value })}
+                                  placeholder="270"
+                                  maxLength="3"
                                 />
                               </div>
                             </div>
@@ -2955,27 +2968,7 @@ export default function App() {
             </div>
           );
 
-        case "coordination":
-          return (
-            <div className="atc-main">
-              <div className="atc-status-panel">
-                <div className="atc-header">
-                  <h2>{selectedAirport} {atcPosition} - COORDINATION</h2>
-                  <div className="position-status online">ONLINE</div>
-                </div>
-                
-                <div className="coordination-content">
-                  <div className="coordination-message">
-                    <div className="coordination-icon">📡</div>
-                    <div>
-                      <h3>COORDINATION MODE</h3>
-                      <p>Advanced coordination features coming soon</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
+        
 
         default:
           return (
@@ -3005,137 +2998,36 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="coordination-container">
-                  <div className="coordination-header">
-                    <h2>INTER-FACILITY COORDINATION - {atcCallsign}</h2>
-                  </div>
-
-                  <div className="coordination-sections">
-                    <div className="coordination-section">
-                      <h3>SLOT TIME MANAGEMENT</h3>
-                      <div className="slot-management">
-                        <div className="slot-controls">
-                          <select 
-                            className="slot-aircraft-select"
-                            onChange={(e) => {
-                              if (e.target.value) {
-                                const timeInput = e.target.parentElement.querySelector('.slot-time-input');
-                                const time = timeInput.value;
-                                if (time) {
-                                  setSlotTimes(prev => ({
-                                    ...prev,
-                                    [e.target.value]: time
-                                  }));
-                                  updateEFS(e.target.value, { slotTime: time });
-                                  timeInput.value = '';
-                                  e.target.value = '';
-                                }
-                              }
-                            }}
-                          >
-                            <option value="">Select Aircraft...</option>
-                            {Object.keys(efsUpdates).map(callsign => (
-                              <option key={callsign} value={callsign}>{callsign}</option>
-                            ))}
-                          </select>
-                          <input
-                            type="time"
-                            className="slot-time-input"
-                            placeholder="Taxi Time"
-                          />
+                <div className="transfer-notifications-section">
+                  <h3>TRANSFER NOTIFICATIONS</h3>
+                  <div className="transfer-notifications">
+                    {transferNotifications.map((notification, index) => (
+                      <div key={index} className="transfer-notification">
+                        <div className="notification-header">
+                          <span className="notification-from">{notification.from}</span>
+                          <span className="notification-time">
+                            {new Date(notification.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <div className="notification-message">
+                          EFS {notification.callsign} transferred from {notification.fromPosition} to {notification.toPosition}
+                        </div>
+                        {notification.toPosition === atcPosition && (
                           <button 
-                            className="assign-slot-btn"
-                            onClick={(e) => {
-                              const selectElement = e.target.parentElement.querySelector('.slot-aircraft-select');
-                              const timeInput = e.target.parentElement.querySelector('.slot-time-input');
-                              const callsign = selectElement.value;
-                              const time = timeInput.value;
-                              
-                              if (callsign && time) {
-                                setSlotTimes(prev => ({
-                                  ...prev,
-                                  [callsign]: time
-                                }));
-                                updateEFS(callsign, { slotTime: time });
-                                timeInput.value = '';
-                                selectElement.value = '';
+                            className="open-efs-btn"
+                            onClick={() => {
+                              setActiveTab('efs');
+                              // Auto-create EFS if it doesn't exist
+                              if (!efsUpdates[notification.callsign]) {
+                                updateEFS(notification.callsign, { status: 'TRANSFERRED' });
                               }
                             }}
                           >
-                            ASSIGN SLOT
+                            OPEN EFS
                           </button>
-                        </div>
-                        <div className="active-slots">
-                          {Object.entries(slotTimes).map(([callsign, slotTime]) => (
-                            <div key={callsign} className="slot-item">
-                              <span className="slot-callsign">{callsign}</span>
-                              <span className="slot-time">{slotTime}</span>
-                              <button 
-                                className="remove-slot-btn"
-                                onClick={() => {
-                                  const newSlots = { ...slotTimes };
-                                  delete newSlots[callsign];
-                                  setSlotTimes(newSlots);
-                                }}
-                              >
-                                REMOVE
-                              </button>
-                            </div>
-                          ))}
-                        </div>
+                        )}
                       </div>
-                    </div>
-
-                    <div className="coordination-section">
-                      <h3>GND TWR CTRL</h3>
-                      <div className="coordination-buttons">
-                        <button className="coord-btn ground">
-                          <span className="coord-icon">🚛</span>
-                          <span>GROUND CONTROL</span>
-                        </button>
-                        <button className="coord-btn tower">
-                          <span className="coord-icon">🗼</span>
-                          <span>TOWER CONTROL</span>
-                        </button>
-                        <button className="coord-btn control">
-                          <span className="coord-icon">📡</span>
-                          <span>CONTROL</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="coordination-section">
-                      <h3>TRANSFER NOTIFICATIONS</h3>
-                      <div className="transfer-notifications">
-                        {transferNotifications.map((notification, index) => (
-                          <div key={index} className="transfer-notification">
-                            <div className="notification-header">
-                              <span className="notification-from">{notification.from}</span>
-                              <span className="notification-time">
-                                {new Date(notification.timestamp).toLocaleTimeString()}
-                              </span>
-                            </div>
-                            <div className="notification-message">
-                              EFS {notification.callsign} transferred from {notification.fromPosition} to {notification.toPosition}
-                            </div>
-                            {notification.toPosition === atcPosition && (
-                              <button 
-                                className="open-efs-btn"
-                                onClick={() => {
-                                  setActiveTab('efs');
-                                  // Auto-create EFS if it doesn't exist
-                                  if (!efsUpdates[notification.callsign]) {
-                                    updateEFS(notification.callsign, { status: 'TRANSFERRED' });
-                                  }
-                                }}
-                              >
-                                OPEN EFS
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
 
@@ -4937,13 +4829,6 @@ export default function App() {
             >
               <span className="nav-icon">📢</span>
               <span>ANNOUNCE</span>
-            </button>
-            <button
-              className={`nav-btn ${activeTab === 'coordination' ? 'active' : ''}`}
-              onClick={() => setActiveTab('coordination')}
-            >
-              <span className="nav-icon">🤝</span>
-              <span>COORD</span>
             </button>
           </>
         )}
