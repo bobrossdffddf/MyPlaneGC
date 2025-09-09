@@ -2808,69 +2808,6 @@ export default function App() {
                             </div>
 
                             <div className="strip-row-3">
-                              <div className="strip-field entry-field">
-                                <label>ENTRY</label>
-                                <input
-                                  type="text"
-                                  className="field-box editable-field"
-                                  value={efsData.entryPoint || ""}
-                                  onChange={(e) => updateEFS(callsign, { entryPoint: e.target.value })}
-                                  placeholder="Entry point..."
-                                />
-                              </div>
-                              <div className="strip-field mid01-field">
-                                <label>MID01</label>
-                                <input
-                                  type="text"
-                                  className="field-box editable-field"
-                                  value={efsData.mid01 || ""}
-                                  onChange={(e) => updateEFS(callsign, { mid01: e.target.value })}
-                                  placeholder="Waypoint 1..."
-                                />
-                              </div>
-                              <div className="strip-field mid02-field">
-                                <label>MID02</label>
-                                <input
-                                  type="text"
-                                  className="field-box editable-field"
-                                  value={efsData.mid02 || ""}
-                                  onChange={(e) => updateEFS(callsign, { mid02: e.target.value })}
-                                  placeholder="Waypoint 2..."
-                                />
-                              </div>
-                              <div className="strip-field exits-field">
-                                <label>EXITS</label>
-                                <input
-                                  type="text"
-                                  className="field-box editable-field"
-                                  value={efsData.exitPoint || ""}
-                                  onChange={(e) => updateEFS(callsign, { exitPoint: e.target.value })}
-                                  placeholder="Exit point..."
-                                />
-                              </div>
-                            </div>
-
-                            <div className="strip-row-4">
-                              <div className="strip-field tail-field">
-                                <label>TAIL NO</label>
-                                <input
-                                  type="text"
-                                  className="field-box editable-field"
-                                  value={efsData.tailNumber || ""}
-                                  onChange={(e) => updateEFS(callsign, { tailNumber: e.target.value })}
-                                  placeholder="Tail number..."
-                                />
-                              </div>
-                              <div className="strip-field ades-field">
-                                <label>ADES</label>
-                                <input
-                                  type="text"
-                                  className="field-box editable-field"
-                                  value={efsData.alternateDestination || ""}
-                                  onChange={(e) => updateEFS(callsign, { alternateDestination: e.target.value })}
-                                  placeholder="Alternate..."
-                                />
-                              </div>
                               <div className="strip-field status-field">
                                 <label>STATUS</label>
                                 <select
@@ -2889,12 +2826,18 @@ export default function App() {
                                 </select>
                               </div>
                               <div className="strip-field slot-field">
-                                <label>SLOT TIME</label>
+                                <label>TAXI TIME</label>
                                 <input
                                   type="time"
                                   className="field-box editable-field"
                                   value={efsData.slotTime || ""}
-                                  onChange={(e) => updateEFS(callsign, { slotTime: e.target.value })}
+                                  onChange={(e) => {
+                                    updateEFS(callsign, { slotTime: e.target.value });
+                                    setSlotTimes(prev => ({
+                                      ...prev,
+                                      [callsign]: e.target.value
+                                    }));
+                                  }}
                                 />
                               </div>
                             </div>
@@ -3072,7 +3015,24 @@ export default function App() {
                       <h3>SLOT TIME MANAGEMENT</h3>
                       <div className="slot-management">
                         <div className="slot-controls">
-                          <select className="slot-aircraft-select">
+                          <select 
+                            className="slot-aircraft-select"
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                const timeInput = e.target.parentElement.querySelector('.slot-time-input');
+                                const time = timeInput.value;
+                                if (time) {
+                                  setSlotTimes(prev => ({
+                                    ...prev,
+                                    [e.target.value]: time
+                                  }));
+                                  updateEFS(e.target.value, { slotTime: time });
+                                  timeInput.value = '';
+                                  e.target.value = '';
+                                }
+                              }
+                            }}
+                          >
                             <option value="">Select Aircraft...</option>
                             {Object.keys(efsUpdates).map(callsign => (
                               <option key={callsign} value={callsign}>{callsign}</option>
@@ -3083,7 +3043,27 @@ export default function App() {
                             className="slot-time-input"
                             placeholder="Taxi Time"
                           />
-                          <button className="assign-slot-btn">ASSIGN SLOT</button>
+                          <button 
+                            className="assign-slot-btn"
+                            onClick={(e) => {
+                              const selectElement = e.target.parentElement.querySelector('.slot-aircraft-select');
+                              const timeInput = e.target.parentElement.querySelector('.slot-time-input');
+                              const callsign = selectElement.value;
+                              const time = timeInput.value;
+                              
+                              if (callsign && time) {
+                                setSlotTimes(prev => ({
+                                  ...prev,
+                                  [callsign]: time
+                                }));
+                                updateEFS(callsign, { slotTime: time });
+                                timeInput.value = '';
+                                selectElement.value = '';
+                              }
+                            }}
+                          >
+                            ASSIGN SLOT
+                          </button>
                         </div>
                         <div className="active-slots">
                           {Object.entries(slotTimes).map(([callsign, slotTime]) => (
