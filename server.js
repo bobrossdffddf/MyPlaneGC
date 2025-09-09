@@ -48,7 +48,7 @@ passport.deserializeUser((user, done) => {
 });
 
 // In-memory storage for demo (use database in production)
-let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {}, groundCrewCallsigns: new Map() } }
+let airportData = {}; // Structure: { airport: { stands: {}, requests: [], users: new Map(), atis: {}, groundCrewCallsigns: new Map(), atcPositions: new Map() } }
 
 // Initialize airport data when needed
 const initializeAirportData = (airport) => {
@@ -58,7 +58,8 @@ const initializeAirportData = (airport) => {
       requests: [],
       users: new Map(),
       atis: {},
-      groundCrewCallsigns: new Map()
+      groundCrewCallsigns: new Map(),
+      atcPositions: new Map() // Track ATC positions: { 'GND': userId, 'TWR': userId, 'CTRL': userId }
     };
   }
 };
@@ -318,6 +319,18 @@ app.get('/api/user', (req, res) => {
   }
 });
 
+app.get('/api/atc-positions/:airport', (req, res) => {
+  const airport = req.params.airport;
+  initializeAirportData(airport);
+  
+  const positions = {};
+  for (const [position, userId] of airportData[airport].atcPositions) {
+    positions[position] = userId;
+  }
+  
+  res.json(positions);
+});
+
 // Aircraft data API with comprehensive realistic data
 const aircraftDatabase = {
   "A318": { 
@@ -548,6 +561,29 @@ io.on("connection", (socket) => {
   socket.on("userMode", ({ mode, airport, userId, position }) => {
     // Initialize airport data if needed
     initializeAirportData(airport);
+
+    // Check if ATC position is already taken
+    if (mode === 'atc' && position) {
+      const currentController = airportData[airport].atcPositions.get(position);
+      if (currentController && currentController !== userId) {
+        socket.emit("error", { 
+          message: `${airport} ${position} is already controlled by another user. Please select a different position.` 
+        });
+        return;
+      }
+
+      // Release any previous ATC position held by this user
+      for (const [pos, controllerId] of airportData[airport].atcPositions) {
+        if (controllerId === userId) {
+          airportData[airport].atcPositions.delete(pos);
+          console.log(`Released ${airport} ${pos} from user ${userId}`);
+        }
+      }
+
+      // Assign the new position
+      airportData[airport].atcPositions.set(position, userId);
+      console.log(`Assigned ${airport} ${position} to user ${userId}`);
+    }
 
     const userData = connectedUsers.get(socket.id) || {};
     userData.mode = mode;
@@ -834,6 +870,24 @@ io.on("connection", (socket) => {
       // Release ground crew callsign if assigned
       if (userInfo.airport && userInfo.mode === 'groundcrew') {
         releaseGroundCrewCallsign(userInfo.airport, userInfo.userId);
+      }
+
+      // Release ATC position if assigned
+      if (userInfo.airport && userInfo.mode === 'atc' && userInfo.position) {
+        const currentController = airportData[userInfo.airport]?.atcPositions?.get(userInfo.position);
+        if (currentController === userInfo.userId) {
+          airportData[userInfo.airport].atcPositions.delete(userInfo.position);
+          console.log(`Released ${userInfo.airport} ${userInfo.position} from disconnected user ${userInfo.userId}`);
+          
+          // Notify other users that the position is now available
+          io.to(userInfo.airport).emit("chatUpdate", {
+            text: `${userInfo.airport} ${userInfo.position} is now available`,
+            sender: "ATC SYSTEM",
+            airport: userInfo.airport,
+            timestamp: new Date().toLocaleTimeString(),
+            mode: "system"
+          });
+        }
       }
 
       connectedUsers.delete(socket.id);

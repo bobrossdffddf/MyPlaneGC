@@ -65,6 +65,7 @@ export default function App() {
   const [badWordsFilter, setBadWordsFilter] = useState(true);
   const [lastServiceRequest, setLastServiceRequest] = useState({});
   const [airportUserCounts, setAirportUserCounts] = useState({});
+  const [atcPositions, setAtcPositions] = useState({});
   const [showPushbackForm, setShowPushbackForm] = useState(false);
   const [pushbackFormData, setPushbackFormData] = useState({
     tugSize: '',
@@ -1327,6 +1328,19 @@ export default function App() {
     }
   }, []);
 
+  // Fetch current ATC positions for an airport
+  const fetchATCPositions = async (airport) => {
+    try {
+      const response = await fetch(`/api/atc-positions/${airport}`);
+      if (response.ok) {
+        const positions = await response.json();
+        setAtcPositions(positions);
+      }
+    } catch (error) {
+      console.error('Failed to fetch ATC positions:', error);
+    }
+  };
+
   // Handle ATC position assignment
   const assignATCPosition = (airport, position) => {
     const callsign = `${airport}_${position}`;
@@ -2283,6 +2297,13 @@ export default function App() {
     );
   }
 
+  // Fetch ATC positions when airport is selected
+  useEffect(() => {
+    if (selectedAirport) {
+      fetchATCPositions(selectedAirport);
+    }
+  }, [selectedAirport]);
+
   if (!selectedAirport) {
     return (
       <div className="tablet-mode-select">
@@ -2400,24 +2421,30 @@ export default function App() {
                 <div className="atc-positions">
                   <button
                     onClick={() => selectMode("atc", selectedAirport, "GND")}
-                    className="atc-position-btn ground"
+                    className={`atc-position-btn ground ${atcPositions.GND ? 'occupied' : ''}`}
+                    disabled={atcPositions.GND && atcPositions.GND !== user?.id}
                   >
                     <div className="position-code">GND</div>
                     <div className="position-name">Ground Control</div>
+                    {atcPositions.GND && <div className="position-status">OCCUPIED</div>}
                   </button>
                   <button
                     onClick={() => selectMode("atc", selectedAirport, "TWR")}
-                    className="atc-position-btn tower"
+                    className={`atc-position-btn tower ${atcPositions.TWR ? 'occupied' : ''}`}
+                    disabled={atcPositions.TWR && atcPositions.TWR !== user?.id}
                   >
                     <div className="position-code">TWR</div>
                     <div className="position-name">Tower Control</div>
+                    {atcPositions.TWR && <div className="position-status">OCCUPIED</div>}
                   </button>
                   <button
                     onClick={() => selectMode("atc", selectedAirport, "CTRL")}
-                    className="atc-position-btn control"
+                    className={`atc-position-btn control ${atcPositions.CTRL ? 'occupied' : ''}`}
+                    disabled={atcPositions.CTRL && atcPositions.CTRL !== user?.id}
                   >
                     <div className="position-code">CTRL</div>
                     <div className="position-name">Control</div>
+                    {atcPositions.CTRL && <div className="position-status">OCCUPIED</div>}
                   </button>
                 </div>
               </div>
@@ -3919,7 +3946,6 @@ export default function App() {
               </div>
             </div>
           );
-      }
     } else {
       // Ground Crew Interface - Comprehensive priority coverage
       const criticalPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["De-icing", "Aircraft Maintenance", "Security Check", "Pushback"].includes(r.service));
