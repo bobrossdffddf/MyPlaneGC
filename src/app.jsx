@@ -2695,7 +2695,7 @@ export default function App() {
 
               <div className="management-instructions">
                 <div className="instructions-header">
-                  <span className="instructions-icon">📡</span>
+                  <span className="instructions-icon">ATC</span>
                   <h3>ATC GROUND CONTROL INSTRUCTIONS</h3>
                 </div>
                 <div className="instructions-content">
@@ -3591,103 +3591,6 @@ export default function App() {
 
 
 
-        case "manifest":
-          const currentStandData = getCurrentAirportStands().find(s => s.id === selectedStand);
-          const currentAircraftData = aircraftData ? aircraftDatabase[aircraft] : null;
-          const isCargoStand = currentStandData?.type === "cargo" ||
-                              (currentAircraftData && (currentAircraftData.category === "cargo" || currentAircraftData.category === "military-cargo"));
-
-          return (
-            <div className="manifest-container">
-              <div className="manifest-header">
-                <h2>{isCargoStand ? "CARGO MANIFEST" : "PASSENGER MANIFEST"}</h2>
-                <div className="manifest-stats">
-                  {isCargoStand ? (
-                    <>
-                      <div className="stat">
-                        <span className="stat-value">{passengerManifest.length}</span>
-                        <span className="stat-label">TOTAL ITEMS</span>
-                      </div>
-                      <div className="stat">
-                        <span className="stat-value">{passengerManifest.reduce((sum, item) => sum + (item.weight || 0), 0).toLocaleString()}</span>
-                        <span className="stat-label">TOTAL KG</span>
-                      </div>
-                      <div className="stat">
-                        <span className="stat-value">{passengerManifest.filter(p => p.hazmat).length}</span>
-                        <span className="stat-label">HAZMAT</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="stat">
-                        <span className="stat-value">{passengerManifest.length}</span>
-                        <span className="stat-label">TOTAL PAX</span>
-                      </div>
-                      <div className="stat">
-                        <span className="stat-value">{passengerManifest.filter(p => p.checkedIn).length}</span>
-                        <span className="stat-label">CHECKED IN</span>
-                      </div>
-                      <div className="stat">
-                        <span className="stat-value">{passengerManifest.filter(p => p.specialRequests).length}</span>
-                        <span className="stat-label">SPECIAL REQ</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="manifest-content">
-                <div className="passenger-list">
-                  {passengerManifest.map((item) => (
-                    isCargoStand ? (
-                      <div key={item.id} className={`passenger-item cargo-item ${item.priority === 'High' ? 'high-priority' : ''}`}>
-                        <div className="passenger-info">
-                          <div className="passenger-name">AWB: {item.awbNumber}</div>
-                          <div className="passenger-details">
-                            <span className="seat">{item.description}</span>
-                            <span className="class">{item.shipper}</span>
-                            {item.destination && <span className="destination">→ {item.destination}</span>}
-                            {item.hazmat && <span className="hazmat">HAZMAT</span>}
-                          </div>
-                        </div>
-                        <div className="passenger-status">
-                          <div className="cargo-details">
-                            <div>{item.pieces} pieces</div>
-                            <div>{item.weight} kg</div>
-                            <div>{item.volume} m³</div>
-                            <div className={`priority-${item.priority.toLowerCase()}`}>{item.priority}</div>
-                            <div className="temperature">{item.temperature}</div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div key={item.id} className={`passenger-item ${item.checkedIn ? 'checked-in' : 'not-checked-in'}`}>
-                        <div className="passenger-info">
-                          <div className="passenger-name">{item.name}</div>
-                          <div className="passenger-details">
-                            <span className="seat">{item.seat}</span>
-                            <span className="class">{item.class}</span>
-                            {item.frequent && <span className="frequent">FREQUENT</span>}
-                          </div>
-                        </div>
-                        <div className="passenger-status">
-                          <div className={`check-status ${item.checkedIn ? 'checked' : 'pending'}`}>
-                            {item.checkedIn ? '✓' : '○'}
-                          </div>
-                          {item.specialRequests && (
-                            <div className="special-req">{item.specialRequests}</div>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  ))}
-                </div>
-              </div>
-            </div>
-          );
-
-
-
         default:
           return (
             <div className="pilot-main">
@@ -3704,7 +3607,7 @@ export default function App() {
                       <span className="weather-value">{atisData.wind || '270°/08KT'}</span>
                     </div>
                     <div className="weather-item">
-                      <span className="weather-label">Qspan>NH:</span>
+                      <span className="weather-label">QNH:</span>
                       <span className="weather-value">{atisData.qnh || '1013'}</span>
                     </div>
                     <div className="weather-item">
