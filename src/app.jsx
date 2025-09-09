@@ -2373,18 +2373,11 @@ export default function App() {
                     <div className="position-name">Tower Control</div>
                   </button>
                   <button
-                    onClick={() => selectMode("atc", selectedAirport, "APP")}
-                    className="atc-position-btn approach"
+                    onClick={() => selectMode("atc", selectedAirport, "CTRL")}
+                    className="atc-position-btn control"
                   >
-                    <div className="position-code">APP</div>
-                    <div className="position-name">Approach Control</div>
-                  </button>
-                  <button
-                    onClick={() => selectMode("atc", selectedAirport, "DEP")}
-                    className="atc-position-btn departure"
-                  >
-                    <div className="position-code">DEP</div>
-                    <div className="position-name">Departure Control</div>
+                    <div className="position-code">CTRL</div>
+                    <div className="position-name">Control</div>
                   </button>
                 </div>
               </div>
@@ -2420,265 +2413,175 @@ export default function App() {
               <div className="efs-header">
                 <h2>ELECTRONIC FLIGHT STRIPS - {atcCallsign}</h2>
                 <div className="efs-controls">
-                  <div className="efs-lookup">
-                    <input
-                      type="text"
-                      placeholder="Lookup EFS by callsign..."
+                  <div className="efs-lookup-section">
+                    <select
                       value={efsLookupCallsign}
-                      onChange={(e) => setEfsLookupCallsign(e.target.value.toUpperCase())}
-                      className="efs-lookup-input"
-                    />
-                  </div>
-                  <div className="notification-indicator">
-                    {pendingFlightPlans.length > 0 && (
-                      <div className="notification-badge blinking">
-                        {pendingFlightPlans.length} NEW
-                      </div>
-                    )}
+                      onChange={(e) => setEfsLookupCallsign(e.target.value)}
+                      className="efs-lookup-select"
+                    >
+                      <option value="">Search flight plans...</option>
+                      {flightPlans
+                        .filter(fp => fp.departing === selectedAirport || fp.arriving === selectedAirport)
+                        .map(fp => (
+                          <option key={fp.callsign} value={fp.callsign}>
+                            {fp.callsign} - {fp.departing} to {fp.arriving}
+                          </option>
+                        ))}
+                    </select>
+                    <button
+                      className="create-efs-btn"
+                      onClick={() => {
+                        if (efsLookupCallsign) {
+                          const fp = flightPlans.find(p => p.callsign === efsLookupCallsign);
+                          if (fp) {
+                            updateEFS(fp.callsign, { status: 'AT GATE' });
+                          }
+                        }
+                      }}
+                      disabled={!efsLookupCallsign}
+                    >
+                      CREATE EFS
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <div className="flight-plans-grid">
-                {flightPlans
-                  .filter(fp => {
-                    const isRelevant = fp.departing === selectedAirport || fp.arriving === selectedAirport;
-                    const matchesLookup = !efsLookupCallsign || fp.callsign.includes(efsLookupCallsign);
-                    return isRelevant && matchesLookup;
-                  })
-                  .map((flightPlan, index) => {
-                    const efsData = efsUpdates[flightPlan.callsign] || {};
-                    const isPending = pendingFlightPlans.some(p => p.callsign === flightPlan.callsign);
-                    
-                    return (
-                      <div 
-                        key={`${flightPlan.callsign}-${index}`}
-                        className={`efs-strip ${isPending ? 'pending' : ''} ${selectedFlightPlan?.callsign === flightPlan.callsign ? 'selected' : ''}`}
-                        onClick={() => setSelectedFlightPlan(flightPlan)}
-                      >
-                        <div className="efs-strip-header">
-                          <div className="strip-actions">
-                            <button 
-                              className="transfer-btn" 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const toPosition = prompt("Transfer to position:", "GND");
-                                if (toPosition) transferEFS(flightPlan.callsign, atcPosition, toPosition);
-                              }}
-                              title="Transfer EFS"
-                            >
-                              ➡️
-                            </button>
-                            <button 
-                              className="remove-btn" 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (confirm(`Remove EFS for ${flightPlan.callsign}?`)) {
-                                  removeEFS(flightPlan.callsign);
-                                }
-                              }}
-                              title="Remove EFS"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </div>
+              <div className="efs-strips-board">
+                {Object.keys(efsUpdates).length === 0 ? (
+                  <div className="no-efs-message">
+                    <div className="no-efs-icon">📋</div>
+                    <div>No Electronic Flight Strips created</div>
+                    <div className="no-efs-subtitle">
+                      Select a flight plan from the dropdown and click "CREATE EFS" to begin
+                    </div>
+                  </div>
+                ) : (
+                  <div className="paper-strips-container">
+                    {Object.entries(efsUpdates).map(([callsign, efsData]) => {
+                      const flightPlan = flightPlans.find(fp => fp.callsign === callsign);
+                      if (!flightPlan) return null;
 
-                        <div className="efs-row-1">
-                          <div className="efs-field type-wake">
-                            <div className="field-label">TYPE</div>
-                            <div className="field-value">{flightPlan.aircraft}/{flightPlan.flightrules}</div>
+                      return (
+                        <div key={callsign} className="paper-strip">
+                          <div className="strip-perforations">
+                            {"• ".repeat(50)}
                           </div>
-                          <div className="efs-field departure">
-                            <div className="field-label">DEPARTURE</div>
-                            <div className="field-value">{flightPlan.departing}</div>
-                          </div>
-                          <div className="efs-field req-fl">
-                            <div className="field-label">REQ FL</div>
-                            <div className="field-value">{flightPlan.flightlevel}</div>
-                          </div>
-                          <div className="efs-field initial">
-                            <div className="field-label">INITIAL</div>
-                            <div 
-                              className="field-value editable"
-                              contentEditable={editingField === `${flightPlan.callsign}-initialHeading`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingField(`${flightPlan.callsign}-initialHeading`);
-                              }}
-                              onBlur={(e) => {
-                                handleInlineEdit(flightPlan.callsign, 'initialHeading', e.target.textContent);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  e.target.blur();
-                                }
-                              }}
-                            >
-                              {efsData.initialHeading || "---"}
+                          
+                          <div className="strip-content">
+                            <div className="strip-row-1">
+                              <div className="strip-field callsign-field">
+                                <label>CALLSIGN</label>
+                                <div className="field-box">{callsign}</div>
+                              </div>
+                              <div className="strip-field aircraft-field">
+                                <label>A/C TYPE</label>
+                                <div className="field-box">{flightPlan.aircraft}</div>
+                              </div>
+                              <div className="strip-field squawk-field">
+                                <label>SQUAWK</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.squawk || ""}
+                                  onChange={(e) => updateEFS(callsign, { squawk: e.target.value.slice(0, 4) })}
+                                  placeholder="----"
+                                  maxLength="4"
+                                />
+                              </div>
+                              <div className="strip-field status-field">
+                                <label>STATUS</label>
+                                <select
+                                  className="field-box editable-field"
+                                  value={efsData.status || "AT GATE"}
+                                  onChange={(e) => updateEFS(callsign, { status: e.target.value })}
+                                >
+                                  <option value="AT GATE">AT GATE</option>
+                                  <option value="PUSHBACK">PUSHBACK</option>
+                                  <option value="TAXI">TAXI</option>
+                                  <option value="READY">READY</option>
+                                  <option value="TAKEOFF">TAKEOFF</option>
+                                  <option value="AIRBORNE">AIRBORNE</option>
+                                  <option value="APPROACH">APPROACH</option>
+                                  <option value="LANDED">LANDED</option>
+                                </select>
+                              </div>
                             </div>
-                          </div>
-                          <div className="efs-field cruise">
-                            <div className="field-label">CRUISE</div>
-                            <div 
-                              className="field-value editable"
-                              contentEditable={editingField === `${flightPlan.callsign}-cruiseHeading`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingField(`${flightPlan.callsign}-cruiseHeading`);
-                              }}
-                              onBlur={(e) => {
-                                handleInlineEdit(flightPlan.callsign, 'cruiseHeading', e.target.textContent);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  e.target.blur();
-                                }
-                              }}
-                            >
-                              {efsData.cruiseHeading || "---"}
+
+                            <div className="strip-row-2">
+                              <div className="strip-field departure-field">
+                                <label>DEP</label>
+                                <div className="field-box">{flightPlan.departing}</div>
+                              </div>
+                              <div className="strip-field arrival-field">
+                                <label>ARR</label>
+                                <div className="field-box">{flightPlan.arriving}</div>
+                              </div>
+                              <div className="strip-field runway-field">
+                                <label>RWY</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.departureRunway || ""}
+                                  onChange={(e) => updateEFS(callsign, { departureRunway: e.target.value })}
+                                  placeholder="--"
+                                />
+                              </div>
+                              <div className="strip-field altitude-field">
+                                <label>ALT</label>
+                                <div className="field-box">{flightPlan.flightlevel}</div>
+                              </div>
                             </div>
-                          </div>
-                          <div className="efs-field other-info">
-                            <div className="field-label">OTHER INFO</div>
-                            <div 
-                              className="field-value editable"
-                              contentEditable={editingField === `${flightPlan.callsign}-otherInfo`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingField(`${flightPlan.callsign}-otherInfo`);
-                              }}
-                              onBlur={(e) => {
-                                handleInlineEdit(flightPlan.callsign, 'otherInfo', e.target.textContent);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  e.target.blur();
-                                }
-                              }}
-                            >
-                              {efsData.otherInfo || "---"}
+
+                            <div className="strip-row-3">
+                              <div className="strip-field remarks-field">
+                                <label>REMARKS</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field wide-field"
+                                  value={efsData.remarks || ""}
+                                  onChange={(e) => updateEFS(callsign, { remarks: e.target.value })}
+                                  placeholder="Controller remarks..."
+                                />
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        
-                        <div className="efs-row-2">
-                          <div className="efs-field callsign-squawk">
-                            <div className="field-label">CALLSIGN</div>
-                            <div className="field-value">{flightPlan.callsign}</div>
-                            <div className="squawk-section">
-                              <div className="squawk-label">SQUAWK</div>
-                              <div 
-                                className="squawk-value editable"
-                                contentEditable={editingField === `${flightPlan.callsign}-squawk`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setEditingField(`${flightPlan.callsign}-squawk`);
-                                }}
-                                onBlur={(e) => {
-                                  handleInlineEdit(flightPlan.callsign, 'squawk', e.target.textContent);
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    e.target.blur();
-                                  }
-                                }}
-                                onInput={(e) => {
-                                  // Limit to 4 digits
-                                  const value = e.target.textContent.replace(/\D/g, '').slice(0, 4);
-                                  if (e.target.textContent !== value) {
-                                    e.target.textContent = value;
-                                    // Move cursor to end
-                                    const range = document.createRange();
-                                    const sel = window.getSelection();
-                                    range.selectNodeContents(e.target);
-                                    range.collapse(false);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
+
+                            <div className="strip-actions">
+                              <select
+                                className="transfer-select"
+                                onChange={(e) => {
+                                  if (e.target.value) {
+                                    transferEFS(callsign, atcPosition, e.target.value);
+                                    e.target.value = "";
                                   }
                                 }}
                               >
-                                {efsData.squawk || "----"}
-                              </div>
+                                <option value="">Transfer to...</option>
+                                <option value="GND">GND</option>
+                                <option value="TWR">TWR</option>
+                                <option value="CTRL">CTRL</option>
+                              </select>
+                              <button
+                                className="remove-strip-btn"
+                                onClick={() => {
+                                  if (confirm(`Remove EFS for ${callsign}?`)) {
+                                    removeEFS(callsign);
+                                  }
+                                }}
+                              >
+                                REMOVE
+                              </button>
                             </div>
                           </div>
-                          <div className="efs-field destination">
-                            <div className="field-label">DESTINATION</div>
-                            <div className="field-value">{flightPlan.arriving}</div>
-                          </div>
-                          <div className="efs-field dep-rwy">
-                            <div className="field-label">DEP RWY</div>
-                            <div 
-                              className="field-value editable"
-                              contentEditable={editingField === `${flightPlan.callsign}-departureRunway`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingField(`${flightPlan.callsign}-departureRunway`);
-                              }}
-                              onBlur={(e) => {
-                                handleInlineEdit(flightPlan.callsign, 'departureRunway', e.target.textContent);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  e.target.blur();
-                                }
-                              }}
-                            >
-                              {efsData.departureRunway || "---"}
-                            </div>
-                          </div>
-                          <div className="efs-field status">
-                            <div className="field-label">STATUS</div>
-                            <div 
-                              className="field-value editable"
-                              contentEditable={editingField === `${flightPlan.callsign}-status`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingField(`${flightPlan.callsign}-status`);
-                              }}
-                              onBlur={(e) => {
-                                handleInlineEdit(flightPlan.callsign, 'status', e.target.textContent);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  e.target.blur();
-                                }
-                              }}
-                            >
-                              {efsData.status || "FILED"}
-                            </div>
+                          
+                          <div className="strip-perforations">
+                            {"• ".repeat(50)}
                           </div>
                         </div>
-                        
-                        {efsData.updatedBy && (
-                          <div className="efs-update-info">
-                            Last updated by {efsData.updatedBy} at {new Date(efsData.updatedAt).toLocaleTimeString()}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
-
-              {flightPlans.filter(fp => {
-                const isRelevant = fp.departing === selectedAirport || fp.arriving === selectedAirport;
-                const matchesLookup = !efsLookupCallsign || fp.callsign.includes(efsLookupCallsign);
-                return isRelevant && matchesLookup;
-              }).length === 0 && (
-                <div className="no-flight-plans">
-                  <div className="no-plans-icon">📋</div>
-                  <div>No flight plans found for {selectedAirport}</div>
-                  <div className="no-plans-subtitle">
-                    {efsLookupCallsign ? `No results for "${efsLookupCallsign}"` : "Flight plans will appear here when filed by pilots"}
+                      );
+                    })}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           );
 

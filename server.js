@@ -257,7 +257,7 @@ const connectToPTFSWebSocket = () => {
         console.log(`📡 ATIS update for ${atisInfo.airport}: INFO ${atisInfo.letter}`);
       } else if (message.t === 'FLIGHT_PLAN' || message.t === 'EVENT_FLIGHT_PLAN') {
         const flightPlan = message.d;
-        
+
         // Store flight plan and broadcast to all connected ATC controllers
         ptfsFlightPlans.push({
           ...flightPlan,
@@ -548,7 +548,7 @@ io.on("connection", (socket) => {
   socket.on("userMode", ({ mode, airport, userId, position }) => {
     // Initialize airport data if needed
     initializeAirportData(airport);
-    
+
     const userData = connectedUsers.get(socket.id) || {};
     userData.mode = mode;
     userData.airport = airport;
@@ -765,7 +765,7 @@ io.on("connection", (socket) => {
   // ATC-specific socket handlers
   socket.on("efsUpdate", (updateData) => {
     const { flightPlanId, updates, updatedBy, airport } = updateData;
-    
+
     // Broadcast EFS update to all ATC controllers at the same airport
     io.to(airport).emit("efsUpdate", {
       flightPlanId,
@@ -779,7 +779,7 @@ io.on("connection", (socket) => {
 
   socket.on("efsTransfer", (transferData) => {
     const { flightPlanId, fromPosition, toPosition, transferredBy, airport } = transferData;
-    
+
     // Broadcast EFS transfer to all ATC controllers at the same airport
     io.to(airport).emit("efsTransfer", {
       flightPlanId,
@@ -794,7 +794,7 @@ io.on("connection", (socket) => {
 
   socket.on("efsRemove", (removeData) => {
     const { flightPlanId, removedBy, airport } = removeData;
-    
+
     // Broadcast EFS removal to all ATC controllers at the same airport
     io.to(airport).emit("efsRemove", {
       flightPlanId,
@@ -807,7 +807,7 @@ io.on("connection", (socket) => {
 
   socket.on("atcAnnouncement", (announcement) => {
     const { message, from, airport } = announcement;
-    
+
     // Broadcast announcement to all ground crew at the airport
     io.to(airport).emit("atcAnnouncement", {
       message,
