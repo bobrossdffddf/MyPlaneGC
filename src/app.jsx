@@ -1427,13 +1427,28 @@ export default function App() {
   }, [messages]);
 
   useEffect(() => {
-    fetch('/api/user')
-      .then(res => res.ok ? res.json() : null)
-      .then(userData => {
-        setUser(userData);
+    // Only fetch user data once on initial load
+    const fetchUserData = async () => {
+      try {
+        const res = await fetch('/api/user');
+        if (res.ok) {
+          const userData = await res.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.log('Auth check failed:', error);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    fetchUserData();
+
+    }, []); // Empty dependency array to run only once
+
+  // Separate useEffect for socket listeners to prevent re-execution
+  useEffect(() => {
+    if (!user) return; // Don't set up socket listeners until user is authenticated
 
     socket.on("chatUpdate", (msg) => {
       if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
