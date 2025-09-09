@@ -84,7 +84,7 @@ export default function App() {
   const [speechSynthesis, setSpeechSynthesis] = useState(null);
   const [efsLookupCallsign, setEfsLookupCallsign] = useState("");
   const [editingField, setEditingField] = useState(null);
-  
+
   const [transferNotifications, setTransferNotifications] = useState([]);
 
   // Static permit document ID to prevent it from changing
@@ -1337,7 +1337,7 @@ export default function App() {
   // Handle EFS updates
   const updateEFS = (flightPlanId, updates) => {
     if (!flightPlanId || !updates) return;
-    
+
     setEfsUpdates(prev => ({
       ...prev,
       [flightPlanId]: {
@@ -1398,7 +1398,7 @@ export default function App() {
     if (field === 'squawk' && value.length > 4) {
       return; // Limit squawk to 4 digits
     }
-    
+
     updateEFS(flightPlanId, { [field]: value });
     setEditingField(null);
   };
@@ -1406,26 +1406,26 @@ export default function App() {
   // Play ATIS audio using TTS (for pilots only)
   const playATISAudio = () => {
     if (!speechSynthesis || !atisData.raw || userMode !== 'pilot') return;
-    
+
     speechSynthesis.cancel(); // Stop any current speech
-    
+
     const utterance = new SpeechSynthesisUtterance(atisData.raw);
     utterance.rate = 0.8;
     utterance.pitch = 1.0;
     utterance.volume = 0.8;
-    
+
     // Try to use a male voice for ATIS
     const voices = speechSynthesis.getVoices();
-    const preferredVoice = voices.find(voice => 
-      voice.name.includes('Male') || 
-      voice.name.includes('Daniel') || 
+    const preferredVoice = voices.find(voice =>
+      voice.name.includes('Male') ||
+      voice.name.includes('Daniel') ||
       voice.name.includes('David')
     ) || voices[0];
-    
+
     if (preferredVoice) {
       utterance.voice = preferredVoice;
     }
-    
+
     speechSynthesis.speak(utterance);
   };
 
@@ -1557,14 +1557,14 @@ export default function App() {
     // ATC-specific socket listeners
     socket.on("flightPlanUpdate", (flightPlans) => {
       setFlightPlans(flightPlans);
-      
+
       // Check for new flight plans for this airport and notify ATC
       if (userMode === 'atc') {
-        const newPlans = flightPlans.filter(fp => 
+        const newPlans = flightPlans.filter(fp =>
           (fp.departing === selectedAirport || fp.arriving === selectedAirport) &&
           !pendingFlightPlans.some(existing => existing.callsign === fp.callsign)
         );
-        
+
         if (newPlans.length > 0) {
           setPendingFlightPlans(prev => [...prev, ...newPlans]);
           // Visual/audio notification for new flight plans
@@ -1573,17 +1573,17 @@ export default function App() {
               const audioContext = new (window.AudioContext || window.webkitAudioContext)();
               const oscillator = audioContext.createOscillator();
               const gainNode = audioContext.createGain();
-              
+
               oscillator.connect(gainNode);
               gainNode.connect(audioContext.destination);
-              
+
               oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
               oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2);
-              
+
               gainNode.gain.setValueAtTime(0, audioContext.currentTime);
               gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
               gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-              
+
               oscillator.start(audioContext.currentTime);
               oscillator.stop(audioContext.currentTime + 0.5);
             } catch (e) {
@@ -1668,7 +1668,7 @@ export default function App() {
     console.log('Selecting mode:', mode, 'for airport:', airport, 'position:', position);
     setUserMode(mode);
     setSelectedAirport(airport);
-    
+
     if (mode === 'atc') {
       setAtcPosition(position);
       const callsign = assignATCPosition(airport, position);
@@ -1695,7 +1695,7 @@ export default function App() {
       alert("Please fill in all required fields");
       return;
     }
-    
+
     if (!validateFlightNumber(flightNumber)) {
       alert("Please enter a valid ICAO flight number (e.g., AAL123, UAL456, BAW100)");
       return;
@@ -2269,7 +2269,7 @@ export default function App() {
             <div className="brand-icon">🛩️</div>
             <h1>MyPlane</h1>
             <div className="brand-subtitle">Professional Aviation Ground Operations</div>
-            <div className="system-version">Version 1.2.0 | Made by @justawacko_</div>
+            <div className="system-version">Version 1.3.0 | Made by @justawacko_</div>
           </div>
           <div className="auth-section">
             <button onClick={handleLogin} className="discord-auth-btn">
@@ -2752,7 +2752,7 @@ export default function App() {
                           <div className="strip-perforations">
                             {"• ".repeat(50)}
                           </div>
-                          
+
                           <div className="strip-content">
                             <div className="strip-row-1">
                               <div className="strip-field callsign-field">
@@ -2895,7 +2895,7 @@ export default function App() {
                               </button>
                             </div>
                           </div>
-                          
+
                           <div className="strip-perforations">
                             {"• ".repeat(50)}
                           </div>
@@ -2931,7 +2931,7 @@ export default function App() {
                       }
                     }}
                   />
-                  <button 
+                  <button
                     className="send-announcement-btn"
                     onClick={(e) => {
                       const input = e.target.previousElementSibling;
@@ -2951,7 +2951,7 @@ export default function App() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="announcements-list">
                 {atcAnnouncements.map((announcement, index) => (
                   <div key={index} className="announcement-item">
@@ -2968,7 +2968,7 @@ export default function App() {
             </div>
           );
 
-        
+
 
         default:
           return (
@@ -2978,7 +2978,7 @@ export default function App() {
                   <h2>{selectedAirport} {atcPosition} - {atcCallsign}</h2>
                   <div className="position-status online">ONLINE</div>
                 </div>
-                
+
                 <div className="atc-statistics">
                   <div className="stat-card">
                     <div className="stat-value">{flightPlans.filter(fp => fp.departing === selectedAirport).length}</div>
@@ -3013,7 +3013,7 @@ export default function App() {
                           EFS {notification.callsign} transferred from {notification.fromPosition} to {notification.toPosition}
                         </div>
                         {notification.toPosition === atcPosition && (
-                          <button 
+                          <button
                             className="open-efs-btn"
                             onClick={() => {
                               setActiveTab('efs');
@@ -3677,7 +3677,7 @@ export default function App() {
                       <span className="weather-value">{atisData.wind || '270°/08KT'}</span>
                     </div>
                     <div className="weather-item">
-                      <span className="weather-label">QNH:</span>
+                      <span className="weather-label">Qspan>NH:</span>
                       <span className="weather-value">{atisData.qnh || '1013'}</span>
                     </div>
                     <div className="weather-item">
@@ -4234,7 +4234,7 @@ export default function App() {
 
       return (
         <div className="groundcrew-main">
-          
+
 
           <div className="service-management-board">
             <div className="service-column critical">
@@ -4531,8 +4531,8 @@ export default function App() {
           <div className="pushback-modal">
             <div className="pushback-modal-header">
               <h3>PUSHBACK REQUEST</h3>
-              <button 
-                className="close-modal-btn" 
+              <button
+                className="close-modal-btn"
                 onClick={() => setShowPushbackForm(false)}
               >
                 ×
@@ -4603,13 +4603,13 @@ export default function App() {
                 </div>
               )}
               <div className="pushback-form-actions">
-                <button 
+                <button
                   className="submit-pushback-btn"
                   onClick={submitPushbackRequest}
                 >
                   SUBMIT REQUEST
                 </button>
-                <button 
+                <button
                   className="cancel-pushback-btn"
                   onClick={() => setShowPushbackForm(false)}
                 >
