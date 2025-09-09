@@ -84,6 +84,8 @@ export default function App() {
   const [speechSynthesis, setSpeechSynthesis] = useState(null);
   const [efsLookupCallsign, setEfsLookupCallsign] = useState("");
   const [editingField, setEditingField] = useState(null);
+  const [slotTimes, setSlotTimes] = useState({});
+  const [transferNotifications, setTransferNotifications] = useState([]);
 
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
@@ -1601,6 +1603,15 @@ export default function App() {
 
     socket.on("efsTransfer", (transferData) => {
       if (userMode === 'atc') {
+        // Add to transfer notifications for the receiving controller
+        if (transferData.toPosition === atcPosition) {
+          setTransferNotifications(prev => [...prev, {
+            ...transferData,
+            timestamp: new Date().toISOString(),
+            callsign: transferData.flightPlanId
+          }]);
+        }
+
         addChatMessage({
           text: `📋 ${transferData.fromPosition} transferred EFS ${transferData.flightPlanId} to ${transferData.toPosition}`,
           sender: "ATC SYSTEM",
@@ -2745,6 +2756,19 @@ export default function App() {
                                 <label>A/C TYPE</label>
                                 <div className="field-box">{flightPlan.aircraft}</div>
                               </div>
+                              <div className="strip-field wake-field">
+                                <label>WAKE</label>
+                                <select
+                                  className="field-box editable-field"
+                                  value={efsData.wakeTurbulence || "M"}
+                                  onChange={(e) => updateEFS(callsign, { wakeTurbulence: e.target.value })}
+                                >
+                                  <option value="L">L (Light)</option>
+                                  <option value="M">M (Medium)</option>
+                                  <option value="H">H (Heavy)</option>
+                                  <option value="J">J (Super)</option>
+                                </select>
+                              </div>
                               <div className="strip-field squawk-field">
                                 <label>SQUAWK</label>
                                 <input
@@ -2755,23 +2779,6 @@ export default function App() {
                                   placeholder="----"
                                   maxLength="4"
                                 />
-                              </div>
-                              <div className="strip-field status-field">
-                                <label>STATUS</label>
-                                <select
-                                  className="field-box editable-field"
-                                  value={efsData.status || "AT GATE"}
-                                  onChange={(e) => updateEFS(callsign, { status: e.target.value })}
-                                >
-                                  <option value="AT GATE">AT GATE</option>
-                                  <option value="PUSHBACK">PUSHBACK</option>
-                                  <option value="TAXI">TAXI</option>
-                                  <option value="READY">READY</option>
-                                  <option value="TAKEOFF">TAKEOFF</option>
-                                  <option value="AIRBORNE">AIRBORNE</option>
-                                  <option value="APPROACH">APPROACH</option>
-                                  <option value="LANDED">LANDED</option>
-                                </select>
                               </div>
                             </div>
 
@@ -2801,6 +2808,98 @@ export default function App() {
                             </div>
 
                             <div className="strip-row-3">
+                              <div className="strip-field entry-field">
+                                <label>ENTRY</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.entryPoint || ""}
+                                  onChange={(e) => updateEFS(callsign, { entryPoint: e.target.value })}
+                                  placeholder="Entry point..."
+                                />
+                              </div>
+                              <div className="strip-field mid01-field">
+                                <label>MID01</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.mid01 || ""}
+                                  onChange={(e) => updateEFS(callsign, { mid01: e.target.value })}
+                                  placeholder="Waypoint 1..."
+                                />
+                              </div>
+                              <div className="strip-field mid02-field">
+                                <label>MID02</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.mid02 || ""}
+                                  onChange={(e) => updateEFS(callsign, { mid02: e.target.value })}
+                                  placeholder="Waypoint 2..."
+                                />
+                              </div>
+                              <div className="strip-field exits-field">
+                                <label>EXITS</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.exitPoint || ""}
+                                  onChange={(e) => updateEFS(callsign, { exitPoint: e.target.value })}
+                                  placeholder="Exit point..."
+                                />
+                              </div>
+                            </div>
+
+                            <div className="strip-row-4">
+                              <div className="strip-field tail-field">
+                                <label>TAIL NO</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.tailNumber || ""}
+                                  onChange={(e) => updateEFS(callsign, { tailNumber: e.target.value })}
+                                  placeholder="Tail number..."
+                                />
+                              </div>
+                              <div className="strip-field ades-field">
+                                <label>ADES</label>
+                                <input
+                                  type="text"
+                                  className="field-box editable-field"
+                                  value={efsData.alternateDestination || ""}
+                                  onChange={(e) => updateEFS(callsign, { alternateDestination: e.target.value })}
+                                  placeholder="Alternate..."
+                                />
+                              </div>
+                              <div className="strip-field status-field">
+                                <label>STATUS</label>
+                                <select
+                                  className="field-box editable-field"
+                                  value={efsData.status || "AT GATE"}
+                                  onChange={(e) => updateEFS(callsign, { status: e.target.value })}
+                                >
+                                  <option value="AT GATE">AT GATE</option>
+                                  <option value="PUSHBACK">PUSHBACK</option>
+                                  <option value="TAXI">TAXI</option>
+                                  <option value="READY">READY</option>
+                                  <option value="TAKEOFF">TAKEOFF</option>
+                                  <option value="AIRBORNE">AIRBORNE</option>
+                                  <option value="APPROACH">APPROACH</option>
+                                  <option value="LANDED">LANDED</option>
+                                </select>
+                              </div>
+                              <div className="strip-field slot-field">
+                                <label>SLOT TIME</label>
+                                <input
+                                  type="time"
+                                  className="field-box editable-field"
+                                  value={efsData.slotTime || ""}
+                                  onChange={(e) => updateEFS(callsign, { slotTime: e.target.value })}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="strip-row-5">
                               <div className="strip-field remarks-field">
                                 <label>REMARKS</label>
                                 <input
@@ -2909,6 +3008,110 @@ export default function App() {
                     <div className="announcement-message">{announcement.message}</div>
                   </div>
                 ))}
+              </div>
+            </div>
+          );
+
+        case "coordination":
+          return (
+            <div className="coordination-container">
+              <div className="coordination-header">
+                <h2>INTER-FACILITY COORDINATION - {atcCallsign}</h2>
+              </div>
+
+              <div className="coordination-sections">
+                <div className="coordination-section">
+                  <h3>SLOT TIME MANAGEMENT</h3>
+                  <div className="slot-management">
+                    <div className="slot-controls">
+                      <select className="slot-aircraft-select">
+                        <option value="">Select Aircraft...</option>
+                        {Object.keys(efsUpdates).map(callsign => (
+                          <option key={callsign} value={callsign}>{callsign}</option>
+                        ))}
+                      </select>
+                      <input
+                        type="time"
+                        className="slot-time-input"
+                        placeholder="Taxi Time"
+                      />
+                      <button className="assign-slot-btn">ASSIGN SLOT</button>
+                    </div>
+                    <div className="active-slots">
+                      {Object.entries(slotTimes).map(([callsign, slotTime]) => (
+                        <div key={callsign} className="slot-item">
+                          <span className="slot-callsign">{callsign}</span>
+                          <span className="slot-time">{slotTime}</span>
+                          <button 
+                            className="remove-slot-btn"
+                            onClick={() => {
+                              const newSlots = { ...slotTimes };
+                              delete newSlots[callsign];
+                              setSlotTimes(newSlots);
+                            }}
+                          >
+                            REMOVE
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="coordination-section">
+                  <h3>DIRECT COORDINATION LINES</h3>
+                  <div className="coordination-buttons">
+                    <button className="coord-btn approach">
+                      <span className="coord-icon">📡</span>
+                      <span>APPROACH CONTROL</span>
+                    </button>
+                    <button className="coord-btn departure">
+                      <span className="coord-icon">🛫</span>
+                      <span>DEPARTURE CONTROL</span>
+                    </button>
+                    <button className="coord-btn center">
+                      <span className="coord-icon">🎯</span>
+                      <span>AREA CONTROL CENTER</span>
+                    </button>
+                    <button className="coord-btn adjacent">
+                      <span className="coord-icon">🤝</span>
+                      <span>ADJACENT TOWER</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="coordination-section">
+                  <h3>TRANSFER NOTIFICATIONS</h3>
+                  <div className="transfer-notifications">
+                    {transferNotifications.map((notification, index) => (
+                      <div key={index} className="transfer-notification">
+                        <div className="notification-header">
+                          <span className="notification-from">{notification.from}</span>
+                          <span className="notification-time">
+                            {new Date(notification.timestamp).toLocaleTimeString()}
+                          </span>
+                        </div>
+                        <div className="notification-message">
+                          EFS {notification.callsign} transferred from {notification.fromPosition} to {notification.toPosition}
+                        </div>
+                        {notification.toPosition === atcPosition && (
+                          <button 
+                            className="open-efs-btn"
+                            onClick={() => {
+                              setActiveTab('efs');
+                              // Auto-create EFS if it doesn't exist
+                              if (!efsUpdates[notification.callsign]) {
+                                updateEFS(notification.callsign, { status: 'TRANSFERRED' });
+                              }
+                            }}
+                          >
+                            OPEN EFS
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -4739,6 +4942,13 @@ export default function App() {
             >
               <span className="nav-icon">📢</span>
               <span>ANNOUNCE</span>
+            </button>
+            <button
+              className={`nav-btn ${activeTab === 'coordination' ? 'active' : ''}`}
+              onClick={() => setActiveTab('coordination')}
+            >
+              <span className="nav-icon">🤝</span>
+              <span>COORD</span>
             </button>
           </>
         )}

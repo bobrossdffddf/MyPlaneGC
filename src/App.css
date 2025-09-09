@@ -4403,6 +4403,224 @@ body {
   opacity: 0.7;
 }
 
+/* Coordination Interface */
+.coordination-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.coordination-header {
+  background: rgba(26, 31, 46, 0.95);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.coordination-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.coordination-section {
+  background: rgba(31, 41, 55, 0.8);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.coordination-section h3 {
+  color: #3b82f6;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Slot Management */
+.slot-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.slot-aircraft-select,
+.slot-time-input {
+  background: rgba(55, 65, 82, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.assign-slot-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.active-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.slot-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(55, 65, 82, 0.5);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.slot-callsign {
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.slot-time {
+  font-family: 'Courier New', monospace;
+  color: #10b981;
+}
+
+.remove-slot-btn {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* Coordination Buttons */
+.coordination-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.coord-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(55, 65, 82, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 16px 12px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.coord-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.coord-icon {
+  font-size: 1.5rem;
+}
+
+/* Transfer Notifications */
+.transfer-notifications {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.transfer-notification {
+  background: rgba(55, 65, 82, 0.8);
+  border-left: 4px solid #3b82f6;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.notification-from {
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.notification-time {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.notification-message {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.open-efs-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.open-efs-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* Enhanced EFS Strip Rows */
+.strip-row-4,
+.strip-row-5 {
+  display: grid;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.strip-row-4 {
+  grid-template-columns: 1fr 1fr 1.5fr 1fr;
+}
+
+.strip-row-5 {
+  grid-template-columns: 1fr;
+}
+
+.entry-field,
+.mid01-field,
+.mid02-field,
+.exits-field,
+.tail-field,
+.ades-field,
+.slot-field,
+.wake-field {
+  display: flex;
+  flex-direction: column;
+}
+
 /* ATC Announcements */
 .atc-announcements-container {
   padding: 20px;
