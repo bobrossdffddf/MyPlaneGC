@@ -1328,7 +1328,7 @@ export default function App() {
     }
   }, []);
 
-  // Fetch current ATC positions for an airport
+  // Fetch ATC positions for an airport
   const fetchATCPositions = async (airport) => {
     try {
       const response = await fetch(`/api/atc-positions/${airport}`);
@@ -3849,6 +3849,7 @@ export default function App() {
               </div>
             </div>
           );
+      }
     } else {
       // Ground Crew Interface - Comprehensive priority coverage
       const criticalPriorityRequests = requests.filter(r => r.status === "REQUESTED" && ["De-icing", "Aircraft Maintenance", "Security Check", "Pushback"].includes(r.service));
@@ -3936,229 +3937,229 @@ export default function App() {
               </div>
             </div>
 
-            <div className="stands-overview">
-              <div className="stands-grid-professional">
-                {getCurrentAirportStands().map(stand => {
-                  const occupiedBy = stands[stand.id];
-                  const standRequests = requests.filter(r => r.stand === stand.id && r.status === "REQUESTED");
-                  const completedServices = requests.filter(r => r.stand === stand.id && r.status === "COMPLETED").length;
+            <div className="stands-overview">>
+                <div className="stands-grid-professional">
+                  {getCurrentAirportStands().map(stand => {
+                    const occupiedBy = stands[stand.id];
+                    const standRequests = requests.filter(r => r.stand === stand.id && r.status === "REQUESTED");
+                    const completedServices = requests.filter(r => r.stand === stand.id && r.status === "COMPLETED").length;
 
-                  return (
-                    <div
-                      key={stand.id}
-                      className={`stand-card-professional ${occupiedBy ? 'occupied' : 'available'} ${standManagementMode ? 'management-enabled' : ''}`}
-                    >
-                      <div className="stand-header-professional">
-                        <div className="stand-identification">
-                          <span className="stand-id-large">{stand.id}</span>
-                          <span className="stand-type-badge">{stand.type.toUpperCase()}</span>
-                        </div>
-                        <div className="stand-status-indicator">
-                          <div className={`status-light ${occupiedBy ? 'occupied' : 'available'}`}></div>
-                          <span className="status-text">{occupiedBy ? 'OCCUPIED' : 'AVAILABLE'}</span>
-                        </div>
-                      </div>
-
-                      {occupiedBy ? (
-                        <div className="occupied-stand-details">
-                          <div className="flight-identification">
-                            <div className="flight-primary">
-                              <span className="flight-number-large">{occupiedBy.flight}</span>
-                              <span className="aircraft-badge">{occupiedBy.aircraft}</span>
-                            </div>
-                            <div className="pilot-info">
-                              <span className="pilot-label">PILOT:</span>
-                              <span className="pilot-name">{occupiedBy.pilot}</span>
-                            </div>
-                            {standManagementMode && (
-                              <button
-                                className="remove-flight-btn"
-                                onClick={() => removeFlightFromStand(stand.id)}
-                                title="Remove flight from stand"
-                              >
-                                REMOVE FLIGHT
-                              </button>
-                            )}
+                    return (
+                      <div
+                        key={stand.id}
+                        className={`stand-card-professional ${occupiedBy ? 'occupied' : 'available'} ${standManagementMode ? 'management-enabled' : ''}`}
+                      >
+                        <div className="stand-header-professional">
+                          <div className="stand-identification">
+                            <span className="stand-id-large">{stand.id}</span>
+                            <span className="stand-type-badge">{stand.type.toUpperCase()}</span>
                           </div>
-
-                          <div className="service-management-section">
-                            <div className="services-header">
-                              <span className="services-title">SERVICES</span>
-                              <div className="service-counters">
-                                <span className="pending-count">{standRequests.length} PENDING</span>
-                                <span className="completed-count">{completedServices} COMPLETED</span>
-                              </div>
-                            </div>
-
-                            {standRequests.length > 0 && (
-                              <div className="active-services-list">
-                                {standRequests.map((req, i) => (
-                                  <div key={i} className="service-item-professional">
-                                    <span className="service-name">{req.service}</span>
-                                    <span className="service-time">{req.timestamp}</span>
-                                    {standManagementMode && (
-                                      <button
-                                        className="remove-service-btn"
-                                        onClick={() => removeServiceRequest(stand.id, req.service)}
-                                        title="Cancel Service"
-                                      >
-                                        ✖
-                                      </button>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-
-                            {standManagementMode && (
-                              <div className="service-quick-actions">
-                                <div className="quick-actions-header">QUICK SERVICES:</div>
-                                <div className="service-action-buttons">
-                                  <button
-                                    className="service-action-btn fuel"
-                                    onClick={() => addServiceRequest(stand.id, "Fuel Service")}
-                                    title="Request Fuel Service"
-                                  >
-                                    <span className="service-icon">⛽</span>
-                                    <span className="service-label">FUEL</span>
-                                  </button>
-                                  <button
-                                    className="service-action-btn catering"
-                                    onClick={() => addServiceRequest(stand.id, "Catering")}
-                                    title="Request Catering"
-                                  >
-                                    <span className="service-icon">🍽️</span>
-                                    <span className="service-label">CATERING</span>
-                                  </button>
-                                  <button
-                                    className="service-action-btn pushback"
-                                    onClick={() => addServiceRequest(stand.id, "Pushback")}
-                                    title="Request Pushback"
-                                  >
-                                    <span className="service-icon">🚛</span>
-                                    <span className="service-label">PUSHBACK</span>
-                                  </button>
-                                  <button
-                                    className="service-action-btn power"
-                                    onClick={() => addServiceRequest(stand.id, "Ground Power")}
-                                    title="Request Ground Power"
-                                  >
-                                    <span className="service-icon">🔌</span>
-                                    <span className="service-label">POWER</span>
-                                  </button>
-                                  <button
-                                    className="service-action-btn cleaning"
-                                    onClick={() => addServiceRequest(stand.id, "Cleaning")}
-                                    title="Request Cleaning"
-                                  >
-                                    <span className="service-icon">🧹</span>
-                                    <span className="service-label">CLEAN</span>
-                                  </button>
-                                  <button
-                                    className="service-action-btn baggage"
-                                    onClick={() => addServiceRequest(stand.id, "Baggage")}
-                                    title="Request Baggage Service"
-                                  >
-                                    <span className="service-icon">🧳</span>
-                                    <span className="service-label">BAGGAGE</span>
-                                  </button>
-                                </div>
-                              </div>
-                            )}
+                          <div className="stand-status-indicator">
+                            <div className={`status-light ${occupiedBy ? 'occupied' : 'available'}`}></div>
+                            <span className="status-text">{occupiedBy ? 'OCCUPIED' : 'AVAILABLE'}</span>
                           </div>
                         </div>
-                      ) : (
-                        <div className="available-stand-section">
-                          <div className="availability-display">
-                            <div className="availability-icon">✈️</div>
-                            <span className="availability-text">READY FOR ASSIGNMENT</span>
-                          </div>
 
-                          {standManagementMode && (
-                            <div className="assignment-controls">
-                              <div className="assignment-form-professional">
-                                <div className="form-header-small">ASSIGN FLIGHT</div>
-                                <div className="assignment-inputs">
-                                  <div className="input-group">
-                                    <label className="input-label">FLIGHT:</label>
-                                    <input
-                                      type="text"
-                                      placeholder="AA1234"
-                                      value={selectedStandForManagement === stand.id ? quickFlightNumber : ''}
-                                      onChange={(e) => {
-                                        setSelectedStandForManagement(stand.id);
-                                        setQuickFlightNumber(e.target.value.toUpperCase());
-                                      }}
-                                      className="professional-input"
-                                    />
-                                  </div>
-                                  <div className="input-group">
-                                    <label className="input-label">AIRCRAFT:</label>
-                                    <select
-                                      value={selectedStandForManagement === stand.id ? quickAircraft : ''}
-                                      onChange={(e) => {
-                                        setSelectedStandForManagement(stand.id);
-                                        setQuickAircraft(e.target.value);
-                                      }}
-                                      className="professional-select"
-                                    >
-                                      <option value="">SELECT</option>
-                                      {aircraftTypes.filter(type => isStandCompatible(stand.type, type)).map(type => (
-                                        <option key={type} value={type}>{type}</option>
-                                      ))}
-                                    </select>
-                                  </div>
-                                </div>
+                        {occupiedBy ? (
+                          <div className="occupied-stand-details">
+                            <div className="flight-identification">
+                              <div className="flight-primary">
+                                <span className="flight-number-large">{occupiedBy.flight}</span>
+                                <span className="aircraft-badge">{occupiedBy.aircraft}</span>
+                              </div>
+                              <div className="pilot-info">
+                                <span className="pilot-label">PILOT:</span>
+                                <span className="pilot-name">{occupiedBy.pilot}</span>
+                              </div>
+                              {standManagementMode && (
                                 <button
-                                  className="assign-flight-btn"
-                                  onClick={() => {
-                                    if (selectedStandForManagement === stand.id) {
-                                      assignFlightToStand(stand.id, quickFlightNumber, quickAircraft);
-                                    }
-                                  }}
-                                  disabled={selectedStandForManagement !== stand.id || !quickFlightNumber || !quickAircraft}
+                                  className="remove-flight-btn"
+                                  onClick={() => removeFlightFromStand(stand.id)}
+                                  title="Remove flight from stand"
                                 >
-                                  ASSIGN TO STAND
+                                  REMOVE FLIGHT
                                 </button>
-                              </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
 
-            {standManagementMode && (
-              <div className="management-instructions">
-                <div className="instructions-header">
-                  <span className="instructions-icon">📋</span>
-                  <h3>MANAGEMENT MODE INSTRUCTIONS</h3>
-                </div>
-                <div className="instructions-content">
-                  <div className="instruction-item">
-                    <span className="instruction-icon">✈️</span>
-                    <span>Fill in flight number and aircraft type to assign flights to available stands</span>
-                  </div>
-                  <div className="instruction-item">
-                    <span className="instruction-icon">🛠️</span>
-                    <span>Use quick service buttons to request services for occupied stands</span>
-                  </div>
-                  <div className="instruction-item">
-                    <span className="instruction-icon">✖</span>
-                    <span>Click the ✖ button next to services to cancel pending requests</span>
-                  </div>
-                  <div className="instruction-item">
-                    <span className="instruction-icon">📊</span>
-                    <span>Monitor service counters to track ground operations efficiency</span>
-                  </div>
+                            <div className="service-management-section">
+                              <div className="services-header">
+                                <span className="services-title">SERVICES</span>
+                                <div className="service-counters">
+                                  <span className="pending-count">{standRequests.length} PENDING</span>
+                                  <span className="completed-count">{completedServices} COMPLETED</span>
+                                </div>
+                              </div>
+
+                              {standRequests.length > 0 && (
+                                <div className="active-services-list">
+                                  {standRequests.map((req, i) => (
+                                    <div key={i} className="service-item-professional">
+                                      <span className="service-name">{req.service}</span>
+                                      <span className="service-time">{req.timestamp}</span>
+                                      {standManagementMode && (
+                                        <button
+                                          className="remove-service-btn"
+                                          onClick={() => removeServiceRequest(stand.id, req.service)}
+                                          title="Cancel Service"
+                                        >
+                                          ✖
+                                        </button>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {standManagementMode && (
+                                <div className="service-quick-actions">
+                                  <div className="quick-actions-header">QUICK SERVICES:</div>
+                                  <div className="service-action-buttons">
+                                    <button
+                                      className="service-action-btn fuel"
+                                      onClick={() => addServiceRequest(stand.id, "Fuel Service")}
+                                      title="Request Fuel Service"
+                                    >
+                                      <span className="service-icon">⛽</span>
+                                      <span className="service-label">FUEL</span>
+                                    </button>
+                                    <button
+                                      className="service-action-btn catering"
+                                      onClick={() => addServiceRequest(stand.id, "Catering")}
+                                      title="Request Catering"
+                                    >
+                                      <span className="service-icon">🍽️</span>
+                                      <span className="service-label">CATERING</span>
+                                    </button>
+                                    <button
+                                      className="service-action-btn pushback"
+                                      onClick={() => addServiceRequest(stand.id, "Pushback")}
+                                      title="Request Pushback"
+                                    >
+                                      <span className="service-icon">🚛</span>
+                                      <span className="service-label">PUSHBACK</span>
+                                    </button>
+                                    <button
+                                      className="service-action-btn power"
+                                      onClick={() => addServiceRequest(stand.id, "Ground Power")}
+                                      title="Request Ground Power"
+                                    >
+                                      <span className="service-icon">🔌</span>
+                                      <span className="service-label">POWER</span>
+                                    </button>
+                                    <button
+                                      className="service-action-btn cleaning"
+                                      onClick={() => addServiceRequest(stand.id, "Cleaning")}
+                                      title="Request Cleaning"
+                                    >
+                                      <span className="service-icon">🧹</span>
+                                      <span className="service-label">CLEAN</span>
+                                    </button>
+                                    <button
+                                      className="service-action-btn baggage"
+                                      onClick={() => addServiceRequest(stand.id, "Baggage")}
+                                      title="Request Baggage Service"
+                                    >
+                                      <span className="service-icon">🧳</span>
+                                      <span className="service-label">BAGGAGE</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="available-stand-section">
+                            <div className="availability-display">
+                              <div className="availability-icon">✈️</div>
+                              <span className="availability-text">READY FOR ASSIGNMENT</span>
+                            </div>
+
+                            {standManagementMode && (
+                              <div className="assignment-controls">
+                                <div className="assignment-form-professional">
+                                  <div className="form-header-small">ASSIGN FLIGHT</div>
+                                  <div className="assignment-inputs">
+                                    <div className="input-group">
+                                      <label className="input-label">FLIGHT:</label>
+                                      <input
+                                        type="text"
+                                        placeholder="AA1234"
+                                        value={selectedStandForManagement === stand.id ? quickFlightNumber : ''}
+                                        onChange={(e) => {
+                                          setSelectedStandForManagement(stand.id);
+                                          setQuickFlightNumber(e.target.value.toUpperCase());
+                                        }}
+                                        className="professional-input"
+                                      />
+                                    </div>
+                                    <div className="input-group">
+                                      <label className="input-label">AIRCRAFT:</label>
+                                      <select
+                                        value={selectedStandForManagement === stand.id ? quickAircraft : ''}
+                                        onChange={(e) => {
+                                          setSelectedStandForManagement(stand.id);
+                                          setQuickAircraft(e.target.value);
+                                        }}
+                                        className="professional-select"
+                                      >
+                                        <option value="">SELECT</option>
+                                        {aircraftTypes.filter(type => isStandCompatible(stand.type, type)).map(type => (
+                                          <option key={type} value={type}>{type}</option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <button
+                                    className="assign-flight-btn"
+                                    onClick={() => {
+                                      if (selectedStandForManagement === stand.id) {
+                                        assignFlightToStand(stand.id, quickFlightNumber, quickAircraft);
+                                      }
+                                    }}
+                                    disabled={selectedStandForManagement !== stand.id || !quickFlightNumber || !quickAircraft}
+                                  >
+                                    ASSIGN TO STAND
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            )}
-          </div>
-        );
+
+              {standManagementMode && (
+                <div className="management-instructions">
+                  <div className="instructions-header">
+                    <span className="instructions-icon">📋</span>
+                    <h3>MANAGEMENT MODE INSTRUCTIONS</h3>
+                  </div>
+                  <div className="instructions-content">
+                    <div className="instruction-item">
+                      <span className="instruction-icon">✈️</span>
+                      <span>Assign flights to stands and coordinate ground movements</span>
+                    </div>
+                    <div className="instruction-item">
+                      <span className="instruction-icon">🛠️</span>
+                      <span>Use quick service buttons to request services for occupied stands</span>
+                    </div>
+                    <div className="instruction-item">
+                      <span className="instruction-icon">✖</span>
+                      <span>Click the ✖ button next to services to cancel pending requests</span>
+                    </div>
+                    <div className="instruction-item">
+                      <span className="instruction-icon">📊</span>
+                      <span>Monitor service counters to track ground operations efficiency</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
       }
 
       return (
