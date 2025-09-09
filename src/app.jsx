@@ -3014,102 +3014,20 @@ export default function App() {
 
         case "coordination":
           return (
-            <div className="coordination-container">
-              <div className="coordination-header">
-                <h2>INTER-FACILITY COORDINATION - {atcCallsign}</h2>
-              </div>
-
-              <div className="coordination-sections">
-                <div className="coordination-section">
-                  <h3>SLOT TIME MANAGEMENT</h3>
-                  <div className="slot-management">
-                    <div className="slot-controls">
-                      <select className="slot-aircraft-select">
-                        <option value="">Select Aircraft...</option>
-                        {Object.keys(efsUpdates).map(callsign => (
-                          <option key={callsign} value={callsign}>{callsign}</option>
-                        ))}
-                      </select>
-                      <input
-                        type="time"
-                        className="slot-time-input"
-                        placeholder="Taxi Time"
-                      />
-                      <button className="assign-slot-btn">ASSIGN SLOT</button>
-                    </div>
-                    <div className="active-slots">
-                      {Object.entries(slotTimes).map(([callsign, slotTime]) => (
-                        <div key={callsign} className="slot-item">
-                          <span className="slot-callsign">{callsign}</span>
-                          <span className="slot-time">{slotTime}</span>
-                          <button 
-                            className="remove-slot-btn"
-                            onClick={() => {
-                              const newSlots = { ...slotTimes };
-                              delete newSlots[callsign];
-                              setSlotTimes(newSlots);
-                            }}
-                          >
-                            REMOVE
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+            <div className="atc-main">
+              <div className="atc-status-panel">
+                <div className="atc-header">
+                  <h2>{selectedAirport} {atcPosition} - COORDINATION</h2>
+                  <div className="position-status online">ONLINE</div>
                 </div>
-
-                <div className="coordination-section">
-                  <h3>DIRECT COORDINATION LINES</h3>
-                  <div className="coordination-buttons">
-                    <button className="coord-btn approach">
-                      <span className="coord-icon">📡</span>
-                      <span>APPROACH CONTROL</span>
-                    </button>
-                    <button className="coord-btn departure">
-                      <span className="coord-icon">🛫</span>
-                      <span>DEPARTURE CONTROL</span>
-                    </button>
-                    <button className="coord-btn center">
-                      <span className="coord-icon">🎯</span>
-                      <span>AREA CONTROL CENTER</span>
-                    </button>
-                    <button className="coord-btn adjacent">
-                      <span className="coord-icon">🤝</span>
-                      <span>ADJACENT TOWER</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="coordination-section">
-                  <h3>TRANSFER NOTIFICATIONS</h3>
-                  <div className="transfer-notifications">
-                    {transferNotifications.map((notification, index) => (
-                      <div key={index} className="transfer-notification">
-                        <div className="notification-header">
-                          <span className="notification-from">{notification.from}</span>
-                          <span className="notification-time">
-                            {new Date(notification.timestamp).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <div className="notification-message">
-                          EFS {notification.callsign} transferred from {notification.fromPosition} to {notification.toPosition}
-                        </div>
-                        {notification.toPosition === atcPosition && (
-                          <button 
-                            className="open-efs-btn"
-                            onClick={() => {
-                              setActiveTab('efs');
-                              // Auto-create EFS if it doesn't exist
-                              if (!efsUpdates[notification.callsign]) {
-                                updateEFS(notification.callsign, { status: 'TRANSFERRED' });
-                              }
-                            }}
-                          >
-                            OPEN EFS
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                
+                <div className="coordination-content">
+                  <div className="coordination-message">
+                    <div className="coordination-icon">📡</div>
+                    <div>
+                      <h3>COORDINATION MODE</h3>
+                      <p>Advanced coordination features coming soon</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3141,6 +3059,103 @@ export default function App() {
                   <div className="stat-card">
                     <div className="stat-value">{Object.keys(efsUpdates).length}</div>
                     <div className="stat-label">PROCESSED</div>
+                  </div>
+                </div>
+
+                <div className="coordination-container">
+                  <div className="coordination-header">
+                    <h2>INTER-FACILITY COORDINATION - {atcCallsign}</h2>
+                  </div>
+
+                  <div className="coordination-sections">
+                    <div className="coordination-section">
+                      <h3>SLOT TIME MANAGEMENT</h3>
+                      <div className="slot-management">
+                        <div className="slot-controls">
+                          <select className="slot-aircraft-select">
+                            <option value="">Select Aircraft...</option>
+                            {Object.keys(efsUpdates).map(callsign => (
+                              <option key={callsign} value={callsign}>{callsign}</option>
+                            ))}
+                          </select>
+                          <input
+                            type="time"
+                            className="slot-time-input"
+                            placeholder="Taxi Time"
+                          />
+                          <button className="assign-slot-btn">ASSIGN SLOT</button>
+                        </div>
+                        <div className="active-slots">
+                          {Object.entries(slotTimes).map(([callsign, slotTime]) => (
+                            <div key={callsign} className="slot-item">
+                              <span className="slot-callsign">{callsign}</span>
+                              <span className="slot-time">{slotTime}</span>
+                              <button 
+                                className="remove-slot-btn"
+                                onClick={() => {
+                                  const newSlots = { ...slotTimes };
+                                  delete newSlots[callsign];
+                                  setSlotTimes(newSlots);
+                                }}
+                              >
+                                REMOVE
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="coordination-section">
+                      <h3>GND TWR CTRL</h3>
+                      <div className="coordination-buttons">
+                        <button className="coord-btn ground">
+                          <span className="coord-icon">🚛</span>
+                          <span>GROUND CONTROL</span>
+                        </button>
+                        <button className="coord-btn tower">
+                          <span className="coord-icon">🗼</span>
+                          <span>TOWER CONTROL</span>
+                        </button>
+                        <button className="coord-btn control">
+                          <span className="coord-icon">📡</span>
+                          <span>CONTROL</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="coordination-section">
+                      <h3>TRANSFER NOTIFICATIONS</h3>
+                      <div className="transfer-notifications">
+                        {transferNotifications.map((notification, index) => (
+                          <div key={index} className="transfer-notification">
+                            <div className="notification-header">
+                              <span className="notification-from">{notification.from}</span>
+                              <span className="notification-time">
+                                {new Date(notification.timestamp).toLocaleTimeString()}
+                              </span>
+                            </div>
+                            <div className="notification-message">
+                              EFS {notification.callsign} transferred from {notification.fromPosition} to {notification.toPosition}
+                            </div>
+                            {notification.toPosition === atcPosition && (
+                              <button 
+                                className="open-efs-btn"
+                                onClick={() => {
+                                  setActiveTab('efs');
+                                  // Auto-create EFS if it doesn't exist
+                                  if (!efsUpdates[notification.callsign]) {
+                                    updateEFS(notification.callsign, { status: 'TRANSFERRED' });
+                                  }
+                                }}
+                              >
+                                OPEN EFS
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
