@@ -1314,24 +1314,35 @@ export default function App() {
   }, [messages]);
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchUser = async () => {
       try {
+        console.log('Fetching user data...');
         const res = await fetch('/api/user');
-        if (res.ok) {
+        if (res.ok && isMounted) {
           const userData = await res.json();
+          console.log('User data received:', userData.username);
           setUser(userData);
-        } else {
+        } else if (isMounted) {
           setUser(null);
         }
       } catch (error) {
         console.error('Failed to fetch user:', error);
-        setUser(null);
+        if (isMounted) {
+          setUser(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchUser();
+    // Only fetch user once when component mounts
+    if (loading) {
+      fetchUser();
+    }
 
     socket.on("chatUpdate", (msg) => {
       if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
@@ -1427,16 +1438,17 @@ export default function App() {
     });
 
     return () => {
+      isMounted = false;
       socket.off("standUpdate");
       socket.off("chatUpdate");
       socket.off("serviceUpdate");
       socket.off("atisUpdate");
-      socket.off("callsignAssigned"); // Remove listener
-      socket.off("callsignUpdate"); // Remove listener
+      socket.off("callsignAssigned");
+      socket.off("callsignUpdate");
       socket.off("error");
       socket.off("userCountUpdate");
     };
-  }, [selectedAirport, soundEnabled, user]);
+  }, [loading]); // Only depend on loading state
 
   const handleLogin = () => {
     window.location.href = "/auth/discord";
