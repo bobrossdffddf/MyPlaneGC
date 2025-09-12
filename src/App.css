@@ -738,6 +738,104 @@ body {
   font-size: 0.8rem;
 }
 
+/* Partnership Carousel Styles */
+.partnerships-carousel {
+  margin: 40px 0;
+  padding: 30px;
+  background: rgba(45, 55, 72, 0.4);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 149, 0, 0.2);
+}
+
+.partnerships-carousel h3 {
+  color: #ff9500;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.carousel-content {
+  text-align: center;
+  animation: fadeIn 0.8s ease-out;
+}
+
+.partner-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 2px solid rgba(255, 149, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.partner-image:hover {
+  border-color: rgba(255, 149, 0, 0.6);
+  transform: scale(1.02);
+}
+
+.partner-info h4 {
+  color: #ffffff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.partner-info p {
+  color: #a0a8b0;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.carousel-indicators .indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-indicators .indicator.active {
+  background: #ff9500;
+  transform: scale(1.2);
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+}
+
+.carousel-indicators .indicator:hover:not(.active) {
+  background: rgba(255, 149, 0, 0.6);
+  transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Mode Selection */
 .tablet-mode-select {
   display: flex;

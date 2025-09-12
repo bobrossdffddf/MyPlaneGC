@@ -72,6 +72,33 @@ export default function App() {
     tailDirection: ''
   });
 
+  // Partnership carousel state
+  const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0);
+
+  // Partnership data - you can customize this
+  const partnerships = [
+    {
+      image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop&crop=center",
+      title: "Aviation Partners International",
+      description: "Leading aircraft modification and certification services"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=400&h=200&fit=crop&crop=center",
+      title: "Lufthansa Technik",
+      description: "Global provider of aircraft maintenance, repair and overhaul services"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=200&fit=crop&crop=center",
+      title: "Boeing Ground Support",
+      description: "Official ground support equipment and training solutions"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=200&fit=crop&crop=center",
+      title: "Airbus Services",
+      description: "Comprehensive aircraft support and ground handling solutions"
+    }
+  ];
+
   // Static permit document ID to prevent it from changing
   const [permitDocumentId] = useState(() => `DOC${Date.now().toString().slice(-6)}`);
 
@@ -1305,6 +1332,17 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
+  // Partnership carousel auto-advance
+  useEffect(() => {
+    const carouselTimer = setInterval(() => {
+      setCurrentPartnerIndex((prevIndex) => 
+        (prevIndex + 1) % partnerships.length
+      );
+    }, 5000); // Change every 5 seconds
+
+    return () => clearInterval(carouselTimer);
+  }, [partnerships.length]);
+
   // Auto-scroll messages to bottom
   useEffect(() => {
     const messagesArea = document.querySelector('.messages-area');
@@ -2050,6 +2088,35 @@ export default function App() {
             <div className="brand-subtitle">Professional Aviation Ground Operations</div>
             <div className="system-version">Version 1.2.0 | Made by @justawacko_</div>
           </div>
+          <div className="partnerships-carousel">
+            <h3>OUR PARTNERS</h3>
+            <div className="carousel-container">
+              <div className="carousel-content">
+                <img 
+                  src={partnerships[currentPartnerIndex].image} 
+                  alt={partnerships[currentPartnerIndex].title}
+                  className="partner-image"
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij5QYXJ0bmVyPC90ZXh0Pgo8L3N2Zz4K';
+                  }}
+                />
+                <div className="partner-info">
+                  <h4>{partnerships[currentPartnerIndex].title}</h4>
+                  <p>{partnerships[currentPartnerIndex].description}</p>
+                </div>
+              </div>
+              <div className="carousel-indicators">
+                {partnerships.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`indicator ${index === currentPartnerIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentPartnerIndex(index)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="auth-section">
             <button onClick={handleLogin} className="discord-auth-btn">
               <span className="auth-icon">🔐</span>
