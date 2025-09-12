@@ -1314,13 +1314,24 @@ export default function App() {
   }, [messages]);
 
   useEffect(() => {
-    fetch('/api/user')
-      .then(res => res.ok ? res.json() : null)
-      .then(userData => {
-        setUser(userData);
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/user');
+        if (res.ok) {
+          const userData = await res.json();
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+        setUser(null);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    fetchUser();
 
     socket.on("chatUpdate", (msg) => {
       if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
