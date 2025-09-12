@@ -78,24 +78,14 @@ export default function App() {
   // Partnership data - you can customize this
   const partnerships = [
     {
-      image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop&crop=center",
-      title: "Aviation Partners International",
-      description: "Leading aircraft modification and certification services"
+      image: "https://cdn.discordapp.com/attachments/1414069423077200004/1415592919615672320/image-aircraft-design.jpg?ex=68c5bf64&is=68c46de4&hm=1911586f9fbedffd2f786c145ca264007e2276e9c851316538f383f4be059a48&r",
+      title: "Hawaiian Airlines",
+      description: "Hawaii Starts Here "
     },
     {
-      image: "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=400&h=200&fit=crop&crop=center",
-      title: "Lufthansa Technik",
-      description: "Global provider of aircraft maintenance, repair and overhaul services"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=200&fit=crop&crop=center",
-      title: "Boeing Ground Support",
-      description: "Official ground support equipment and training solutions"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=200&fit=crop&crop=center",
-      title: "Airbus Services",
-      description: "Comprehensive aircraft support and ground handling solutions"
+      image: "https://images-ext-1.discordapp.net/external/I8JsnA0Z92V7xbG1qnkSN0Ia6qqWQEJ3l7t-bqK1qJw/https/cdn.discordapp.com/icons/1369593726262972487/1921ab8dd4fc249951595e42ba8fd9e0.png?format=webp&quality=lossless&width=102&height=102",
+      title: "24Academy.com",
+      description: "ATC24 Academy helps controllers and pilots improve their skills, learn tips and tricks for controlling or piloting."
     }
   ];
 
