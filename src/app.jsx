@@ -74,21 +74,28 @@ export default function App() {
 
   // Partnership carousel state
   const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0);
-  const [showPartnerships, setShowPartnerships] = useState(false);
-  const [showChangelog, setShowChangelog] = useState(false);
-  const [changelogData, setChangelogData] = useState(null);
 
   // Partnership data - you can customize this
   const partnerships = [
     {
-      image: "https://cdn.discordapp.com/attachments/1414069423077200004/1415592919615672320/image-aircraft-design.jpg?ex=68c5bf64&is=68c46de4&hm=1911586f9fbedffd2f786c145ca264007e2276e9c851316538f383f4be059a48&r",
-      title: "Hawaiian Airlines",
-      description: "Hawaii Starts Here "
+      image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop&crop=center",
+      title: "Aviation Partners International",
+      description: "Leading aircraft modification and certification services"
     },
     {
-      image: "https://images.ext-1.discordapp.net/external/I8JsnA0Z92V7xbG1qnkSN0Ia6qqWQEJ3l7t-bqK1qJw/https/cdn.discordapp.com/icons/1369593726262972487/1921ab8dd4fc249951595e42ba8fd9e0.png?format=webp&quality=lossless&width=102&height=102",
-      title: "24Academy.com",
-      description: "ATC24 Academy helps controllers and pilots improve their skills, learn tips and tricks for controlling or piloting."
+      image: "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=400&h=200&fit=crop&crop=center",
+      title: "Lufthansa Technik",
+      description: "Global provider of aircraft maintenance, repair and overhaul services"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=200&fit=crop&crop=center",
+      title: "Boeing Ground Support",
+      description: "Official ground support equipment and training solutions"
+    },
+    {
+      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=200&fit=crop&crop=center",
+      title: "Airbus Services",
+      description: "Comprehensive aircraft support and ground handling solutions"
     }
   ];
 
@@ -1328,7 +1335,7 @@ export default function App() {
   // Partnership carousel auto-advance
   useEffect(() => {
     const carouselTimer = setInterval(() => {
-      setCurrentPartnerIndex((prevIndex) =>
+      setCurrentPartnerIndex((prevIndex) => 
         (prevIndex + 1) % partnerships.length
       );
     }, 5000); // Change every 5 seconds
@@ -1346,7 +1353,7 @@ export default function App() {
 
   useEffect(() => {
     let isMounted = true;
-
+    
     const fetchUser = async () => {
       try {
         console.log('Fetching user data...');
@@ -1374,19 +1381,6 @@ export default function App() {
     if (loading) {
       fetchUser();
     }
-
-    const loadChangelogData = async () => {
-      try {
-        const response = await fetch('/src/changelog.json');
-        const data = await response.json();
-        setChangelogData(data);
-      } catch (error) {
-        console.error('Failed to load changelog:', error);
-      }
-    };
-
-    loadChangelogData();
-
 
     socket.on("chatUpdate", (msg) => {
       if (!selectedAirport || msg.airport === selectedAirport || (!msg.airport && msg.mode === 'system')) {
@@ -2098,8 +2092,8 @@ export default function App() {
             <h3>OUR PARTNERS</h3>
             <div className="carousel-container">
               <div className="carousel-content">
-                <img
-                  src={partnerships[currentPartnerIndex].image}
+                <img 
+                  src={partnerships[currentPartnerIndex].image} 
                   alt={partnerships[currentPartnerIndex].title}
                   className="partner-image"
                   onError={(e) => {
@@ -2124,13 +2118,9 @@ export default function App() {
           </div>
 
           <div className="auth-section">
-            <button className="login-btn" onClick={handleLogin}>
-              <i className="fab fa-discord"></i>
-              Login with Discord
-            </button>
-            <button className="changelog-btn" onClick={() => setShowChangelog(true)}>
-              <i className="fas fa-clipboard-list"></i>
-              View Changelog
+            <button onClick={handleLogin} className="discord-auth-btn">
+              <span className="auth-icon">🔐</span>
+              <span className="auth-text">AUTHENTICATE WITH DISCORD</span>
             </button>
             <div className="security-note">Secure authentication required for access</div>
           </div>
@@ -2146,15 +2136,6 @@ export default function App() {
           <div className="welcome-header">
             <h1>AIRPORT SELECTION</h1>
             <div className="user-welcome">Welcome, {user.username} - Select your airport</div>
-          </div>
-
-          <div className="airport-confirmation">
-            <h3>AIRPORT CONFIRMED: {selectedAirport}</h3>
-            <div className="confirmation-details">
-              <span>Stands Available</span>
-              <span>Ground Frequency Active</span>
-              <span>Systems Operational</span>
-            </div>
           </div>
 
           <div className="airport-selector">
@@ -3451,7 +3432,7 @@ export default function App() {
 
       return (
         <div className="groundcrew-main">
-
+          
 
           <div className="service-management-board">
             <div className="service-column critical">
@@ -3743,62 +3724,13 @@ export default function App() {
 
   return (
     <div className="tablet-interface">
-      {showChangelog && changelogData && (
-        <div className="changelog-overlay">
-          <div className="changelog-modal">
-            <div className="changelog-header">
-              <h2>{changelogData.title}</h2>
-              <button className="changelog-close" onClick={() => setShowChangelog(false)}>
-                ×
-              </button>
-            </div>
-
-            <div className="changelog-content">
-              <div className="changelog-subtitle">
-                {changelogData.subtitle}
-              </div>
-
-              <div className="changelog-support">
-                <h3>🎯 {changelogData.supportSection.title}</h3>
-                <p>
-                  {changelogData.supportSection.description}{' '}
-                  <a href={changelogData.supportSection.linkUrl} className="support-link">
-                    {changelogData.supportSection.link}
-                  </a>
-                </p>
-              </div>
-
-              <div className="changelog-sections">
-                <h3>Changelog</h3>
-                {changelogData.sections.map((section, index) => (
-                  <div key={index} className="changelog-section">
-                    <h4>{section.title}</h4>
-                    <ul>
-                      {section.items.map((item, itemIndex) => (
-                        <li key={itemIndex}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="changelog-footer">
-              <button className="changelog-ok-btn" onClick={() => setShowChangelog(false)}>
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showPushbackForm && (
         <div className="pushback-modal-overlay">
           <div className="pushback-modal">
             <div className="pushback-modal-header">
               <h3>PUSHBACK REQUEST</h3>
-              <button
-                className="close-modal-btn"
+              <button 
+                className="close-modal-btn" 
                 onClick={() => setShowPushbackForm(false)}
               >
                 ×
@@ -3869,13 +3801,13 @@ export default function App() {
                 </div>
               )}
               <div className="pushback-form-actions">
-                <button
+                <button 
                   className="submit-pushback-btn"
                   onClick={submitPushbackRequest}
                 >
                   SUBMIT REQUEST
                 </button>
-                <button
+                <button 
                   className="cancel-pushback-btn"
                   onClick={() => setShowPushbackForm(false)}
                 >
