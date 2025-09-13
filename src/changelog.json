@@ -2,23 +2,41 @@
 {
   "version": "1.2.0",
   "title": "Changelog v1.2.0 - PTFS Ground Operations",
-  "subtitle": "Found a Bug? DM me @justawacko_",
+  "subtitle": "Found a Bug? Join the Discord!",
   "supportSection": {
-    "title": "Thank you for supporting!",
-    "description": "THANK YOU!",
-    
+    "title": "Support PTFS Operations",
+    "description": "You can now show your support and support our services by",
+    "link": "donating!",
+    "linkUrl": "#"
   },
   "sections": [
     {
       "title": "🔧 Changed",
       "items": [
-        "Partners screen",
+        "Enhanced ground crew operations with realistic procedures",
+        "Added comprehensive aircraft weight and balance calculations",
+        "Implemented professional MCDU interface for A320 operations",
+        "Added partnership carousel on login page",
+        "Improved checklist system with categorized items"
+      ]
+    },
+    {
+      "title": "✨ Added",
+      "items": [
+        "Real-time ATIS integration with PTFS 24data WebSocket",
+        "Professional ground crew training guides and procedures",
+        "Aircraft fueling, pushback, and marshalling protocols",
+        "Multi-airport support with PTFS airport codes",
+        "Advanced passenger manifest and cargo loading system"
       ]
     },
     {
       "title": "🐛 Fixed",
       "items": [
-        "Fixed bugs with background spam",
+        "Resolved CSS syntax errors in build process",
+        "Fixed carousel auto-cycling functionality",
+        "Improved responsive design for mobile devices",
+        "Fixed MCDU display formatting issues"
       ]
     }
   ]
