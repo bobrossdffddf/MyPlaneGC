@@ -78,28 +78,16 @@ export default function App() {
   // Partnership data - you can customize this
   const partnerships = [
     {
-      image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop&crop=center",
-      title: "Aviation Partners International",
-      description: "Leading aircraft modification and certification services",
-      joinLink: "https://discord.gg/aviation-partners"
+      image: "https://cdn.discordapp.com/attachments/1414524632190681088/1416224001201541240/academy.png?ex=68c610e2&is=68c4bf62&hm=18061b9023c4f4bcaa890f2cc2aaffba2b4b159ca8fcff25d089551c6bd8e8a1&",
+      title: "24Academy.com",
+      description: "ATC24 Academy helps controllers and pilots improve their skills, learn tips and tricks for controlling or piloting.",
+      joinLink: "https://discord.gg/wPSWYn6sh9"
     },
     {
-      image: "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=400&h=200&fit=crop&crop=center",
-      title: "Lufthansa Technik",
-      description: "Global provider of aircraft maintenance, repair and overhaul services",
-      joinLink: "https://discord.gg/lufthansa-technik"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=200&fit=crop&crop=center",
-      title: "Boeing Ground Support",
-      description: "Official ground support equipment and training solutions",
-      joinLink: "https://discord.gg/boeing-support"
-    },
-    {
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=200&fit=crop&crop=center",
-      title: "Airbus Services",
-      description: "Comprehensive aircraft support and ground handling solutions",
-      joinLink: "https://discord.gg/airbus-services"
+      image: "https://media.discordapp.net/attachments/1414069423077200004/1415592919615672320/image-aircraft-design.jpg?ex=68c5bf64&is=68c46de4&hm=1911586f9fbedffd2f786c145ca264007e2276e9c851316538f383f4be059a48&=&format=webp&width=1042&height=813",
+      title: "Hawaiian Airlines",
+      description: "Hawaii Starts Here.",
+      joinLink: "https://discord.gg/pAfSpvvJUB"
     }
   ];
 
