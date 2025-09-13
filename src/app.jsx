@@ -80,22 +80,26 @@ export default function App() {
     {
       image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=200&fit=crop&crop=center",
       title: "Aviation Partners International",
-      description: "Leading aircraft modification and certification services"
+      description: "Leading aircraft modification and certification services",
+      joinLink: "https://discord.gg/aviation-partners"
     },
     {
       image: "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=400&h=200&fit=crop&crop=center",
       title: "Lufthansa Technik",
-      description: "Global provider of aircraft maintenance, repair and overhaul services"
+      description: "Global provider of aircraft maintenance, repair and overhaul services",
+      joinLink: "https://discord.gg/lufthansa-technik"
     },
     {
       image: "https://images.unsplash.com/photo-1520637836862-4d197d17c7a4?w=400&h=200&fit=crop&crop=center",
       title: "Boeing Ground Support",
-      description: "Official ground support equipment and training solutions"
+      description: "Official ground support equipment and training solutions",
+      joinLink: "https://discord.gg/boeing-support"
     },
     {
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=200&fit=crop&crop=center",
       title: "Airbus Services",
-      description: "Comprehensive aircraft support and ground handling solutions"
+      description: "Comprehensive aircraft support and ground handling solutions",
+      joinLink: "https://discord.gg/airbus-services"
     }
   ];
 
@@ -2103,6 +2107,14 @@ export default function App() {
                 <div className="partner-info">
                   <h4>{partnerships[currentPartnerIndex].title}</h4>
                   <p>{partnerships[currentPartnerIndex].description}</p>
+                  <a 
+                    href={partnerships[currentPartnerIndex].joinLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="partner-join-btn"
+                  >
+                    Join Partnership
+                  </a>
                 </div>
               </div>
               <div className="carousel-indicators">

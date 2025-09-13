@@ -771,11 +771,14 @@ body {
 .partner-image {
   width: 100%;
   height: 200px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   border-radius: 12px;
   margin-bottom: 20px;
   border: 2px solid rgba(255, 149, 0, 0.3);
   transition: all 0.3s ease;
+  background: rgba(45, 55, 72, 0.8);
+  padding: 10px;
 }
 
 .partner-image:hover {
@@ -783,18 +786,49 @@ body {
   transform: scale(1.02);
 }
 
+.partner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
 .partner-info h4 {
   color: #ffffff;
   font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin: 0;
 }
 
 .partner-info p {
   color: #a0a8b0;
   font-size: 1rem;
   line-height: 1.5;
-  margin-bottom: 20px;
+  margin: 0;
+  flex: 1;
+}
+
+.partner-join-btn {
+  background: linear-gradient(135deg, #ff9500, #ffb340);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.partner-join-btn:hover {
+  background: linear-gradient(135deg, #ffb340, #ff9500);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 149, 0, 0.3);
 }
 
 .carousel-indicators {
