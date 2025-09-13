@@ -5,20 +5,19 @@
   "subtitle": "Found a Bug? DM me @justawacko_",
   "supportSection": {
     "title": "Thank you for supporting!",
-    "description": "THANK YOU!",
-    
+    "description": "THANK YOU!"
   },
   "sections": [
     {
       "title": "🔧 Changed",
       "items": [
-        "Partners screen",
+        "Partners screen"
       ]
     },
     {
       "title": "🐛 Fixed",
       "items": [
-        "Fixed bugs with background spam",
+        "Fixed bugs with background spam"
       ]
     }
   ]
