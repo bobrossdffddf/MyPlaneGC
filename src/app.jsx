@@ -2019,7 +2019,7 @@ export default function App() {
       "Boeing 787": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=300&fit=crop&crop=center",
       "Bombardier CRJ700": "https://images.unsplash.com/photo-1542718610-a1d656d1884c?w=500&h=300&fit=crop&crop=center",
       "Embraer E190": "https://images.unsplash.com/photo-1585956048631-7a1d3b07cdb9?w=500&h=300&fit=crop&crop=center",
-      "ATR-72": "https://images.unsplash.com/photo-1584464461033-06628f3a6b7b?w=500&h=300&fit=crop&crop=center",
+      "ATR-72": "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=300&fit=crop&crop=center",
       "DHC-6 Twin Otter": "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=500&h=300&fit=crop&crop=center",
       "Cessna 172": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
       "Concorde": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center",
@@ -2086,100 +2086,56 @@ export default function App() {
 
   if (!user) {
     return (
-      <>
-        {/* Changelog Modal */}
-        {showChangelog && changelogData && (
-          <div className="changelog-overlay">
-            <div className="changelog-modal">
-              <div className="changelog-header">
-                <h2>{changelogData.title}</h2>
-                <button className="changelog-close" onClick={() => setShowChangelog(false)}>
-                  ×
-                </button>
-              </div>
-              <div className="changelog-content">
-                <p className="changelog-subtitle">{changelogData.subtitle}</p>
-
-                {changelogData.supportSection && (
-                  <div className="changelog-support">
-                    <h3>{changelogData.supportSection.title}</h3>
-                    <p>{changelogData.supportSection.description}</p>
-                  </div>
-                )}
-
-                <div className="changelog-sections">
-                  {changelogData.sections.map((section, index) => (
-                    <div key={index} className="changelog-section">
-                      <h4>{section.title}</h4>
-                      <ul>
-                        {section.items.map((item, itemIndex) => (
-                          <li key={itemIndex}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
+      <div className="tablet-login">
+        <div className="login-content">
+          <div className="brand-header">
+            <div className="brand-icon">🛩️</div>
+            <h1>MyPlane</h1>
+            <div className="brand-subtitle">Professional Aviation Ground Operations</div>
+            <div className="system-version">Version 1.2.0 | Made by @justawacko_</div>
+          </div>
+          <div className="partnerships-carousel">
+            <h3>OUR PARTNERS</h3>
+            <div className="carousel-container">
+              <div className="carousel-content">
+                <img
+                  src={partnerships[currentPartnerIndex].image}
+                  alt={partnerships[currentPartnerIndex].title}
+                  className="partner-image"
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij5QYXJ0bmVyPC90ZXh0Pgo8L3N2Zz4K';
+                  }}
+                />
+                <div className="partner-info">
+                  <h4>{partnerships[currentPartnerIndex].title}</h4>
+                  <p>{partnerships[currentPartnerIndex].description}</p>
                 </div>
               </div>
-              <div className="changelog-footer">
-                <button className="changelog-ok-btn" onClick={() => setShowChangelog(false)}>
-                  Ok
-                </button>
+              <div className="carousel-indicators">
+                {partnerships.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`indicator ${index === currentPartnerIndex ? 'active' : ''}`}
+                    onClick={() => setCurrentPartnerIndex(index)}
+                  />
+                ))}
               </div>
             </div>
           </div>
-        )}
 
-        <div className="tablet-interface">
-          <div className="login-content">
-            <div className="brand-header">
-              <div className="brand-icon">🛩️</div>
-              <h1>MyPlane</h1>
-              <div className="brand-subtitle">Professional Aviation Ground Operations</div>
-              <div className="system-version">Version 1.2.0 | Made by @justawacko_</div>
-            </div>
-            <div className="partnerships-carousel">
-              <h3>OUR PARTNERS</h3>
-              <div className="carousel-container">
-                <div className="carousel-content">
-                  <img
-                    src={partnerships[currentPartnerIndex].image}
-                    alt={partnerships[currentPartnerIndex].title}
-                    className="partner-image"
-                    onError={(e) => {
-                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjMzMzIi8+Cjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0Ij5QYXJ0bmVyPC90ZXh0Pgo8L3N2Zz4K';
-                    }}
-                  />
-                  <div className="partner-info">
-                    <h4>{partnerships[currentPartnerIndex].title}</h4>
-                    <p>{partnerships[currentPartnerIndex].description}</p>
-                  </div>
-                </div>
-                <div className="carousel-indicators">
-                  {partnerships.map((_, index) => (
-                    <button
-                      key={index}
-                      className={`indicator ${index === currentPartnerIndex ? 'active' : ''}`}
-                      onClick={() => setCurrentPartnerIndex(index)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="auth-section">
-              <button className="login-btn" onClick={handleLogin}>
-                <i className="fab fa-discord"></i>
-                Login with Discord
-              </button>
-              <button className="changelog-btn" onClick={() => setShowChangelog(true)}>
-                <i className="fas fa-clipboard-list"></i>
-                View Changelog
-              </button>
-              <div className="security-note">Secure authentication required for access</div>
-            </div>
+          <div className="auth-section">
+            <button className="login-btn" onClick={handleLogin}>
+              <i className="fab fa-discord"></i>
+              Login with Discord
+            </button>
+            <button className="changelog-btn" onClick={() => setShowChangelog(true)}>
+              <i className="fas fa-clipboard-list"></i>
+              View Changelog
+            </button>
+            <div className="security-note">Secure authentication required for access</div>
           </div>
         </div>
-      </>
+      </div>
     );
   }
 
@@ -4023,7 +3979,7 @@ export default function App() {
                 <div key={i} className={`message ${msg.mode || 'system'}`}>
                   <div className="message-header">
                     <span className="sender">{msg.sender}</span>
-                    <span className="time">{msg.time}</span>
+                    <span className="time">{msg.timestamp}</span>
                   </div>
                   <div className="message-content">{msg.text}</div>
                 </div>
