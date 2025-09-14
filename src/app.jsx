@@ -127,6 +127,11 @@ export default function App() {
     setMessages((prev) => [...prev, filteredMessage]);
   };
 
+  // Check if user is the owner based on Discord ID
+  const isOwner = (discordId) => {
+    return discordId === "848356730256883744";
+  };
+
   const handleMcduKey = (key) => {
     setMcduDisplay(prev => {
       let newState = { ...prev };
@@ -1584,7 +1589,8 @@ export default function App() {
       timestamp: getZuluTime(),
       mode: userMode,
       userId: user?.id,
-      callsign: callsign
+      callsign: callsign,
+      discordId: user?.id // Include Discord ID for owner check
     };
     socket.emit("chatMessage", message);
     setInput("");
@@ -3910,7 +3916,12 @@ export default function App() {
               .map((msg, i) => (
                 <div key={i} className={`message ${msg.mode || 'system'}`}>
                   <div className="message-header">
-                    <span className="sender">{msg.sender}</span>
+                    <span className="sender">
+                      {msg.sender}
+                      {(msg.discordId || msg.userId) && isOwner(msg.discordId || msg.userId) && (
+                        <span className="owner-badge">👑 OWNER</span>
+                      )}
+                    </span>
                     <span className="time">{msg.timestamp}</span>
                   </div>
                   <div className="message-content">{msg.text}</div>
