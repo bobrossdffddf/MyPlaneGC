@@ -78,13 +78,13 @@ export default function App() {
   // Partnership data - you can customize this
   const partnerships = [
     {
-      image: "https://cdn.discordapp.com/attachments/1414524632190681088/1416224001201541240/academy.png?ex=68c610e2&is=68c4bf62&hm=18061b9023c4f4bcaa890f2cc2aaffba2b4b159ca8fcff25d089551c6bd8e8a1&",
+      image: "https://media.discordapp.net/attachments/1414524632190681088/1416224001201541240/academy.png?ex=68c76262&is=68c610e2&hm=fc0422fe27994e16966c6ef722a58bb3e45cc1278835eaee6438f9e2322bd15c&=&format=webp&quality=lossless&width=400&height=400",
       title: "24Academy.com",
       description: "ATC24 Academy helps controllers and pilots improve their skills, learn tips and tricks for controlling or piloting.",
       joinLink: "https://discord.gg/wPSWYn6sh9"
     },
     {
-      image: "https://media.discordapp.net/attachments/1414069423077200004/1415592919615672320/image-aircraft-design.jpg?ex=68c5bf64&is=68c46de4&hm=1911586f9fbedffd2f786c145ca264007e2276e9c851316538f383f4be059a48&=&format=webp&width=1042&height=813",
+      image: "https://media.discordapp.net/attachments/1414069423077200004/1415592919615672320/image-aircraft-design.jpg?ex=68c710e4&is=68c5bf64&hm=ed0d56c25f3a5f7675af942c4ad26a14067547535d36f8d6429f2abd61a6c3d6&=&format=webp&width=1042&height=813",
       title: "Hawaiian Airlines",
       description: "Hawaii Starts Here.",
       joinLink: "https://discord.gg/pAfSpvvJUB"
