@@ -104,7 +104,7 @@ let ptfsAtisData = {}; // Store real ATIS data from PTFS
 const claimedCallsigns = {}; // Store callsign data
 
 // Parse ATIS content to extract useful information
-// Ground crew callsign management
+// Ground crew callsign management with sequential numbering
 const assignGroundCrewCallsign = (airport, userId) => {
   if (!airportData[airport].groundCrewCallsigns) {
     airportData[airport].groundCrewCallsigns = new Map();
@@ -117,14 +117,19 @@ const assignGroundCrewCallsign = (airport, userId) => {
     }
   }
 
-  // Find the lowest available callsign number
-  let callsignNumber = 1;
-  while (airportData[airport].groundCrewCallsigns.has(`GROUND ${callsignNumber}`)) {
-    callsignNumber++;
-  }
+  // Get current assignments and sort by number to maintain order
+  const currentAssignments = Array.from(airportData[airport].groundCrewCallsigns.entries())
+    .sort((a, b) => {
+      const numA = parseInt(a[0].split(' ')[1]);
+      const numB = parseInt(b[0].split(' ')[1]);
+      return numA - numB;
+    });
 
-  const newCallsign = `GROUND ${callsignNumber}`;
+  // Assign the next sequential number
+  const nextNumber = currentAssignments.length + 1;
+  const newCallsign = `Ground ${nextNumber}`;
   airportData[airport].groundCrewCallsigns.set(newCallsign, userId);
+  
   return newCallsign;
 };
 
@@ -132,14 +137,18 @@ const releaseGroundCrewCallsign = (airport, userId) => {
   if (!airportData[airport].groundCrewCallsigns) return;
 
   // Find and remove the user's callsign
+  let removedCallsign = null;
   for (const [callsign, assignedUserId] of airportData[airport].groundCrewCallsigns) {
     if (assignedUserId === userId) {
       airportData[airport].groundCrewCallsigns.delete(callsign);
+      removedCallsign = callsign;
       break;
     }
   }
 
-  // Reassign callsigns to maintain sequential numbering
+  if (!removedCallsign) return;
+
+  // Get remaining assignments and sort by current number
   const remainingAssignments = Array.from(airportData[airport].groundCrewCallsigns.entries())
     .sort((a, b) => {
       const numA = parseInt(a[0].split(' ')[1]);
@@ -147,10 +156,12 @@ const releaseGroundCrewCallsign = (airport, userId) => {
       return numA - numB;
     });
 
+  // Clear all current assignments
   airportData[airport].groundCrewCallsigns.clear();
 
+  // Reassign with sequential numbers starting from 1
   remainingAssignments.forEach(([oldCallsign, assignedUserId], index) => {
-    const newCallsign = `GROUND ${index + 1}`;
+    const newCallsign = `Ground ${index + 1}`;
     airportData[airport].groundCrewCallsigns.set(newCallsign, assignedUserId);
 
     // Notify the user of their new callsign if it changed
@@ -733,6 +744,17 @@ io.on("connection", (socket) => {
         timestamp: new Date().toLocaleTimeString(),
         mode: "groundcrew"
       });
+    }
+  });
+
+  socket.on("requestGroundCallsign", (data) => {
+    const { userId, airport } = data;
+    
+    if (airport && airportData[airport]) {
+      const callsign = assignGroundCrewCallsign(airport, userId);
+      socket.emit("callsignAssigned", { callsign });
+      
+      console.log(`Ground callsign ${callsign} assigned to user ${userId} at ${airport}`);
     }
   });
 

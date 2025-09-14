@@ -1124,11 +1124,9 @@ export default function App() {
   };
 
   const assignGroundCallsign = () => {
-    // Ensure the callsign is unique and stable for ground crew
-    const newCallsign = `Ground ${groundCallsignCounter}`;
-    // No state update here, as the socket event will handle it
+    // Request a callsign from the server for proper sequential numbering
     socket.emit("requestGroundCallsign", { userId: user?.id, airport: selectedAirport });
-    return newCallsign; // Return a temporary callsign until confirmed
+    return "Ground (pending)"; // Return a temporary callsign until confirmed
   };
 
   // Function to assign crew to a task
@@ -1500,6 +1498,11 @@ export default function App() {
     setGroundCrewCallsign(""); // Reset ground crew callsign as well
 
     socket.emit("userMode", { mode, airport, userId: user?.id });
+
+    // If selecting ground crew mode, request a callsign immediately
+    if (mode === "groundcrew") {
+      socket.emit("requestGroundCallsign", { userId: user?.id, airport: airport });
+    }
   };
 
   const validateFlightNumber = (flightNum) => {
