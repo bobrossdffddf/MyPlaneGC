@@ -698,120 +698,123 @@ export default function App() {
   };
 
   const groundCrewGuides = {
-    marshalling: {
-      title: "Aircraft Marshalling & Ground Signals",
+    basics: {
+      title: "Ground Crew Basics",
       sections: [
         {
-          title: "Standard Marshalling Positions",
+          title: "ATC24 Rules and Regulations",
           image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
           steps: [
-            "Marshaller positions directly in front of aircraft nose, minimum 15 feet",
-            "Wing walkers position at wingtips during taxi operations in congested areas",
-            "Maintain constant visual contact with pilot throughout operation",
-            "Use only standardized ICAO hand signals - no improvisation",
-            "Wear high-visibility reflective vest and carry backup lighting equipment",
-            "Always plan and maintain clear escape route in case of emergency",
-            "Ensure all ground crew vehicles remain outside aircraft movement envelope"
+            "Cannot speak in VC - GC service requests/intercommunication should be done in Roblox chat",
+            "Must remain in main airport VC unless ground is online, then remain in ground VC",
+            "Must follow all ATC instructions",
+            "Only GC may use the cone tool - may only be used at gates around aircraft",
+            "May not place cones on taxiways, runways, or anywhere else",
+            "No vehicles allowed to enter public roads or leave airport grounds",
+            "All vehicles may be driven into cargo holds of aircraft with the ability to do so",
+            "Pushbacks may only be performed after clearance from ATC"
           ]
         },
         {
-          title: "Hand Signals - Movement Control",
-          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
+          title: "Pre-Departure Operations (PDO)",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
-            "COME FORWARD: Both arms raised above head, palms facing forward, wave toward your body with deliberate motion",
-            "MOVE BACK: Both arms raised above head, palms facing outward, wave aircraft away from you",
-            "TURN LEFT (aircraft's left): Right arm down at side, left arm extended horizontally pointing left",
-            "TURN RIGHT (aircraft's right): Left arm down at side, right arm extended horizontally pointing right",
-            "NORMAL STOP: Arms crossed above head forming clear X formation, hold steady",
-            "EMERGENCY STOP: Arms crossed above head with rapid, urgent waving motion",
-            "SLOW DOWN: Arms extended downward at 45°, palms down, gentle rhythmic up/down motion"
+            "Stairway/Jet bridge connection",
+            "Terminal Bus if at a stand with no jet bridge",
+            "Baggage truck",
+            "Catering Truck",
+            "Small Pushback Tug",
+            "This order is important and is the most efficient way to turn-around an airliner",
+            "Order applies to all small-medium airliners with different vehicles for large airliners",
+            "For cargo aircraft, omit: Stair Truck/Jet bridge, Terminal Bus, Baggage Truck"
           ]
         },
         {
-          title: "Engine and System Signals",
-          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
-          steps: [
-            "START ENGINES: Circular motion with right hand above head, pointing to specific engine",
-            "SHUT DOWN ENGINES: Hand drawn across throat in decisive cutting motion",
-            "CHOCKS IN: Both hands at waist level moving toward each other",
-            "CHOCKS OUT: Both hands at waist level moving away from each other",
-            "CONNECT GROUND POWER: Point to ground power receptacle, then clear thumbs up",
-            "DISCONNECT GROUND POWER: Point to ground power unit, then slashing motion across body",
-            "ALL CLEAR: Both arms extended outward horizontally, then swept downward"
-          ]
-        },
-        {
-          title: "Gate Positioning and Final Parking",
+          title: "Post-Arrival Operations (PAO)",
           image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
-            "Use precise, deliberate hand movements during final 50 feet of approach",
-            "Continuously monitor wingtip clearance and jetbridge alignment",
-            "Give clear STOP signal when aircraft nose gear reaches parking position marker",
-            "Verify nose gear is precisely on gate centerline before final parking approval",
-            "Check jetbridge can be safely positioned before final parking approval",
-            "Signal SET PARKING BRAKE with both hands pushing down motion",
-            "Wait for pilot acknowledgment before approaching aircraft or signaling ground crew"
+            "Follow me truck if aircraft or ATC requests",
+            "Marshalling",
+            "Stairway/Jet bridge connection",
+            "Fuel Truck",
+            "Baggage Truck",
+            "Catering Truck",
+            "Small Pushback Tug if the pilot decides to fly again (ask before bringing one out)",
+            "This order applies to all small-medium airliners with aircraft-specific variations"
+          ]
+        },
+        {
+          title: "Aircraft-Specific Services",
+          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
+          steps: [
+            "Small Airliners (ATR-72, A220, CRJ700, Q400, E190): Use small variants of baggage and fuel trucks",
+            "Large Airliners: Use Pushback Tug instead of small and long-bar tugs",
+            "Light Aircraft: Omit Marshalling, Stair Truck, Terminal Bus, Catering Truck, regular Pushback Tug",
+            "Cargo Aircraft: Omit Stair Truck/Jet bridge, Terminal Bus, Baggage Truck",
+            "Exception: Bombardier Learjet may use small or long bar tug for pushback",
+            "For aircraft with no catering point, place truck nearby and load cargo manually",
+            "General Aviation passengers can carry their own luggage"
           ]
         }
       ]
     },
-    fueling: {
-      title: "Aircraft Fueling Procedures",
+    vehicles: {
+      title: "Ground Vehicles Operations",
       sections: [
         {
-          title: "Pre-Fueling Safety Protocol",
+          title: "Baggage Truck Positioning",
           image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
-            "Verify aircraft engines completely shut down and cooled (minimum 15 minutes)",
-            "Establish proper grounding bond between fuel truck and aircraft",
-            "Check wind conditions - maximum 25 knots for safe fueling operations",
-            "Post 'NO SMOKING' signs and establish 50-foot safety perimeter",
-            "Confirm fire extinguisher (minimum 150lb CO2 or equivalent) is present",
-            "Test all fuel equipment for leaks and proper operation",
-            "Check fuel truck positioning allows safe escape routes",
-            "Check for any hot work or sources of ignition in area"
+            "The Baggage Truck has 3 baggage cells and holds one driver",
+            "Purpose: Load and unload passengers' luggage from aircraft to gate",
+            "Position behind the right wing of the aircraft, facing forward",
+            "Use Small Baggage Truck (2 cells) for Specific Small Airliners only",
+            "Light Aircraft passengers carry their own luggage",
+            "Always drive to a point where aircraft has no line-of-sight before deleting",
+            "Green zone diagram shows intended parking area behind right wing",
+            "Maintain safe distance from aircraft engines and moving parts"
           ]
         },
         {
-          title: "Narrow Body Aircraft (A320, B737) Fueling",
-          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
+          title: "Terminal Bus and Passenger Transport",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
-            "Locate fuel panel on right side of fuselage (typically behind wing)",
-            "Open fuel panel and identify fuel connections (overwing or pressure)",
-            "Connect grounding cable first, then fuel line to appropriate connection",
-            "Set fuel flow rate to maximum 300 gallons per minute for narrow body",
-            "Monitor fuel gauges - typical capacity: A320 (6,400 gal), B737 (6,875 gal)",
-            "Check for fuel distribution between left and right wing tanks",
-            "Maintain communication with flight crew throughout fueling process",
-            "Stop fueling at required amount minus 50 gallons, then top off slowly"
+            "Terminal Bus carries passengers from aircraft to terminal",
+            "Capacity: Nine passengers and one driver",
+            "Used mainly for Airliners, occasionally for Bombardier Learjet",
+            "Position in front of aircraft's left door, facing sideways",
+            "Green zone shows intended parking area in front of left door",
+            "Coordinate with cabin crew for passenger boarding/deboarding",
+            "Ensure safe passenger movement between aircraft and bus",
+            "Only use when aircraft is at stand without jet bridge"
           ]
         },
         {
-          title: "Wide Body Aircraft (A330, B777, B747) Fueling",
-          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
+          title: "Catering Truck Operations",
+          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373817659502/XXb1X4QkQ1QuG7BI1OlJsewZmiyART8m7iuhiKZL.jpg?ex=68c76bae&is=68c61a2e&hm=d4d9c73d3ce590b3a30bd51f28b4ac0c40eedc3846736470e012be8334a4b735&=&format=webp&width=813&height=542",
           steps: [
-            "Position multiple fuel trucks for larger aircraft (up to 3 trucks for B747)",
-            "Locate fuel panels on both sides of aircraft - typically 2-3 connections per side",
-            "Connect fuel lines to underwing pressure refueling connections",
-            "Set flow rate up to 600 gallons per minute for wide body aircraft",
-            "Monitor multiple tank systems: Main tanks, center tank, trim tank (if equipped)",
-            "Fuel capacity examples: A330 (25,000 gal), B777 (45,000 gal), B747 (57,000 gal)",
-            "Coordinate fuel distribution to maintain proper aircraft balance",
-            "Monitor fuel temperature - must be between -40°C and +50°C"
+            "Delivers snacks and drinks with retractable cargo bay",
+            "Seats one driver and passenger",
+            "Used for all airliners except ATR-72",
+            "Also used for cargo aircraft: B777F, B737F, B747F",
+            "Position and connect to bottom right door of aircraft",
+            "If no catering point available, place nearby and load manually",
+            "Separate from aircraft before retracting cargo bay",
+            "Green zone shows connection point at bottom right door"
           ]
         },
         {
-          title: "Fuel Quality Control & Documentation",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
+          title: "Fire Engine and Water Salutes",
+          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
           steps: [
-            "Take fuel sample from each fuel truck before connecting",
-            "Test fuel for water contamination using water detection paste",
-            "Verify fuel type matches aircraft requirements (Jet A, Jet A-1)",
-            "Check fuel color and clarity - should be clear to straw colored",
-            "Record fuel batch numbers and quality test results",
-            "Document exact fuel quantity added and final fuel load",
-            "Obtain pilot signature on fuel slip confirming quantity",
-            "Report any fuel quality issues immediately to operations"
+            "Large Fire Engine: One driver, five passengers",
+            "Fire Engine: One driver, one passenger",
+            "Hose operates by spraying water where user points mouse",
+            "Used for water salutes on aprons only if approved by ATC",
+            "Cannot be used for fire roleplays",
+            "Position on either side of aircraft's wing on apron",
+            "Both variants work interchangeably for water salutes",
+            "Fire Engines cannot enter taxiways - apron only"
           ]
         }
       ]
@@ -820,167 +823,228 @@ export default function App() {
       title: "Pushback and Towing Operations",
       sections: [
         {
-          title: "Equipment Selection by Aircraft Type",
+          title: "Follow Me Truck Operations",
           image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
-            "Light aircraft (up to 50,000 lbs): Standard tow bar pushback tractor",
-            "Medium aircraft (50,000-200,000 lbs): Heavy duty tow bar or towbarless tractor",
-            "Heavy aircraft (200,000+ lbs): Towbarless pushback tractor required",
-            "Verify tractor capacity exceeds aircraft weight by minimum 25%",
-            "Check tow bar compatibility with aircraft nose gear type",
-            "For towbarless: Verify cradle fits aircraft tire size and gear configuration",
-            "Inspect all hydraulic systems and emergency release mechanisms",
-            "Test radio communication equipment before operation"
+            "Small, very fast vehicle designed to lead aircraft",
+            "Leads unsure aircraft from gate-runway and runway-gate",
+            "Capacity: One driver and one passenger",
+            "Only vehicle allowed off apron (with pushback tug exception)",
+            "Must listen to ATC for aircraft taxi instructions",
+            "Stay at least three follow me trucks ahead of aircraft",
+            "Aircraft average 25-30kts on ground - don't be slow",
+            "Cross taxiways minimum number of times when returning"
           ]
         },
         {
-          title: "Pre-Pushback Safety Checklist",
-          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
+          title: "Fuel Truck Positioning and Operations",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
-            "Obtain ATC pushback clearance and confirm pushback direction",
-            "Verify aircraft parking brake is SET and engines are shut down",
-            "Check area clear of ground equipment, personnel, and other aircraft",
-            "Position wing walkers at wingtips if required by airport procedures",
-            "Establish positive radio contact with flight crew on intercom",
-            "Verify ground power is connected if engines not running",
-            "Check weather conditions - wind limits and visibility minimums",
-            "Ensure emergency stops and disconnect procedures are understood"
+            "Essential for turning around large airliners",
+            "Long, slim vehicle with rotating fuel canister",
+            "Capacity: One driver and passenger, infinite fuel supply",
+            "Pilot must be seated in cockpit for automatic refueling",
+            "Position to the right of aircraft's right wing, facing parallel",
+            "Small Fuel Truck used for Specific Small Airliners and Light Aircraft",
+            "Automatically begins refueling when positioned near engines",
+            "Green zone shows parking area right of right wing"
           ]
         },
         {
-          title: "Pushback Execution Procedures",
-          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
+          title: "Pushback Tug Operations and Controls",
+          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
           steps: [
-            "Begin pushback slowly - maximum 5 mph initial movement",
-            "Announce 'Pushback commencing' to flight crew",
-            "Monitor nose wheel steering - pilot maintains directional control",
-            "Call out obstacles, other aircraft, or hazards immediately",
-            "For straight pushback: maintain constant slow speed throughout",
-            "For turn during pushback: announce direction and pause before turning",
-            "Stop smoothly when reaching designated position or ATC instruction",
-            "Announce 'Pushback complete, set parking brake' to flight crew"
+            "Wide, slow vehicle for pushing aircraft from gate to taxiway",
+            "Capacity: One driver and one passenger",
+            "Request connection only after ATC clearance for pushback",
+            "Controls reversed: 'S' to push back, 'A' moves aircraft left, 'D' moves right",
+            "Begin with light taps of 'S' key for slow pushback",
+            "For short taxiways: push opposite direction first, then redirect",
+            "Announce 'You may start engines' and 'Pushback commencing'",
+            "Position directly in front of aircraft nose gear when not in use"
           ]
         },
         {
-          title: "Post-Pushback Disconnect Procedures",
-          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
+          title: "Pushback Variants and Applications",
+          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
           steps: [
-            "Verify aircraft parking brake is set before disconnecting",
-            "Announce 'Disconnecting tow bar, remain on brakes' to flight crew",
-            "For tow bar: Remove safety pins, disconnect from nose gear",
-            "For towbarless: Lower aircraft, retract cradle arms slowly",
-            "Perform final visual inspection of nose gear area for damage",
-            "Remove any ground equipment from aircraft path",
-            "Signal 'All clear' to flight crew when area is clear",
-            "Monitor aircraft taxi until clear of gate area"
+            "Pushback Tug: For large airliner aircraft",
+            "Long Bar Pushback Tug: For Special Small Airliners with longer towbar",
+            "Pushback Tug Small: Smaller variant for Special Small Airliners",
+            "All variants use same control instructions (refer to main pushback guide)",
+            "May slant Long Bar tug if aircraft too close to terminal",
+            "All pushbacks require ATC clearance before commencing",
+            "Can push aircraft forward slightly to center on taxi line if needed",
+            "Perfect pushbacks usually don't require forward movement"
           ]
         }
       ]
     },
-    baggage: {
-      title: "Baggage and Cargo Operations",
+    stairs: {
+      title: "Stair Truck and Passenger Access",
       sections: [
         {
-          title: "Weight and Balance Calculations",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373817659502/XXb1X4QkQ1QuG7BI1OlJsewZmiyART8m7iuhiKZL.jpg?ex=68c76bae&is=68c61a2e&hm=d4d9c73d3ce590b3a30bd51f28b4ac0c40eedc3846736470e012be8334a4b735&=&format=webp&width=813&height=542",
+          title: "Standard Stair Truck Operations",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
-            "Verify total baggage weight does not exceed aircraft cargo limits",
-            "Calculate center of gravity based on baggage compartment loading",
-            "Front compartment (forward of wing): affects nose-down moment",
-            "Aft compartment (behind wing): affects nose-up moment",
-            "Distribute heavy items evenly between compartments",
-            "Consider passenger loading - heavy baggage in rear if passengers in front",
-            "Maximum baggage per compartment: varies by aircraft type",
-            "Document final weight distribution on load sheet"
+            "One of tallest vehicles in PTFS when extended",
+            "Almost as tall as Catering Truck when at maximum extension",
+            "Provides passenger access when jet bridge unavailable",
+            "Applicable to all airliners except B737",
+            "Connect to front left door of aircraft",
+            "Always separate from aircraft before retracting stairs",
+            "Green zone shows connection point at front left door",
+            "Coordinate with cabin crew for passenger operations"
           ]
         },
         {
-          title: "Baggage Compartment Configuration",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373817659502/XXb1X4QkQ1QuG7BI1OlJsewZmiyART8m7iuhiKZL.jpg?ex=68c76bae&is=68c61a2e&hm=d4d9c73d3ce590b3a30bd51f28b4ac0c40eedc3846736470e012be8334a4b735&=&format=webp&width=813&height=542",
+          title: "Boeing 737 Stair Truck",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
-            "Load heavy items first - place against compartment walls",
-            "Use cargo nets and tie-down straps to secure all items",
-            "Pack items tightly to prevent shifting during flight",
-            "Separate fragile items and mark clearly",
-            "Load connecting flight baggage in accessible areas",
-            "Place priority/first-class baggage for easy identification",
-            "Ensure emergency equipment access is not blocked",
-            "Check compartment door seals and locking mechanisms"
+            "Variant specifically designed for B737 (not B737F)",
+            "Main difference: 737 Stair Truck does not extend",
+            "Used when B737 parked at gate missing jet bridge",
+            "Connect to front left door of B737 only",
+            "Warning: Vehicle may shift randomly even with no user inside",
+            "Glitch affects both low and high-end systems",
+            "Green zone shows specific B737 connection point",
+            "Only applicable to this specific aircraft type"
           ]
         },
         {
-          title: "Special Cargo Handling Procedures",
+          title: "Complete Ground Service Example",
           image: "https://media.discordapp.net/attachments/949137214154100776/1416596373817659502/XXb1X4QkQ1QuG7BI1OlJsewZmiyART8m7iuhiKZL.jpg?ex=68c76bae&is=68c61a2e&hm=d4d9c73d3ce590b3a30bd51f28b4ac0c40eedc3846736470e012be8334a4b735&=&format=webp&width=813&height=542",
           steps: [
-            "Live animals: Load last, unload first, maintain temperature control",
-            "Hazardous materials: Follow IATA dangerous goods regulations",
-            "Medical supplies: Maintain cold chain for temperature-sensitive items",
-            "Valuable cargo: Security escort required, locked compartments",
-            "Oversized items: May require special loading equipment",
-            "Diplomatic pouches: Chain of custody documentation required",
-            "Human remains: Specific handling protocols and documentation",
-            "Sports equipment: Secure properly to prevent damage"
+            "Reference image shows A320 with all ground services applied correctly",
+            "Pushback tug positioned at nose gear",
+            "Baggage truck behind right wing",
+            "Catering truck connected to bottom right door",
+            "Fuel truck parallel to right wing",
+            "Terminal bus in front of left door",
+            "Stair truck connected to front left door",
+            "All vehicles in proper positions for safe, efficient operations"
           ]
         }
       ]
     },
-    catering: {
-      title: "Catering and Cabin Services",
+    marshalling: {
+      title: "Marshalling and RP Items",
       sections: [
         {
-          title: "Catering Truck Positioning and Setup",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
+          title: "Marshal Sticks Usage",
+          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
           steps: [
-            "Position catering truck at designated catering door (typically forward left)",
-            "Extend truck platform to match aircraft door sill height exactly",
-            "Test platform stability and weight capacity before loading",
-            "Establish communication with cabin crew before opening doors",
-            "Check catering door operation - verify hydraulic pressure if applicable",
-            "Position bridge between truck and aircraft doorway",
-            "Set up safety barriers around elevated work area",
-            "Verify electrical power for refrigeration units during service"
+            "Found in 'RP Items' menu on bottom left of screen",
+            "Assist aircraft when parking at gate to ensure nose wheel centerline",
+            "Listen for aircraft's gate choice from pilot or ATC",
+            "May persuade aircraft into gate of your choice if none provided",
+            "Position behind final yellow line, before aircraft spawner",
+            "Ensures peak visibility for both aircraft and marshaller",
+            "Commence marshalling once aircraft moving into gate",
+            "Use standard hand signals for aircraft guidance"
           ]
         },
         {
-          title: "Service Flow by Aircraft Configuration",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
+          title: "Cone Placement and Security",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
-            "Single-aisle aircraft: Service through forward galley door only",
-            "Wide-body aircraft: Multiple service doors - coordinate timing",
-            "Remove used catering equipment first - trolleys, ovens, coffee makers",
-            "Clean galley areas and dispose of waste properly",
-            "Load fresh catering supplies by class of service (First, Business, Economy)",
-            "Verify meal counts match passenger manifest numbers",
-            "Check special meals are properly labeled and positioned",
-            "Reload galley equipment and test operation before departure"
+            "Also found in 'RP Items' menu on bottom left",
+            "Purpose: Secure aircraft once parked at gate",
+            "Click to place cone at current standing position",
+            "Click existing cone to remove it",
+            "Maximum 10 cones can be placed at one time",
+            "Wait for aircraft to be stationary before using",
+            "Standard positioning: Around nose gear, main gear, and wingtips",
+            "Exceptions: CRJ700 and MD90 omit engine-area cones"
           ]
         },
         {
-          title: "Water and Waste Service Procedures",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
+          title: "Cone Positioning for Airliners",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
-            "Locate potable water service panel (typically right side of aircraft)",
-            "Connect waste service truck to lavatory waste drain valve first",
-            "Pump out all waste tanks completely - verify tank empty indicators",
-            "Flush waste system with fresh water and biocide solution",
-            "Connect potable water truck to aircraft water fill connection",
-            "Fill water tanks slowly to prevent air locks in system",
-            "Test water system pressure and verify proper flow to lavatories",
-            "Check water tank quantity indicators show proper fill levels"
+            "Example uses A320 but applicable to most airliners",
+            "Green spots represent correct cone positions",
+            "Place cones around nose gear area",
+            "Position cones at main landing gear",
+            "Add cones near wingtips for clearance",
+            "Include cones near engines (except CRJ700/MD90)",
+            "Exceptions: CRJ700 and MD90 omit two cones near engines",
+            "Standard pattern ensures aircraft security and safety"
           ]
         },
         {
-          title: "Cabin Cleaning and Preparation",
+          title: "Light Aircraft Cone Positioning",
           image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
           steps: [
-            "Remove all trash and debris from seat pockets and floor areas",
-            "Vacuum all carpeted areas including aisles and seat rows",
-            "Clean and disinfect tray tables, armrests, and seat surfaces",
-            "Replace headrest covers and seat pocket materials as required",
-            "Clean and stock lavatories with supplies (soap, towels, tissue)",
-            "Check emergency equipment placement and expiration dates",
-            "Verify cabin lighting, air conditioning, and entertainment systems",
-            "Final inspection with cabin crew before passenger boarding"
+            "Light Aircraft positioning is simpler than airliners",
+            "Only 4 cones required for Light Aircraft",
+            "Example uses C172 but applicable to all Light Aircraft",
+            "Green spots represent correct cone positions",
+            "Position cones around nose gear and main gear",
+            "Simpler pattern due to smaller aircraft size",
+            "Adequate security with fewer cones needed",
+            "Maintains same safety standards as larger aircraft"
+          ]
+        }
+      ]
+    },
+    jetbridges: {
+      title: "Jet Bridges and Airport Infrastructure",
+      sections: [
+        {
+          title: "Jet Bridge Operations",
+          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
+          steps: [
+            "Industry standard for boarding and deboarding passengers",
+            "Available at every major international airport except IGRV, IBTH, IPAP",
+            "Much simpler to maneuver than real-world jet bridges",
+            "Only require tilting up or down according to aircraft door height",
+            "Control buttons clearly marked: 'Adjust Gate Height'",
+            "Up and down arrows for height adjustment",
+            "Easiest task for ground crew personnel to perform",
+            "Coordinate with flight crew for passenger operations"
+          ]
+        },
+        {
+          title: "Vehicle Spawn Locations - Major Airports",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
+          steps: [
+            "IRFD (Rockford International): Ground Crew Station marked",
+            "ITKO (Tokyo International): Spawn location highlighted",
+            "IPPH (Perth International): Ground crew spawner available",
+            "IZOL (Izolirani International): Vehicle spawn point marked",
+            "ILAR (Larnaca International): Ground operations area",
+            "IPAP (Paphos Airport): Limited ground crew facilities",
+            "IMLR (Mellor Airport): Ground crew station available",
+            "IGRV (Grindavik International): Check for spawn locations"
+          ]
+        },
+        {
+          title: "Ground Crew Station Identification",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
+          steps: [
+            "Look for 'Ground Crew Station' signage at airports",
+            "Stations typically located near terminal buildings",
+            "Green circles in manual highlight exact locations",
+            "Some smaller airports may not have dedicated spawners",
+            "Check airport layout for ground operations areas",
+            "Coordinate with ATC for ground crew operations clearance",
+            "Familiarize yourself with each airport's layout",
+            "ISAU (Sauthemptona International): Ground crew facilities available"
+          ]
+        },
+        {
+          title: "Professional Ground Operations Summary",
+          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373817659502/XXb1X4QkQ1QuG7BI1OlJsewZmiyART8m7iuhiKZL.jpg?ex=68c76bae&is=68c61a2e&hm=d4d9c73d3ce590b3a30bd51f28b4ac0c40eedc3846736470e012be8334a4b735&=&format=webp&width=813&height=542",
+          steps: [
+            "Always follow ATC24 rules and regulations strictly",
+            "Maintain proper vehicle positioning per aircraft type",
+            "Use correct vehicle variants for aircraft categories",
+            "Follow proper service sequence for efficiency",
+            "Coordinate with flight crew for all operations",
+            "Ensure safety protocols are always followed",
+            "Remember: Ground crew exists to support air traffic flow",
+            "Professional operations benefit both pilots and ATC"
           ]
         }
       ]
