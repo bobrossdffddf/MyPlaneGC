@@ -72,19 +72,7 @@ export default function App() {
     tailDirection: ''
   });
 
-  // ATC Mode State
-  const [flightStrips, setFlightStrips] = useState([]);
-  const [draggedStrip, setDraggedStrip] = useState(null);
-  const [stripBays, setStripBays] = useState({
-    arrivals: [],
-    departures: [],
-    ground: [],
-    taxi: [],
-    holding: [],
-    cleared: []
-  });
-  const [selectedStrip, setSelectedStrip] = useState(null);
-  const [atcCallsign, setAtcCallsign] = useState("");
+  
 
   // Partnership carousel state
   const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0);
@@ -132,151 +120,7 @@ export default function App() {
     return filteredText;
   };
 
-  // ATC Functions
-  const initializeFlightStrips = (airport) => {
-    const sampleStrips = [
-      {
-        id: 'AAL123',
-        callsign: 'AAL123',
-        aircraftType: 'B738',
-        destination: 'KLAX',
-        origin: airport,
-        flightRules: 'I',
-        squawkCode: '2341',
-        estimatedOffBlock: '14:30',
-        route: 'DCT',
-        remarks: '',
-        sid: 'RNAV1',
-        initialClimb: '5000',
-        finalClimb: 'FL350',
-        status: 'PENDING',
-        bay: 'departures',
-        position: { x: 0, y: 0 },
-        altitude: '0',
-        speed: '0',
-        heading: '000',
-        cleared: false,
-        contact: false
-      },
-      {
-        id: 'UAL456',
-        callsign: 'UAL456',
-        aircraftType: 'A320',
-        destination: 'KORD',
-        origin: airport,
-        flightRules: 'I',
-        squawkCode: '4521',
-        estimatedOffBlock: '14:45',
-        route: 'STAR1',
-        remarks: 'RVSM',
-        sid: 'RNAV2',
-        initialClimb: '6000',
-        finalClimb: 'FL380',
-        status: 'READY',
-        bay: 'departures',
-        position: { x: 0, y: 1 },
-        altitude: '0',
-        speed: '0',
-        heading: '000',
-        cleared: false,
-        contact: false
-      },
-      {
-        id: 'BAW789',
-        callsign: 'BAW789',
-        aircraftType: 'A333',
-        destination: airport,
-        origin: 'EGLL',
-        flightRules: 'I',
-        squawkCode: '7621',
-        estimatedOffBlock: '12:15',
-        route: 'STAR2',
-        remarks: 'HEAVY',
-        sid: '',
-        initialClimb: '',
-        finalClimb: '',
-        status: 'APPROACH',
-        bay: 'arrivals',
-        position: { x: 0, y: 0 },
-        altitude: '3000',
-        speed: '180',
-        heading: '270',
-        cleared: true,
-        contact: true
-      }
-    ];
-
-    setFlightStrips(sampleStrips);
-    
-    // Organize strips into bays
-    const newBays = {
-      arrivals: sampleStrips.filter(s => s.bay === 'arrivals'),
-      departures: sampleStrips.filter(s => s.bay === 'departures'),
-      ground: [],
-      taxi: [],
-      holding: [],
-      cleared: []
-    };
-    setStripBays(newBays);
-  };
-
-  const handleStripDragStart = (e, strip) => {
-    setDraggedStrip(strip);
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleStripDragOver = (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  };
-
-  const handleStripDrop = (e, targetBay) => {
-    e.preventDefault();
-    if (!draggedStrip) return;
-
-    // Update strip's bay
-    const updatedStrip = { ...draggedStrip, bay: targetBay };
-    
-    // Update flight strips
-    setFlightStrips(prev => 
-      prev.map(strip => strip.id === draggedStrip.id ? updatedStrip : strip)
-    );
-
-    // Update bays
-    setStripBays(prev => {
-      const newBays = { ...prev };
-      
-      // Remove from old bay
-      Object.keys(newBays).forEach(bayKey => {
-        newBays[bayKey] = newBays[bayKey].filter(strip => strip.id !== draggedStrip.id);
-      });
-      
-      // Add to new bay
-      newBays[targetBay].push(updatedStrip);
-      
-      return newBays;
-    });
-
-    setDraggedStrip(null);
-  };
-
-  const updateStripData = (stripId, field, value) => {
-    setFlightStrips(prev =>
-      prev.map(strip => 
-        strip.id === stripId ? { ...strip, [field]: value } : strip
-      )
-    );
-
-    setStripBays(prev => {
-      const newBays = { ...prev };
-      Object.keys(newBays).forEach(bayKey => {
-        newBays[bayKey] = newBays[bayKey].map(strip =>
-          strip.id === stripId ? { ...strip, [field]: value } : strip
-        );
-      });
-      return newBays;
-    });
-  };
+  
 
   // Helper function to add messages and filter bad words
   const addChatMessage = (message) => {
@@ -1664,11 +1508,7 @@ export default function App() {
       socket.emit("requestGroundCallsign", { userId: user?.id, airport: airport });
     }
 
-    // If selecting ATC mode, initialize with sample flight strips
-    if (mode === "atc") {
-      setAtcCallsign(`${airport}_TWR`);
-      initializeFlightStrips(airport);
-    }
+    
   };
 
   const validateFlightNumber = (flightNum) => {
@@ -2304,9 +2144,7 @@ export default function App() {
     );
   }
 
-  if (userMode === "atc") {
-    return renderContent();
-  }
+  
 
   if (!selectedAirport) {
     return (
@@ -2416,14 +2254,7 @@ export default function App() {
                   </div>
                 )}
               </button>
-              <button
-                onClick={() => selectMode("atc", selectedAirport)}
-                className="role-card atc"
-              >
-                <div className="role-icon">🎯</div>
-                <div className="role-title">AIR TRAFFIC CONTROL</div>
-                <div className="role-description">Manage air traffic with electronic flight strips</div>
-              </button>
+              
             </div>
           </div>
 
@@ -2448,244 +2279,6 @@ export default function App() {
   }
 
   const renderContent = () => {
-    if (userMode === "atc") {
-      return (
-        <div className="atc-interface">
-          <div className="atc-header">
-            <div className="atc-callsign">{atcCallsign}</div>
-            <div className="atc-time">{currentTime.toLocaleTimeString()}</div>
-            <div className="atc-airport">{selectedAirport}</div>
-          </div>
-
-          <div className="strip-bays-container">
-            <div className="strip-bay arrivals-bay">
-              <div className="bay-header">
-                <span className="bay-title">ARRIVALS</span>
-                <span className="bay-count">{stripBays.arrivals.length}</span>
-              </div>
-              <div 
-                className="bay-content"
-                onDragOver={handleStripDragOver}
-                onDrop={(e) => handleStripDrop(e, 'arrivals')}
-              >
-                {stripBays.arrivals.map((strip, index) => (
-                  <div
-                    key={strip.id}
-                    className={`flight-strip ${selectedStrip?.id === strip.id ? 'selected' : ''}`}
-                    draggable
-                    onDragStart={(e) => handleStripDragStart(e, strip)}
-                    onClick={() => setSelectedStrip(strip)}
-                  >
-                    <div className="strip-row-1">
-                      <span className="callsign">{strip.callsign}</span>
-                      <span className="aircraft-type">{strip.aircraftType}</span>
-                      <span className="squawk">{strip.squawkCode}</span>
-                    </div>
-                    <div className="strip-row-2">
-                      <span className="origin">{strip.origin}</span>
-                      <span className="destination">{strip.destination}</span>
-                      <span className="altitude">{strip.altitude}</span>
-                    </div>
-                    <div className="strip-row-3">
-                      <span className="route">{strip.route}</span>
-                      <span className="remarks">{strip.remarks}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="strip-bay departures-bay">
-              <div className="bay-header">
-                <span className="bay-title">DEPARTURES</span>
-                <span className="bay-count">{stripBays.departures.length}</span>
-              </div>
-              <div 
-                className="bay-content"
-                onDragOver={handleStripDragOver}
-                onDrop={(e) => handleStripDrop(e, 'departures')}
-              >
-                {stripBays.departures.map((strip, index) => (
-                  <div
-                    key={strip.id}
-                    className={`flight-strip ${selectedStrip?.id === strip.id ? 'selected' : ''}`}
-                    draggable
-                    onDragStart={(e) => handleStripDragStart(e, strip)}
-                    onClick={() => setSelectedStrip(strip)}
-                  >
-                    <div className="strip-row-1">
-                      <span className="callsign">{strip.callsign}</span>
-                      <span className="aircraft-type">{strip.aircraftType}</span>
-                      <span className="squawk">{strip.squawkCode}</span>
-                    </div>
-                    <div className="strip-row-2">
-                      <span className="origin">{strip.origin}</span>
-                      <span className="destination">{strip.destination}</span>
-                      <span className="etd">{strip.estimatedOffBlock}</span>
-                    </div>
-                    <div className="strip-row-3">
-                      <span className="sid">{strip.sid}</span>
-                      <span className="initial-climb">{strip.initialClimb}</span>
-                      <span className="final-climb">{strip.finalClimb}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="strip-bay ground-bay">
-              <div className="bay-header">
-                <span className="bay-title">GROUND</span>
-                <span className="bay-count">{stripBays.ground.length}</span>
-              </div>
-              <div 
-                className="bay-content"
-                onDragOver={handleStripDragOver}
-                onDrop={(e) => handleStripDrop(e, 'ground')}
-              >
-                {stripBays.ground.map((strip, index) => (
-                  <div
-                    key={strip.id}
-                    className={`flight-strip ${selectedStrip?.id === strip.id ? 'selected' : ''}`}
-                    draggable
-                    onDragStart={(e) => handleStripDragStart(e, strip)}
-                    onClick={() => setSelectedStrip(strip)}
-                  >
-                    <div className="strip-row-1">
-                      <span className="callsign">{strip.callsign}</span>
-                      <span className="aircraft-type">{strip.aircraftType}</span>
-                      <span className="gate">Gate {Math.floor(Math.random() * 20) + 1}</span>
-                    </div>
-                    <div className="strip-row-2">
-                      <span className="destination">{strip.destination}</span>
-                      <span className="status">{strip.status}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="strip-bay taxi-bay">
-              <div className="bay-header">
-                <span className="bay-title">TAXI</span>
-                <span className="bay-count">{stripBays.taxi.length}</span>
-              </div>
-              <div 
-                className="bay-content"
-                onDragOver={handleStripDragOver}
-                onDrop={(e) => handleStripDrop(e, 'taxi')}
-              >
-                {stripBays.taxi.map((strip, index) => (
-                  <div
-                    key={strip.id}
-                    className={`flight-strip ${selectedStrip?.id === strip.id ? 'selected' : ''}`}
-                    draggable
-                    onDragStart={(e) => handleStripDragStart(e, strip)}
-                    onClick={() => setSelectedStrip(strip)}
-                  >
-                    <div className="strip-row-1">
-                      <span className="callsign">{strip.callsign}</span>
-                      <span className="aircraft-type">{strip.aircraftType}</span>
-                      <span className="runway">RWY {Math.floor(Math.random() * 36) + 1}</span>
-                    </div>
-                    <div className="strip-row-2">
-                      <span className="destination">{strip.destination}</span>
-                      <span className="taxi-route">A1, B, C3</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="strip-bay cleared-bay">
-              <div className="bay-header">
-                <span className="bay-title">CLEARED</span>
-                <span className="bay-count">{stripBays.cleared.length}</span>
-              </div>
-              <div 
-                className="bay-content"
-                onDragOver={handleStripDragOver}
-                onDrop={(e) => handleStripDrop(e, 'cleared')}
-              >
-                {stripBays.cleared.map((strip, index) => (
-                  <div
-                    key={strip.id}
-                    className={`flight-strip cleared ${selectedStrip?.id === strip.id ? 'selected' : ''}`}
-                    draggable
-                    onDragStart={(e) => handleStripDragStart(e, strip)}
-                    onClick={() => setSelectedStrip(strip)}
-                  >
-                    <div className="strip-row-1">
-                      <span className="callsign">{strip.callsign}</span>
-                      <span className="aircraft-type">{strip.aircraftType}</span>
-                      <span className="cleared-indicator">CLR</span>
-                    </div>
-                    <div className="strip-row-2">
-                      <span className="destination">{strip.destination}</span>
-                      <span className="final-climb">{strip.finalClimb}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {selectedStrip && (
-            <div className="strip-details">
-              <div className="details-header">
-                <h3>{selectedStrip.callsign} - {selectedStrip.aircraftType}</h3>
-                <button onClick={() => setSelectedStrip(null)}>×</button>
-              </div>
-              <div className="details-content">
-                <div className="detail-row">
-                  <label>Callsign:</label>
-                  <input 
-                    value={selectedStrip.callsign} 
-                    onChange={(e) => updateStripData(selectedStrip.id, 'callsign', e.target.value)}
-                  />
-                </div>
-                <div className="detail-row">
-                  <label>Aircraft:</label>
-                  <input 
-                    value={selectedStrip.aircraftType} 
-                    onChange={(e) => updateStripData(selectedStrip.id, 'aircraftType', e.target.value)}
-                  />
-                </div>
-                <div className="detail-row">
-                  <label>Squawk:</label>
-                  <input 
-                    value={selectedStrip.squawkCode} 
-                    onChange={(e) => updateStripData(selectedStrip.id, 'squawkCode', e.target.value)}
-                  />
-                </div>
-                <div className="detail-row">
-                  <label>Destination:</label>
-                  <input 
-                    value={selectedStrip.destination} 
-                    onChange={(e) => updateStripData(selectedStrip.id, 'destination', e.target.value)}
-                  />
-                </div>
-                <div className="detail-row">
-                  <label>Route:</label>
-                  <input 
-                    value={selectedStrip.route} 
-                    onChange={(e) => updateStripData(selectedStrip.id, 'route', e.target.value)}
-                  />
-                </div>
-                <div className="detail-row">
-                  <label>Remarks:</label>
-                  <input 
-                    value={selectedStrip.remarks} 
-                    onChange={(e) => updateStripData(selectedStrip.id, 'remarks', e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-    
     if (userMode === "pilot") {
       switch (activeTab) {
         case "checklists":
