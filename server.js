@@ -79,13 +79,15 @@ const getUserCounts = () => {
   for (const [socketId, userData] of connectedUsers) {
     if (userData.airport && userData.mode) {
       if (!counts[userData.airport]) {
-        counts[userData.airport] = { pilots: 0, groundCrew: 0 };
+        counts[userData.airport] = { pilots: 0, groundCrew: 0, atc: 0 };
       }
 
       if (userData.mode === 'pilot') {
         counts[userData.airport].pilots++;
       } else if (userData.mode === 'groundcrew') {
         counts[userData.airport].groundCrew++;
+      } else if (userData.mode === 'atc') {
+        counts[userData.airport].atc++;
       }
     }
   }
