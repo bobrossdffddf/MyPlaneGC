@@ -72,7 +72,7 @@ export default function App() {
     tailDirection: ''
   });
 
-  
+
 
   // Partnership carousel state
   const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0);
@@ -80,7 +80,7 @@ export default function App() {
   // Partnership data - you can customize this
   const partnerships = [
     {
-      image: "https://drive.google.com/file/d/1E54Q09l4WyJFEhY6Kqo5bN3zObrEQ8Bf/view?usp=sharing",
+      image: "https://drive.google.com/thumbnail?id=1E54Q09l4WyJFEhY6Kqo5bN3zObrEQ8Bf&sz=w640-h480",
       title: "24Academy.com",
       description: "ATC24 Academy helps controllers and pilots improve their skills, learn tips and tricks for controlling or piloting.",
       joinLink: "https://discord.gg/wPSWYn6sh9"
@@ -120,7 +120,7 @@ export default function App() {
     return filteredText;
   };
 
-  
+
 
   // Helper function to add messages and filter bad words
   const addChatMessage = (message) => {
@@ -1352,7 +1352,7 @@ export default function App() {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchUser = async () => {
       try {
         console.log('Fetching user data...');
@@ -1508,7 +1508,7 @@ export default function App() {
       socket.emit("requestGroundCallsign", { userId: user?.id, airport: airport });
     }
 
-    
+
   };
 
   const validateFlightNumber = (flightNum) => {
@@ -2020,7 +2020,7 @@ export default function App() {
       "Boeing 787": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=300&fit=crop&crop=center",
       "Bombardier CRJ700": "https://images.unsplash.com/photo-1542718610-a1d656d1884c?w=500&h=300&fit=crop&crop=center",
       "Embraer E190": "https://images.unsplash.com/photo-1585956048631-7a1d3b07cdb9?w=500&h=300&fit=crop&crop=center",
-      "ATR-72": "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=500&h=300&fit=crop&crop=center",
+      "ATR-72": "https://images.unsplash.com/photo-158446446103-07a5e4e89b?w=500&h=300&fit=crop&crop=center",
       "DHC-6 Twin Otter": "https://images.unsplash.com/photo-1569629698899-7a9a8b5e4e89?w=500&h=300&fit=crop&crop=center",
       "Cessna 172": "https://images.unsplash.com/photo-1583500178711-897000e968d5?w=500&h=300&fit=crop&crop=center",
       "Concorde": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=500&h=300&fit=crop&crop=center",
@@ -2144,7 +2144,7 @@ export default function App() {
     );
   }
 
-  
+
 
   if (!selectedAirport) {
     return (
@@ -2254,7 +2254,7 @@ export default function App() {
                   </div>
                 )}
               </button>
-              
+
             </div>
           </div>
 
@@ -3450,7 +3450,7 @@ export default function App() {
 
       return (
         <div className="groundcrew-main">
-          
+
 
           <div className="service-management-board">
             <div className="service-column critical">
