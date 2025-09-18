@@ -203,6 +203,52 @@ export default function App() {
         heading: '270',
         cleared: true,
         contact: true
+      },
+      {
+        id: 'DLH001',
+        callsign: 'DLH001',
+        aircraftType: 'A346',
+        destination: 'EDDF',
+        origin: airport,
+        flightRules: 'I',
+        squawkCode: '1234',
+        estimatedOffBlock: '15:00',
+        route: 'DCT',
+        remarks: 'HEAVY',
+        sid: 'RNAV1',
+        initialClimb: '5000',
+        finalClimb: 'FL370',
+        status: 'TAXI',
+        bay: 'taxi',
+        position: { x: 0, y: 0 },
+        altitude: '0',
+        speed: '0',
+        heading: '000',
+        cleared: false,
+        contact: true
+      },
+      {
+        id: 'AFR447',
+        callsign: 'AFR447',
+        aircraftType: 'A320',
+        destination: 'LFPG',
+        origin: airport,
+        flightRules: 'I',
+        squawkCode: '2000',
+        estimatedOffBlock: '15:30',
+        route: 'UL9',
+        remarks: '',
+        sid: 'RNAV3',
+        initialClimb: '6000',
+        finalClimb: 'FL350',
+        status: 'GROUND',
+        bay: 'ground',
+        position: { x: 0, y: 0 },
+        altitude: '0',
+        speed: '0',
+        heading: '000',
+        cleared: false,
+        contact: false
       }
     ];
 
@@ -212,8 +258,8 @@ export default function App() {
     const newBays = {
       arrivals: sampleStrips.filter(s => s.bay === 'arrivals'),
       departures: sampleStrips.filter(s => s.bay === 'departures'),
-      ground: [],
-      taxi: [],
+      ground: sampleStrips.filter(s => s.bay === 'ground'),
+      taxi: sampleStrips.filter(s => s.bay === 'taxi'),
       holding: [],
       cleared: []
     };
@@ -487,6 +533,13 @@ export default function App() {
   useEffect(() => {
     updateMcduDisplay();
   }, [mcduDisplay.currentPage, selectedAirport, flightNumber, passengerManifest.length]);
+
+  // Initialize ATC strips when entering ATC mode
+  useEffect(() => {
+    if (userMode === "atc" && selectedAirport && flightStrips.length === 0) {
+      initializeFlightStrips(selectedAirport);
+    }
+  }, [userMode, selectedAirport]);
 
   // Auto-hide bottom navigation logic
   useEffect(() => {
@@ -1667,7 +1720,10 @@ export default function App() {
     // If selecting ATC mode, initialize with sample flight strips
     if (mode === "atc") {
       setAtcCallsign(`${airport}_TWR`);
-      initializeFlightStrips(airport);
+      // Use setTimeout to ensure state is set before initializing strips
+      setTimeout(() => {
+        initializeFlightStrips(airport);
+      }, 100);
     }
   };
 
