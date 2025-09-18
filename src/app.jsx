@@ -80,7 +80,7 @@ export default function App() {
   // Partnership data - you can customize this
   const partnerships = [
     {
-      image: "https://media.discordapp.net/attachments/1414524632190681088/1416224001201541240/academy.png?ex=68c76262&is=68c610e2&hm=fc0422fe27994e16966c6ef722a58bb3e45cc1278835eaee6438f9e2322bd15c&=&format=webp&quality=lossless&width=400&height=400",
+      image: "https://drive.google.com/file/d/1E54Q09l4WyJFEhY6Kqo5bN3zObrEQ8Bf/view?usp=sharing",
       title: "24Academy.com",
       description: "ATC24 Academy helps controllers and pilots improve their skills, learn tips and tricks for controlling or piloting.",
       joinLink: "https://discord.gg/wPSWYn6sh9"
