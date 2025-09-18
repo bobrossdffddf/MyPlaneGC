@@ -1,0 +1,333 @@
+
+GROUND CREW OPERATIONS MANUAL 
+By: @Guythatspeakspanish
+Go to Table of Contents 
+TABLE OF  
+CONTENTS 
+Basics 
+• Rules for ATC24 (Important) . . . . . . . . . . . . . . 5 • ATC24 Ground Crew Server . . . . . . . . . . . . . . . 8 • Ground Crew Basics . . . . . . . . . . . . . . . . . . . . . . . 9 
+Ground Vehicles 
+• Baggage Truck. . . . . . . . . . . . . . . . . . . . . . . . . . . . 14 o Small Baggage Truck. . . . . . . . . . . . . . . . . 16 • Terminal Bus . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 • Catering Truck. . . . . . . . . . . . . . . . . . . . . . . . . . . . 20 • Large Fire Engine (GAMEPASS) . . . . . . . . . . . 22 o Fire Engine (GAMEPASS) . . . . . . . . . . . . . 24 
+• Follow Me Truck. . . . . . . . . . . . . . . . . . . . . . . . . . 26 • Fuel Truck. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 28 o Small Fuel Truck. . . . . . . . . . . . . . . . . . . . . 30 • Pushback Tug. . . . . . . . . . . . . . . . . . . . . . . . . . . . 32 o How To Use. . . . . . . . . . . . . . . . . . . . . . . . . . 33 o Long Bar Pushback Tug. . . . . . . . . . . . . . 37 
+o Pushback Tug Small . . . . . . . . . . . . . . . . . . 40 • Stair Truck. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 43 o 737 Stair Truck. . . . . . . . . . . . . . . . . . . . . . . 45
+Go to Table of Contents 
+RP Items 
+• Marshal Sticks . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49 • Cones . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51 
+Extra 
+• Jet bridges . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 55 • Vehicle Spawn Locations . . . . . . . . . . . . . . . . . 57 
+SPACE LEFT BLANK
+Go to Table of Contents 
+BASICS SECTION
+Go to Table of Contents 
+Rules for ATC24 
+This operations manual will be discussing  ground crew operations for the private PTFS server  known as ATC24. 
+ATC24 has set rules for how users are to  behave, and one of the parts in their rules are for  ground crew operations. Below is this list of rules  taken directly from #atc-24-rules: 
+General Rules 
+• Cannot speak in VC 
+o GC service requests/intercommunication  
+should be done in Roblox chat. 
+• Must remain in main airport VC unless ground is  online, then remain in ground VC. 
+• Must follow all ATC instructions. 
+o Only GC may use the cone tool. 
+o May only be used at gates around aircraft., o May not be placed on taxiways, runways, or  anywhere else.
+Go to Table of Contents 
+Vehicle Rules 
+• No vehicles are allowed to enter public roads or  leave airport grounds. 
+• All vehicles may be driven into the cargo holds  of aircraft with the ability to do so. 
+Vehicle Types: Catering Truck, Fuel  Truck, Fire Truck, Stair Truck, Baggage  Truck, Terminal Bus 
+• May never enter taxiways or runways, 
+• Must remain on the service roads or against  terminal unless servicing an aircraft. 
+• If ATC approves a water salute, fire trucks  must be on the apron, not on taxiways. 
+Vehicle Types: Follow-me trucks 
+• May never enter runways. 
+• May only enter taxiways when approved by  ATC. 
+• Should only enter taxiways when requested by  a pilot or ATC. 
+• May speak in VC only to read-back taxi  instructions.
+Go to Table of Contents 
+Vehicle Types: Pushback Tugs 
+• May never enter runways., 
+• May only enter taxiways when pushing back  an aircraft., 
+• Aircraft are only ever allowed to be pushed  back, never towed forward down taxiways., • Pushbacks may only be performed after  clearance from the ATC.  
+• If a pushback is carried out without ATC  permission, both the pilot of the offending  aircraft and the driver of the offending tug will  be striked. 
+Role: Marshalls: 
+• Marshalls are only to be present at gates or  stands, near the marked end of the taxiway  line for that gate/stand. 
+• They may use the marshalling tool to guide  aircraft into a stand. 
+• Cannot guide aircraft pushing back. 
+• Cannot enter taxiways to guide aircraft. 
+All Ground Crew personnel must abide by  these rules or else you are in danger of being  striked or banned from ATC24.
+Go to Table of Contents 
+ATC24 Ground Crew  Server 
+This operations manual was made for the  Discord server ATC24 Ground Crew, but this  manual is applicable for any and all ground crew  operations. If you would like to join their server,  below is the link! 
+https://discord.gg/MNE97nQmZS
+
+Go to Table of Contents 
+Ground Crew Basics 
+Ground Crew personnel exist to provide  services to aircraft such as loading passengers,  catering, refueling, pushback, and more. When  
+done correctly by both parties, air traffic can flow  more easily. 
+Ground Crew operations can be categorized  into two phases, Pre-Departure Operations  (PDO) and Post-Arrival Operations (PAO).  Each of these phases require separate services  from ground crew that are listed on the next page,  note the order of the operations. The order of  these operations is how they should be carried out  upon the arrival of an aircraft: 
+SEE NEXT PAGE
+Go to Table of Contents 
+Pre-Departure Operations (PDO) 
+• Stairway/Jet bridge connection 
+• Terminal Bus if at a stand with no jet bridge • Baggage truck  
+• Catering Truck 
+• Small Pushback Tug 
+Post-Arrival Operations (PAO) 
+• Follow me truck if aircraft or ATC requests • Marshalling 
+• Stairway/Jet bridge connection 
+• Fuel Truck 
+• Baggage Truck 
+• Catering Truck 
+• Small Pushback Tug if the pilot decides to  fly again (ask before bringing one out) 
+This order is important and is the most efficient way to turn-around an airliner. This order  applies to all small-medium airliners. For large airliners, the order remains almost the same, but  with different vehicles.
+Go to Table of Contents 
+That order and vehicle selection varies  depending on the type of aircraft you are servicing. For cargo and general aviation aircraft, this is  different. 
+Cargo Aircraft 
+For cargo aircraft, the order is the same, but  the following vehicles and services are omitted  from being used: 
+• Stair Truck/Jet bridge connection 
+• Terminal Bus 
+• Baggage Truck 
+For aircraft that do not have a good position to  connect the Catering Truck, park the truck near the  aircraft and load the cargo (with the exception of  the 747 SCA & AN225 Shuttle Carrier Liveries). 
+Light Aircraft 
+For General Aviation/Light aircraft, the vehicles  and services provided vary more. The vehicles  omitted from servicing such an aircraft are: 
+• Marshalling 
+• Stair Truck 
+• Terminal Bus
+Go to Table of Contents 
+• Catering Truck 
+• Pushback Tug (exceptions are the 
+Bombardier Learjet, and you must use  either a small or long bar tug) 
+• Fuel Truck (use a small fuel truck  
+instead) 
+• Baggage Truck (including small baggage  truck) 
+Large Airliners 
+Large airliners get all services provided by  ground crew as well, but you must use the  Pushback Tug instead of the small and long-bar  tugs. 
+Specific Small Airliners 
+For the following small airliners, use the small  variants of the baggage and fuel trucks: 
+• ATR-72 
+• A220 
+• Bombardier CRJ700 
+• Bombardier Q400 
+• Embraer E190
+Go to Table of Contents 
+GROUND VEHICLES  SECTION
+Go to Table of Contents 
+Baggage Truck 
+
+Description 
+The Baggage Truck in PTFS is a thin, slender  vehicle with 3 Baggage cells attached to the back  of it, and can only hold one driver. The purpose of  the Baggage Truck is to load and unload  passengers’ luggage (or baggage) from their  aircraft to the gate.  
+For realism it is good to bring the Baggage  Truck at least to a point in which the aircraft does  not have line-of-site before deleting. This applies  to all other vehicles in the game.
+Go to Table of Contents 
+Positioning 
+The baggage truck should always be positioned  behind the right wing of the aircraft, facing  forward. Below is a diagram using the A320, but applicable to all airliner aircraft (the green is the  intended parking zone):
+Go to Table of Contents 
+Small Baggage Truck 
+Description 
+The Small Baggage Truck in PTFS is the smaller  variant to the normal Baggage Truck. It is a thin,  slender vehicle with 2 Baggage cells attached to  the back of it, and can only hold one driver. The  purpose of the Small Baggage Truck is to load and  unload passengers’ luggage (or baggage) from  their small aircraft to the gate. 
+The Small Baggage Truck is only used on  Specific Small Airliners. Light Aircraft do not  need Small Baggage Trucks (The passengers  could carry their own luggage let’s be honest)
+Go to Table of Contents 
+Positioning 
+The Small Baggage Truck, like the normal  Baggage Truck, should always be positioned  behind the right wing of the aircraft, facing  forward. Below is a diagram using the A320, but  applicable to all Specific Small Airliner aircraft (the  green is the intended parking zone):
+Go to Table of Contents 
+Terminal Bus 
+
+Description 
+The Terminal Bus is a long and wide bus  designed to carry passengers from their aircraft to  the airport’s terminal. Hence; Terminal bus. This  bus can hold nine passengers and one driver. 
+The vehicle is mainly just used for Airliners,  however occasionally it may be used for the  Bombardier Learjet.
+Go to Table of Contents 
+Positioning 
+The Terminal Bus, should always be positioned in front of the aircraft’s left door, facing sideways. Below is a diagram using the A320, but  applicable to all airliner aircraft (the green is the  intended parking zone):
+Go to Table of Contents 
+Catering Truck 
+
+Description 
+The Catering Truck delivers snacks and drinks  to aircraft before and after flights. It has a  retractable cargo bay to fit all map clearances and  seats one driver and passenger. 
+It’s used for all airliners (except the ATR-72)  and cargo aircraft like the B777F, B737F, and  B747F. If an aircraft has no catering point, place  the truck nearby and load cargo manually using  the in-game trolley or your own method. Also  note, make sure you are separated from the  aircraft you’re servicing before retracting  your cargo bay.
+Go to Table of Contents 
+
+Positioning 
+The Catering Truck should always be parked  and connected to the bottom right door of the  aircraft. Below is a diagram using the A320, but  applicable to most airliner aircraft (the green is the  intended parking zone):
+Go to Table of Contents 
+
+Large Fire Engine  (GAMEPASS) 
+
+The Large Fire Engine is one of the vehicles  that is more used in roleplay rather than ground  crew operations, but is still used for water salutes  in ATC24. The Large Fire Engine can hold one  driver and five passengers. 
+The Large Fire Engine’s hose operates by  spraying water where the user points their mouse.  As stated in the ATC24 Rules, Fire Engines can only  give water salutes on aprons and only if approved  by ATC. Fire Engines cannot be used for fire  roleplays. The two variants of the Fire Engines  do not matter when it comes to water  salutes.
+Go to Table of Contents 
+Position (For water saluting) 
+Large Fire Engines should be parked on either  side of an aircraft’s wing, preferably the one  closest to an apron at your airport of choice.  
+The diagram beneath shows how this could be  done on the aircrafts right wing, and the photo  shows how it could be done on the left wing (The  vehicle in the photo is a Fire Engine, but both  work and are interchangeable). Both are viable  for a water salute in ATC24.
+
+Go to Table of Contents 
+Fire Engine 
+(GAMEPASS) 
+
+The Fire Engine is one of the vehicles that is  more used in roleplay rather than ground crew  operations, but is still used for water salutes in  ATC24. The Fire Engine can hold one driver and  passenger. 
+The Fire Engine’s hose operates by spraying  water where the user points their mouse. As stated  in the ATC24 Rules, Fire Engines can only give  water salutes on aprons and only if approved by  ATC. Fire Engines cannot be used for fire roleplays. The two variants of the Fire Engines do not  matter when it comes to water salutes.
+Go to Table of Contents 
+Position (For water saluting) 
+Fire Engines should be parked on either side  of an aircraft’s wing, preferably the one  closest to an apron at your airport of choice.  
+The diagram beneath shows how this could be  done on the aircrafts right wing, and the photo  shows how it could be done on the left wing. Both  are viable for a water salute in ATC24.
+
+Go to Table of Contents 
+Follow Me Truck 
+The Follow Me Truck is a small and very fast  vehicle. It’s designed to lead unsure aircraft from  gate-runway and runway-gate. The vehicle can  hold one driver and one passenger.  
+The Follow Me Truck is the only vehicle allowed  off of the apron on ATC24 (with the small  exception of the pushback tugs). In order to use  one of these vehicles, it is important that you  listen to ATC as they give your aircraft of  choice their taxi instructions. If you don’t know  the aircrafts taxi instructions either, you’re useless  to everyone. 
+Go to Table of Contents 
+
+Position (For leading aircraft) 
+While there aren’t too many restrictions when  it comes to the Follow Me truck, it is always good  to be at least three follow me trucks ahead of  the aircraft at any given time. Also, don’t be  slow.  
+Remember, these aircraft can go 25-30kts on  the ground on average. For returning from the  taxiways, there aren’t any specifications on ATC24,  but it is good to cross taxiways the minimum  number of times required to get back to the apron.  You can also delete your truck if desired. 
+Go to Table of Contents 
+
+Fuel Truck 
+
+The Fuel Truck is essential for turning around  large airliners in PTFS. It’s a long, slim vehicle with  room for a driver and passenger, and now includes  a rotating fuel canister that moves with the user.  Fuel Trucks carry an infinite fuel supply and  are among the fastest vehicles in the game. 
+However, to function properly, the pilot must  be seated in the aircraft’s cockpit. When  positioned near the engines, the truck  
+automatically begins refueling. While standard for  large airliners, this vehicle is omitted for  Specific Small Airliners and Light Aircraft.
+Go to Table of Contents 
+
+Positioning 
+The Fuel Truck should always be parked to  the right of the aircrafts right wing, facing  parallel to the aircraft. Below is a diagram using  the A320, but applicable to all airliner aircraft (the  green is the intended parking zone):
+Go to Table of Contents 
+
+Small Fuel Truck 
+The Small Fuel Truck works exactly like the  normal Fuel Truck. The Small Fuel Truck is a very  short and thin vehicle which can hold one driver  and passenger. The purpose of the Small Fuel  Truck is to, as the name suggests, refuel aircraft  when placed close enough to the engines.  
+The Small Fuel Truck is only used on  Specific Small Airliners and Light Aircraft; the  Fuel Truck is used on all other aircraft. While  functionality wise there is no difference, using a  Small Fuel Truck on an A330 wouldn’t be the most  realistic.
+Go to Table of Contents 
+
+Positioning 
+The Small Fuel Truck, like the normal Fuel  Truck, should always be parked to the right of  the aircrafts right wing, facing parallel to the  
+aircraft. Below is a diagram using the A320, but  applicable to all Specific Small Airliner aircraft (the  green is the intended parking zone):
+Go to Table of Contents 
+
+Pushback Tug 
+
+Yes, I am now going to talk about the star  Pushback Tug. Chances are you skimmed  through the manual to read about this vehicle in  particular (if not then thanks for reading!), so let’s  talk. The Pushback Tug is a wide and very slow  vehicle whose purpose is to connect and push  aircraft from their gate of choice onto the taxiways  to commence taxi.  
+The vehicle can hold one driver and one passenger.  These vehicles are difficult to handle, but are  useful to aircraft. If a Pushback Tug isn’t available,  aircraft just have to use their reverse thrust, which  isn’t very realistic and wastes fuel if you have it  enabled.
+Go to Table of Contents 
+How To Use 
+I’m adding this section only for the Pushback  Tugs, as they take more to get used to and use  properly.  
+To first use a Pushback Tug, you need to  request connection to an aircraft. Note, there is a  bug in the game that sometimes prevents  Pushback Tugs from connecting, and shows  “Connection Already Requested” even if no  connection has been requested. You should  only request connection to an aircraft once ATC has  verbally cleared them for a pushback. 
+Once a clearance is issued, and the aircraft  accepts, you may commence the pushback.  Sometimes pushback operators like to say things  like: 
+• “You may start the engines in sequence” • “Pushback Commencing” 
+• “Bypass pin inserted” 
+These are all fine to say, and while not required,  it is best for you to say at least something  about starting the engines to prevent  wasted time on the taxiways (even though in  this game engine startups are instant).
+Go to Table of Contents 
+Now comes the hard part, pushing back the  aircraft properly onto the taxiway. To commence,  begin by lightly tapping the “S’’ key a couple times  to starting pushing the aircraft slowly back. Since  you’re controlling backwards, movements are  reversed. To move the aircraft right, you press  “D”, and to move it left, you press “A”. The  Pushback Tug will move in the opposite direction,  but that’s expected. 
+Something important to note is that sometimes  the taxiway you’re pushing the aircraft back to is  very short on one end, or is obstructed by a  building. An example of this is gates 8 and 7 at  IRFD. In cases like this, you should begin by  pushing back the aircraft in the opposite  direction, and then, calmly redirecting the aircraft  back in the correct direction. The maneuver should  look something like this: 
+SEE NEXT PAGE
+Go to Table of Contents 
+Path of a successful pushback from gate 8 at  IRFD: 
+
+And also, yes, you are allowed to push  aircraft forward a little bit to center then on  the taxi line. Perfect pushbacks usually don’t  require this, but it is also something done in real  life pushback procedures, so you can do it in the  game too. This will take practice, but after some  time you will start to get better pushbacks.
+Go to Table of Contents 
+
+Positioning 
+The Pushback Tug, when not in use, should be  placed directly in front of the aircrafts nose  gear. Below is a diagram using the A320, but  applicable to all large airliner aircraft (the green is  the intended parking zone):
+
+Go to Table of Contents 
+
+Long Bar Pushback Tug 
+The Long Bar Pushback Tug is a variant of the  Pushback Tug Small which has a much longer  towbar at the end. The Long Bar Pushback Tug is  used to pushback aircraft in the Special Small  Airliners category. whose purpose is to connect  and push aircraft from their gate of choice onto the  taxiways to commence taxi.  
+The vehicle can hold one driver and one  passenger. These vehicles are difficult to handle,  but are useful to aircraft. If a Pushback Tug Small  isn’t available, aircraft just have to use their  reverse thrust, which isn’t very realistic and wastes  fuel if you have it enabled.
+Go to Table of Contents 
+FOR INSTRUCTIONS ON HOW TO  USE THE LONG BAR PUSHBACK TUG, GO TO PAGE 33 OF THIS PDF
+Go to Table of Contents 
+
+Positioning 
+The Long Bar Pushback Tug, when not in use,  should be placed directly in front of the  aircrafts nose gear. If the aircraft is too close to  the terminal, you may slant the pushback tug to  allow it to fit. Below is a diagram using the A320,  but applicable to most airliner aircraft (the green is  the intended parking zone):
+
+Go to Table of Contents 
+
+Pushback Tug Small 
+The Pushback Tug Small is a small variant of  the Pushback Tug used to pushback aircraft in  the Special Small Airliners category. whose  purpose is to connect and push aircraft from their  gate of choice onto the taxiways to commence  taxi.  
+The vehicle can hold one driver and one  passenger. These vehicles are difficult to handle,  but are useful to aircraft. If a Pushback Tug Small  isn’t available, aircraft just have to use their  reverse thrust, which isn’t very realistic and wastes  fuel if you have it enabled.
+Go to Table of Contents 
+FOR INSTRUCTIONS ON HOW TO  USE THE PUSHBACK TUG SMALL,  GO TO PAGE 33 OF THIS PDF
+Go to Table of Contents 
+
+Positioning 
+The Pushback Tug Small, when not in use,  should be placed directly in front of the  aircrafts nose gear. Below is a diagram using the  A320, but applicable to all airliner aircraft (the  green is the intended parking zone):
+
+Go to Table of Contents 
+
+Stair Truck 
+
+The Stair Truck is one of the tallest vehicles in  PTFS, and when extended to the max is almost as  tall as the Catering Truck. The purpose of the Stair  Truck is to provide an easy way for passengers to  deboard from an aircraft if the aircraft is parked at  a gate that is missing a jet bridge. 
+The Stair Truck is applicable to all airliners  except the B737, that one has its own Stair Truck.  Note, always separate from the aircraft  you’re servicing before retracting the stairs.
+Go to Table of Contents 
+Positioning 
+The Stair Truck should be connected to the  front left door of the aircraft. Below is a  diagram using the A320, but applicable to all  airliner aircraft (the green is the intended parking  zone):
+Go to Table of Contents 
+737 Stair Truck 
+
+The 737 Stair Truck is a variant of the normal  Stair Truck, but specifically used for the B737 (the  B737F is not included). One of the main differences  is that the 737 Stair truck does not extend. The purpose of the 737 Stair Truck is to provide an  easy way for passengers to deboard from a B737 if  the aircraft is parked at a gate that is missing a jet  bridge. 
+Note, there is a glitch where on both low  and high-end systems, the 737 Stair Truck  can shift seemingly at random even if no user  is inside the vehicle.
+Go to Table of Contents 
+Positioning 
+The 737 Stair Truck should be connected to  the front left door of the B737. Below is a  diagram using the B737, only applicable to this  specific aircraft (the green is the intended parking  zone):
+Go to Table of Contents 
+
+To finish the Ground Vehicles  Section, here is an image of an A320 with all ground services  applied correctly:
+Go to Table of Contents 
+
+RP ITEMS SECTION
+Go to Table of Contents 
+Marshal Sticks 
+The Marshal Sticks are a tool that appears in  the “RP Items” menu on the bottom left of your  screen: 
+
+The purpose of the Marshal sticks is to assist  aircraft when parking at a gate to ensure the  aircrafts nose wheel is center lined. Once  equipped, you need to listen for your target  aircrafts gate of choice.  
+If one is not provided, you may try to  persuade them into a gate of your choice.  Once the aircraft is moving into a gate, whether by  their choice, ATC’s choice, or your choice, you may  commence the marshalling. 
+Go to Table of Contents 
+To marshal, there really aren’t many specifics I  can give in this manual. The only thing I will give,  is your position relative to the aircrafts gate. 
+You should always be positioned behind the  final yellow line, right before the aircraft  spawner. This is to ensure peak visibility for the  aircraft in relation to you, and you in relation to  the aircraft. 
+
+From there, proceed as normal and marshal the  aircraft to their gate of choice. That’s all for  marshalling.
+Go to Table of Contents 
+Cones 
+The Cones are also a tool that appears in the  “RP Items” menu on the bottom left of your  screen: 
+
+The purpose of the cones is to secure an  aircraft once its parked at a gate.  
+Once equipped, if you click, a cone will be  placed on the spot you are currently standing in.  To remove a cone, you can click on it again. You  can only place a maximum of 10 cones at a  time. you must wait for an aircraft to be stationary  before using them. Cones have a very specific way  to be placed on aircraft, see the next page for a  diagram:
+Go to Table of Contents 
+This example uses the A320, but applicable to  most airliners. Exceptions are CRJ700 and the  MD90. For those aircraft, omit the two cones near  the engines on this diagram (the green spots  represent the correct cone positions):
+Go to Table of Contents 
+
+For Light Aircraft, the positioning is simpler,  just 4 cones are required, in this positioning.  Below is a diagram using the C172, but this  positioning is applicable to all Light Aircraft (the  green spots represent the correct cone positions):
+Go to Table of Contents 
+
+EXTRA SECTION
+Go to Table of Contents 
+Jet Bridges 
+
+Jet Bridges are the industry standard for  boarding and deboarding airliners of their  passengers.  
+In PTFS there is at least one Jet Bridge at  every major international airport except IGRV,  IBTH, and IPAP. Jet Bridges in this game are much  simpler to maneuver, as they only require tilting  the Jet Bridge up or down according to the  aircraft’s door. 
+Go to Table of Contents 
+Here is a photo of the buttons: 
+
+Aligning a Jet Bridge to an aircraft’s door is  possibly the easiest task for ground crew  personnel to perform, and as such this is all I  will discuss regarding Jet Bridges.
+Go to Table of Contents 
+Vehicle Spawn  
+Locations 
+This section of the manual will show photos  of each major airport in PTFS (that has a ground  crew spawner), and highlight its location in a green  circle. Some smaller airports have not been shown. 
+IRFD (Rockford International)
+Go to Table of Contents 
+ITKO (Tokyo International) 
+
+IPPH (Perth International)
+Go to Table of Contents 
+IZOL (Izolirani International) 
+
+ILAR (Larnaca International)
+Go to Table of Contents 
+IPAP (Paphos Airport) 
+
+IMLR (Mellor Airport)
+Go to Table of Contents 
+IGRV (Grindavik International) 
+
+ISAU (Sauthemptona International)
+Go to Table of Contents 
+END OF MANUAL
+Go to Table of Contents 

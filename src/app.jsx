@@ -80,13 +80,19 @@ export default function App() {
   // Partnership data - you can customize this
   const partnerships = [
     {
+      image: "https://drive.google.com/thumbnail?id=1rNf4t8UwVBYQ6P8wlgr5iWB48asqQahV&sz=w640-h480",
+      title: "24Ground Crew",
+      description: "Offical ground partner for MyPlane.",
+      joinLink: "https://discord.gg/T3Sx8fUJvn"
+    },
+    {
       image: "https://drive.google.com/thumbnail?id=1E54Q09l4WyJFEhY6Kqo5bN3zObrEQ8Bf&sz=w640-h480",
       title: "24Academy.com",
       description: "ATC24 Academy helps controllers and pilots improve their skills, learn tips and tricks for controlling or piloting.",
       joinLink: "https://discord.gg/wPSWYn6sh9"
     },
     {
-      image: "https://media.discordapp.net/attachments/1414069423077200004/1415592919615672320/image-aircraft-design.jpg?ex=68c710e4&is=68c5bf64&hm=ed0d56c25f3a5f7675af942c4ad26a14067547535d36f8d6429f2abd61a6c3d6&=&format=webp&width=1042&height=813",
+      image: "https://drive.google.com/thumbnail?id=1fOHdZEPv1bOtJp7zF9_YTsUC2oES3yZ5&sz=w640-h480",
       title: "Hawaiian Airlines",
       description: "Hawaii Starts Here.",
       joinLink: "https://discord.gg/pAfSpvvJUB"
@@ -697,7 +703,7 @@ export default function App() {
       sections: [
         {
           title: "Standard Marshalling Positions",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373419069460/ground-crew-signal-vest-aviation-600nw-1017653671.webp?ex=68c76bae&is=68c61a2e&hm=740552a50c72993c7bc2727608898dafea6ccfcf7a9108337465f6847fc88845&=&format=webp&width=480&height=320",
+          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
           steps: [
             "Marshaller positions directly in front of aircraft nose, minimum 15 feet",
             "Wing walkers position at wingtips during taxi operations in congested areas",
@@ -710,7 +716,7 @@ export default function App() {
         },
         {
           title: "Hand Signals - Movement Control",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373817659502/XXb1X4QkQ1QuG7BI1OlJsewZmiyART8m7iuhiKZL.jpg?ex=68c76bae&is=68c61a2e&hm=d4d9c73d3ce590b3a30bd51f28b4ac0c40eedc3846736470e012be8334a4b735&=&format=webp&width=813&height=542",
+          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
           steps: [
             "COME FORWARD: Both arms raised above head, palms facing forward, wave toward your body with deliberate motion",
             "MOVE BACK: Both arms raised above head, palms facing outward, wave aircraft away from you",
@@ -723,7 +729,7 @@ export default function App() {
         },
         {
           title: "Engine and System Signals",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596372773142528/190712104202-derby-civil-aerospace-trent-xwb-product-2.jpg?ex=68c76bae&is=68c61a2e&hm=a5f14119b76357fce8bfaccf0ec2cf12e5cf63ec20541d2065a3482b44c206ab&=&format=webp&width=958&height=539",
+          image: "https://drive.google.com/thumbnail?id=1bzID7UOaBKtrGDBmv0VQVpm07MiQwgDs&sz=w640-h480",
           steps: [
             "START ENGINES: Circular motion with right hand above head, pointing to specific engine",
             "SHUT DOWN ENGINES: Hand drawn across throat in decisive cutting motion",
@@ -736,7 +742,7 @@ export default function App() {
         },
         {
           title: "Gate Positioning and Final Parking",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596372282540154/2ec001653721ed8079c798e70289c1610698640f.jpeg?ex=68c76bae&is=68c61a2e&hm=a323a5464269672d33ff58847001d56035cb2ff7dc8640c244c8495ebddcf84c&=&format=webp&width=819&height=654",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
             "Use precise, deliberate hand movements during final 50 feet of approach",
             "Continuously monitor wingtip clearance and jetbridge alignment",
@@ -754,7 +760,7 @@ export default function App() {
       sections: [
         {
           title: "Pre-Fueling Safety Protocol",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596372773142528/190712104202-derby-civil-aerospace-trent-xwb-product-2.jpg?ex=68c76bae&is=68c61a2e&hm=a5f14119b76357fce8bfaccf0ec2cf12e5cf63ec20541d2065a3482b44c206ab&=&format=webp&width=958&height=539",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
             "Verify aircraft engines completely shut down and cooled (minimum 15 minutes)",
             "Establish proper grounding bond between fuel truck and aircraft",
@@ -768,7 +774,7 @@ export default function App() {
         },
         {
           title: "Narrow Body Aircraft (A320, B737) Fueling",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596371775160390/Airbus_A320-214_Airbus_Industrie_JP7617615.jpg?ex=68c76bae&is=68c61a2e&hm=e0de69cec2af2ff0c0ed805782329031d21c5164ecd27dea418ef8d8ec1ea1b3&=&format=webp&width=958&height=639",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
             "Locate fuel panel on right side of fuselage (typically behind wing)",
             "Open fuel panel and identify fuel connections (overwing or pressure)",
@@ -782,7 +788,7 @@ export default function App() {
         },
         {
           title: "Wide Body Aircraft (A330, B777, B747) Fueling",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596371405803591/A6-EDY_A380_Emirates_31_jan_2013_jfk_8442269364_cropped.jpg?ex=68c76bae&is=68c61a2e&hm=8cc6d545552ac935c6a8ae46a445e0d70203993175d4099edbc2ce5006d2e519&=&format=webp&width=958&height=639",
+          image: "https://drive.google.com/thumbnail?id=1lwxRqbJrMXFShFyVPBYNfdsLUmgoqt8X&sz=w640-h480",
           steps: [
             "Position multiple fuel trucks for larger aircraft (up to 3 trucks for B747)",
             "Locate fuel panels on both sides of aircraft - typically 2-3 connections per side",
@@ -815,7 +821,7 @@ export default function App() {
       sections: [
         {
           title: "Equipment Selection by Aircraft Type",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596372282540154/2ec001653721ed8079c798e70289c1610698640f.jpeg?ex=68c76bae&is=68c61a2e&hm=a323a5464269672d33ff58847001d56035cb2ff7dc8640c244c8495ebddcf84c&=&format=webp&width=819&height=654",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
             "Light aircraft (up to 50,000 lbs): Standard tow bar pushback tractor",
             "Medium aircraft (50,000-200,000 lbs): Heavy duty tow bar or towbarless tractor",
@@ -829,7 +835,7 @@ export default function App() {
         },
         {
           title: "Pre-Pushback Safety Checklist",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596372282540154/2ec001653721ed8079c798e70289c1610698640f.jpeg?ex=68c76bae&is=68c61a2e&hm=a323a5464269672d33ff58847001d56035cb2ff7dc8640c244c8495ebddcf84c&=&format=webp&width=819&height=654",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
             "Obtain ATC pushback clearance and confirm pushback direction",
             "Verify aircraft parking brake is SET and engines are shut down",
@@ -843,7 +849,7 @@ export default function App() {
         },
         {
           title: "Pushback Execution Procedures",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373419069460/ground-crew-signal-vest-aviation-600nw-1017653671.webp?ex=68c76bae&is=68c61a2e&hm=740552a50c72993c7bc2727608898dafea6ccfcf7a9108337465f6847fc88845&=&format=webp&width=480&height=320",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
             "Begin pushback slowly - maximum 5 mph initial movement",
             "Announce 'Pushback commencing' to flight crew",
@@ -857,7 +863,7 @@ export default function App() {
         },
         {
           title: "Post-Pushback Disconnect Procedures",
-          image: "https://media.discordapp.net/attachments/949137214154100776/1416596373117075516/SIA-ground-crew-1.jpg?ex=68c76bae&is=68c61a2e&hm=9871aa3aeb5bf03197d42d9d50841a7c7cbca73d593321120b9d79bed11eabd0&=&format=webp&width=800&height=534",
+          image: "https://drive.google.com/thumbnail?id=1O0AF9QlALuMunS2QHA2QANjVjbVI_ZUJ&sz=w640-h480",
           steps: [
             "Verify aircraft parking brake is set before disconnecting",
             "Announce 'Disconnecting tow bar, remain on brakes' to flight crew",
