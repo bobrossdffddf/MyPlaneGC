@@ -2099,7 +2099,7 @@ export default function App() {
             <div className="brand-icon">🛩️</div>
             <h1>MyPlane</h1>
             <div className="brand-subtitle">Professional Aviation Ground Operations</div>
-            <div className="system-version">Version 1.2.0 | Made by @justawacko_</div>
+            <div className="system-version">Version 1.2.5 | Made by @justawacko_</div>
           </div>
           <div className="partnerships-carousel">
             <h3>OUR PARTNERS</h3>
