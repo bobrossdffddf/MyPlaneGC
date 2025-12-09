@@ -8524,14 +8524,14 @@ body {
   transform: scale(1.02);
 }
 
-/* ATC Loading Screen */
+/* ATC Loading Screen - iPad/Laptop Style Boot */
 .atc-loading-screen {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: #0a0a0a;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8540,86 +8540,100 @@ body {
 
 .atc-loading-container {
   width: 100%;
-  max-width: 800px;
-  padding: 20px;
+  max-width: 500px;
+  padding: 40px;
+  text-align: center;
 }
 
 .atc-boot-animation {
-  background: #111;
-  border: 2px solid #10b981;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
-}
-
-.terminal-header {
-  background: #10b981;
-  padding: 10px 20px;
+  background: transparent;
+  border: none;
   display: flex;
-  justify-content: space-between;
-  color: #0a0a0a;
-  font-weight: 700;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
 }
 
-.terminal-body {
-  padding: 30px;
-  font-family: 'Courier New', monospace;
-  color: #10b981;
+.boot-logo {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  box-shadow: 0 20px 60px rgba(59, 130, 246, 0.4);
+  animation: logoFloat 3s ease-in-out infinite;
 }
 
-.boot-lines {
-  margin-bottom: 30px;
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
-.boot-line {
-  margin: 10px 0;
-  opacity: 0.6;
+.boot-title {
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-top: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.boot-line.current {
-  opacity: 1;
-  animation: blink 0.5s infinite;
+.boot-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  margin-top: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-@keyframes blink {
-  50% { opacity: 0.5; }
+.boot-progress-wrapper {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
-.progress-container {
-  background: #1a1a1a;
-  height: 20px;
-  border-radius: 10px;
+.boot-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
   overflow: hidden;
-  border: 1px solid #10b981;
 }
 
-.progress-bar-atc {
+.boot-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #10b981, #34d399);
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.progress-percent {
-  text-align: center;
-  margin-top: 15px;
-  font-size: 1.5rem;
-  font-weight: 700;
+.boot-status {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500;
+  animation: statusPulse 2s ease-in-out infinite;
 }
 
-.scanline {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: rgba(16, 185, 129, 0.5);
-  animation: scan 2s linear infinite;
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
-@keyframes scan {
-  0% { top: 0; }
-  100% { top: 100%; }
+.boot-airport-badge {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 8px 20px;
+  border-radius: 20px;
+  color: #60a5fa;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
 }
 
 /* ATC Mode Container */
@@ -9469,7 +9483,6 @@ body {
 .strip-notes::placeholder {
   color: #6b7280;
   opacity: 0.5;
-}in-bottom: 20px;
 }
 
 .atc-stands-grid {
@@ -9577,75 +9590,17 @@ body {
   border-radius: 10px;
 }
 
-.flight-strip {
-  background: #252525;
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 10px;
-  cursor: grab;
+/* Drag and Drop Feedback */
+.efs-column.drag-over {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981 !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 }
 
-.flight-strip:active {
-  cursor: grabbing;
-}
-
-.strip-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.strip-callsign {
-  font-weight: 700;
-  color: #10b981;
-  font-size: 1.1rem;
-}
-
-.strip-aircraft {
-  color: #6b7280;
-}
-
-.strip-delete {
-  background: #ef4444;
-  border: none;
-  color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.strip-route {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.route-arrow {
-  color: #10b981;
-}
-
-.strip-details {
-  display: flex;
-  gap: 15px;
-  font-size: 0.8rem;
-  color: #6b7280;
-  margin-bottom: 10px;
-}
-
-.strip-notes {
-  width: 100%;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 5px;
-  color: #10b981;
-  padding: 8px;
-  resize: none;
-  height: 50px;
-  font-size: 0.8rem;
+.flight-strip.dragging {
+  opacity: 0.5;
+  transform: rotate(3deg) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .no-requests {
@@ -9682,4 +9637,92 @@ body {
   gap: 15px;
   color: #6b7280;
   font-size: 0.85rem;
+}
+
+/* Add Plane Form Styles */
+.add-plane-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.add-plane-input, .add-plane-select {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #10b981;
+  font-size: 0.9rem;
+}
+
+.add-plane-input:focus, .add-plane-select:focus {
+  border-color: #10b981;
+  outline: none;
+}
+
+.add-plane-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.add-plane-confirm {
+  flex: 1;
+  background: #10b981;
+  border: none;
+  color: #0a0a0a;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-plane-confirm:hover {
+  background: #059669;
+}
+
+.add-plane-cancel {
+  flex: 1;
+  background: #333;
+  border: 1px solid #444;
+  color: #ef4444;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-plane-cancel:hover {
+  background: #444;
+}
+
+.add-plane-btn {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.add-plane-btn:hover {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+.remove-plane-btn {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.remove-plane-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
 }

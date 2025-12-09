@@ -83,6 +83,8 @@ export default function App() {
   const [atcRequests, setAtcRequests] = useState([]);
   const [atcHasAccess, setAtcHasAccess] = useState({});
   const [draggedStrip, setDraggedStrip] = useState(null);
+  const [dragOverColumn, setDragOverColumn] = useState(null);
+  const [atcAddPlaneForm, setAtcAddPlaneForm] = useState({ standId: null, flight: '', aircraft: '' });
 
   // Owner Discord ID for full access
   const OWNER_DISCORD_ID = "848356730256883744";
@@ -1597,15 +1599,34 @@ export default function App() {
     setSelectedAirport("");
   };
 
-  const handleDragStart = (strip, column) => {
+  const handleDragStart = (strip, column, e) => {
     setDraggedStrip({ strip, fromColumn: column });
+    if (e?.target) {
+      e.target.classList.add('dragging');
+    }
   };
 
-  const handleDragOver = (e) => {
+  const handleDragEnd = (e) => {
+    setDraggedStrip(null);
+    setDragOverColumn(null);
+    if (e?.target) {
+      e.target.classList.remove('dragging');
+    }
+  };
+
+  const handleDragOver = (e, column) => {
     e.preventDefault();
+    if (dragOverColumn !== column) {
+      setDragOverColumn(column);
+    }
+  };
+
+  const handleDragLeave = () => {
+    setDragOverColumn(null);
   };
 
   const handleDrop = (toColumn) => {
+    setDragOverColumn(null);
     if (draggedStrip && draggedStrip.fromColumn !== toColumn) {
       socket.emit("moveFlightStrip", {
         airport: selectedAirport,
@@ -1643,6 +1664,29 @@ export default function App() {
       service,
       flight,
       requestedBy: `ATC-${user?.username}`
+    });
+  };
+
+  const atcAddPlaneToStand = (standId) => {
+    if (!atcAddPlaneForm.flight || !atcAddPlaneForm.aircraft) {
+      alert("Please enter both flight number and aircraft type");
+      return;
+    }
+    socket.emit("atcAddPlane", {
+      airport: selectedAirport,
+      stand: standId,
+      flight: atcAddPlaneForm.flight.toUpperCase(),
+      aircraft: atcAddPlaneForm.aircraft,
+      addedBy: `ATC-${user?.username}`
+    });
+    setAtcAddPlaneForm({ standId: null, flight: '', aircraft: '' });
+  };
+
+  const atcRemovePlaneFromStand = (standId) => {
+    socket.emit("atcRemovePlane", {
+      airport: selectedAirport,
+      stand: standId,
+      removedBy: `ATC-${user?.username}`
     });
   };
 
@@ -2235,29 +2279,24 @@ export default function App() {
     setSoundEnabled(!soundEnabled);
   };
 
-  // ATC Loading Screen
+  // ATC Loading Screen - iPad/Laptop Style Boot
   if (atcLoading) {
     return (
       <div className="atc-loading-screen">
         <div className="atc-loading-container">
           <div className="atc-boot-animation">
-            <div className="terminal-header">
-              <span className="terminal-title">ATC GROUND CONTROL SYSTEM</span>
-              <span className="terminal-version">v2.4.1</span>
+            <div className="boot-logo">🎧</div>
+            <div>
+              <div className="boot-title">Ground Control</div>
+              <div className="boot-subtitle">ATC Management System</div>
             </div>
-            <div className="terminal-body">
-              <div className="boot-lines">
-                <div className="boot-line">{'>'} INITIALIZING ATC GROUND CONTROL INTERFACE...</div>
-                <div className="boot-line">{'>'} CONNECTING TO PTFS DATA NETWORK...</div>
-                <div className="boot-line">{'>'} LOADING AIRPORT: {selectedAirport}</div>
-                <div className="boot-line current">{`> ${atcLoadingStep}`}</div>
+            <div className="boot-progress-wrapper">
+              <div className="boot-progress-bar">
+                <div className="boot-progress-fill" style={{ width: `${atcLoadingProgress}%` }}></div>
               </div>
-              <div className="progress-container">
-                <div className="progress-bar-atc" style={{ width: `${atcLoadingProgress}%` }}></div>
-              </div>
-              <div className="progress-percent">{atcLoadingProgress}%</div>
+              <div className="boot-status">{atcLoadingStep}</div>
             </div>
-            <div className="scanline"></div>
+            <div className="boot-airport-badge">{selectedAirport}</div>
           </div>
         </div>
       </div>
@@ -2382,6 +2421,9 @@ export default function App() {
                                 🧹 CLEAN
                               </button>
                             </div>
+                            <button className="remove-plane-btn" onClick={() => atcRemovePlaneFromStand(stand.id)}>
+                              ❌ Remove Plane
+                            </button>
                             {standRequests.length > 0 && (
                               <div className="active-requests-badge">
                                 <span className="badge-icon">📋</span>
@@ -2392,8 +2434,43 @@ export default function App() {
                           </div>
                         ) : (
                           <div className="vacant-stand-info">
-                            <div className="vacant-icon">✈️</div>
-                            <div className="vacant-text">STAND AVAILABLE</div>
+                            {atcAddPlaneForm.standId === stand.id ? (
+                              <div className="add-plane-form">
+                                <input 
+                                  type="text" 
+                                  placeholder="Flight (e.g. AAL123)"
+                                  value={atcAddPlaneForm.flight}
+                                  onChange={(e) => setAtcAddPlaneForm({...atcAddPlaneForm, flight: e.target.value})}
+                                  className="add-plane-input"
+                                />
+                                <select 
+                                  value={atcAddPlaneForm.aircraft}
+                                  onChange={(e) => setAtcAddPlaneForm({...atcAddPlaneForm, aircraft: e.target.value})}
+                                  className="add-plane-select"
+                                >
+                                  <option value="">Select Aircraft</option>
+                                  {aircraftTypes.map(ac => (
+                                    <option key={ac} value={ac}>{ac}</option>
+                                  ))}
+                                </select>
+                                <div className="add-plane-buttons">
+                                  <button className="add-plane-confirm" onClick={() => atcAddPlaneToStand(stand.id)}>
+                                    ✓ Add
+                                  </button>
+                                  <button className="add-plane-cancel" onClick={() => setAtcAddPlaneForm({ standId: null, flight: '', aircraft: '' })}>
+                                    ✕ Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <div className="vacant-icon">✈️</div>
+                                <div className="vacant-text">STAND AVAILABLE</div>
+                                <button className="add-plane-btn" onClick={() => setAtcAddPlaneForm({ standId: stand.id, flight: '', aircraft: '' })}>
+                                  ➕ Add Plane
+                                </button>
+                              </>
+                            )}
                           </div>
                         )}
                       </div>
@@ -2483,8 +2560,9 @@ export default function App() {
               </div>
               <div className="efs-columns">
                 <div 
-                  className="efs-column waiting"
-                  onDragOver={handleDragOver}
+                  className={`efs-column waiting ${dragOverColumn === 'waiting' ? 'drag-over' : ''}`}
+                  onDragOver={(e) => handleDragOver(e, 'waiting')}
+                  onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop('waiting')}
                 >
                   <div className="column-header">
@@ -2504,7 +2582,8 @@ export default function App() {
                           key={strip.id} 
                           className="flight-strip"
                           draggable
-                          onDragStart={() => handleDragStart(strip, 'waiting')}
+                          onDragStart={(e) => handleDragStart(strip, 'waiting', e)}
+                          onDragEnd={handleDragEnd}
                         >
                           <div className="strip-header">
                             <span className="strip-callsign">{strip.callsign}</span>
@@ -2534,8 +2613,9 @@ export default function App() {
                 </div>
 
                 <div 
-                  className="efs-column cleared"
-                  onDragOver={handleDragOver}
+                  className={`efs-column cleared ${dragOverColumn === 'cleared' ? 'drag-over' : ''}`}
+                  onDragOver={(e) => handleDragOver(e, 'cleared')}
+                  onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop('cleared')}
                 >
                   <div className="column-header">
@@ -2555,7 +2635,8 @@ export default function App() {
                           key={strip.id} 
                           className="flight-strip"
                           draggable
-                          onDragStart={() => handleDragStart(strip, 'cleared')}
+                          onDragStart={(e) => handleDragStart(strip, 'cleared', e)}
+                          onDragEnd={handleDragEnd}
                         >
                           <div className="strip-header">
                             <span className="strip-callsign">{strip.callsign}</span>
@@ -2585,8 +2666,9 @@ export default function App() {
                 </div>
 
                 <div 
-                  className="efs-column taxi"
-                  onDragOver={handleDragOver}
+                  className={`efs-column taxi ${dragOverColumn === 'taxi' ? 'drag-over' : ''}`}
+                  onDragOver={(e) => handleDragOver(e, 'taxi')}
+                  onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop('taxi')}
                 >
                   <div className="column-header">
@@ -2606,7 +2688,8 @@ export default function App() {
                           key={strip.id} 
                           className="flight-strip"
                           draggable
-                          onDragStart={() => handleDragStart(strip, 'taxi')}
+                          onDragStart={(e) => handleDragStart(strip, 'taxi', e)}
+                          onDragEnd={handleDragEnd}
                         >
                           <div className="strip-header">
                             <span className="strip-callsign">{strip.callsign}</span>

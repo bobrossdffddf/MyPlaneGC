@@ -1052,6 +1052,39 @@ io.on("connection", (socket) => {
     console.log(`✈️ Test flight strip added for ${airport}: ${testStrip.callsign}`);
   });
 
+  socket.on("atcAddPlane", (data) => {
+    const { airport, stand, flight, aircraft, addedBy } = data;
+    
+    if (!airport || !stand) return;
+    initializeAirportData(airport);
+    
+    const standData = {
+      flight,
+      aircraft,
+      pilot: addedBy,
+      userId: `atc-${Date.now()}`,
+      claimedAt: new Date().toLocaleTimeString(),
+      addedByAtc: true
+    };
+    
+    airportData[airport].stands[stand] = standData;
+    io.to(airport).emit("standUpdate", airportData[airport].stands);
+    io.to(`atc-${airport}`).emit("standUpdate", airportData[airport].stands);
+    console.log(`✈️ ATC added plane ${flight} to ${stand} at ${airport}`);
+  });
+
+  socket.on("atcRemovePlane", (data) => {
+    const { airport, stand, removedBy } = data;
+    
+    if (!airport || !stand) return;
+    if (!airportData[airport]) return;
+    
+    delete airportData[airport].stands[stand];
+    io.to(airport).emit("standUpdate", airportData[airport].stands);
+    io.to(`atc-${airport}`).emit("standUpdate", airportData[airport].stands);
+    console.log(`❌ ATC removed plane from ${stand} at ${airport}`);
+  });
+
   socket.on("disconnect", () => {
     const userInfo = connectedUsers.get(socket.id);
     if (userInfo) {
