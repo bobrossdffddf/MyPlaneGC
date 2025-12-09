@@ -2282,20 +2282,29 @@ export default function App() {
                 className={`atc-tab ${atcActiveTab === 'groundcrew' ? 'active' : ''}`}
                 onClick={() => setAtcActiveTab('groundcrew')}
               >
+                <span className="tab-icon">👷</span>
                 GROUND CREW
               </button>
               <button 
                 className={`atc-tab ${atcActiveTab === 'efs' ? 'active' : ''}`}
                 onClick={() => setAtcActiveTab('efs')}
               >
+                <span className="tab-icon">✈️</span>
                 EFS - FLIGHT STRIPS
               </button>
             </div>
           </div>
           <div className="atc-header-right">
-            <div className="atc-user">Welcome, {user?.username}</div>
-            <div className="atc-time">{getZuluTime()}</div>
+            <div className="atc-user">
+              <span className="user-icon">👤</span>
+              {user?.username}
+            </div>
+            <div className="atc-time">
+              <span className="time-icon">🕐</span>
+              {getZuluTime()}
+            </div>
             <button className="atc-exit-btn" onClick={exitAtcMode}>
+              <span className="exit-icon">🚪</span>
               EXIT ATC MODE
             </button>
           </div>
@@ -2305,29 +2314,86 @@ export default function App() {
           {atcActiveTab === 'groundcrew' && (
             <div className="atc-groundcrew-tab">
               <div className="atc-section">
-                <h2>STAND MANAGEMENT</h2>
+                <div className="section-header">
+                  <h2>🛩️ STAND MANAGEMENT - {selectedAirport}</h2>
+                  <div className="atc-stats">
+                    <div className="stat-badge occupied">
+                      <span className="stat-number">{Object.keys(atcStands).filter(s => atcStands[s]).length}</span>
+                      <span className="stat-label">OCCUPIED</span>
+                    </div>
+                    <div className="stat-badge available">
+                      <span className="stat-number">{getCurrentAirportStands().length - Object.keys(atcStands).filter(s => atcStands[s]).length}</span>
+                      <span className="stat-label">AVAILABLE</span>
+                    </div>
+                  </div>
+                </div>
                 <div className="atc-stands-grid">
-                  {getAirportConfig(selectedAirport).stands.map(stand => {
-                    const standData = atcStands[stand];
+                  {getCurrentAirportStands().map(stand => {
+                    const standData = atcStands[stand.id];
+                    const standRequests = atcRequests.filter(r => r.stand === stand.id);
                     return (
-                      <div key={stand} className={`atc-stand-card ${standData ? 'occupied' : 'vacant'}`}>
+                      <div key={stand.id} className={`atc-stand-card ${standData ? 'occupied' : 'vacant'}`}>
                         <div className="stand-header">
-                          <span className="stand-name">{stand}</span>
+                          <div className="stand-id-badge">
+                            <span className="stand-name">{stand.id}</span>
+                            <span className="stand-type">{stand.type.toUpperCase()}</span>
+                          </div>
                           <span className={`stand-status ${standData ? 'occupied' : 'vacant'}`}>
-                            {standData ? 'OCCUPIED' : 'VACANT'}
+                            {standData ? '🔴 OCCUPIED' : '🟢 VACANT'}
                           </span>
                         </div>
-                        {standData && (
+                        {standData ? (
                           <div className="stand-details">
-                            <div className="flight-info">{standData.flight}</div>
-                            <div className="aircraft-info">{standData.aircraft}</div>
-                            <div className="pilot-info">Pilot: {standData.pilot}</div>
-                            <div className="stand-actions">
-                              <button onClick={() => atcRequestService(stand, 'Fuel', standData.flight)}>FUEL</button>
-                              <button onClick={() => atcRequestService(stand, 'Catering', standData.flight)}>CATERING</button>
-                              <button onClick={() => atcRequestService(stand, 'Baggage', standData.flight)}>BAGGAGE</button>
-                              <button onClick={() => atcRequestService(stand, 'Pushback', standData.flight)}>PUSHBACK</button>
+                            <div className="flight-info-card">
+                              <div className="info-row">
+                                <span className="info-label">FLIGHT:</span>
+                                <span className="info-value">{standData.flight}</span>
+                              </div>
+                              <div className="info-row">
+                                <span className="info-label">AIRCRAFT:</span>
+                                <span className="info-value">{standData.aircraft}</span>
+                              </div>
+                              <div className="info-row">
+                                <span className="info-label">PILOT:</span>
+                                <span className="info-value">{standData.pilot}</span>
+                              </div>
+                              <div className="info-row">
+                                <span className="info-label">TIME:</span>
+                                <span className="info-value">{standData.claimedAt}</span>
+                              </div>
                             </div>
+                            <div className="stand-actions">
+                              <button className="service-btn fuel" onClick={() => atcRequestService(stand.id, 'Fuel Service', standData.flight)}>
+                                ⛽ FUEL
+                              </button>
+                              <button className="service-btn catering" onClick={() => atcRequestService(stand.id, 'Catering', standData.flight)}>
+                                🍽️ CATERING
+                              </button>
+                              <button className="service-btn baggage" onClick={() => atcRequestService(stand.id, 'Baggage', standData.flight)}>
+                                🧳 BAGGAGE
+                              </button>
+                              <button className="service-btn pushback" onClick={() => atcRequestService(stand.id, 'Pushback', standData.flight)}>
+                                🚛 PUSHBACK
+                              </button>
+                              <button className="service-btn power" onClick={() => atcRequestService(stand.id, 'Ground Power', standData.flight)}>
+                                🔌 POWER
+                              </button>
+                              <button className="service-btn cleaning" onClick={() => atcRequestService(stand.id, 'Cleaning', standData.flight)}>
+                                🧹 CLEAN
+                              </button>
+                            </div>
+                            {standRequests.length > 0 && (
+                              <div className="active-requests-badge">
+                                <span className="badge-icon">📋</span>
+                                <span className="badge-count">{standRequests.length}</span>
+                                <span className="badge-label">Active Requests</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="vacant-stand-info">
+                            <div className="vacant-icon">✈️</div>
+                            <div className="vacant-text">STAND AVAILABLE</div>
                           </div>
                         )}
                       </div>
@@ -2337,21 +2403,58 @@ export default function App() {
               </div>
 
               <div className="atc-section">
-                <h2>SERVICE REQUESTS</h2>
+                <div className="section-header">
+                  <h2>📋 SERVICE REQUESTS</h2>
+                  <div className="requests-stats">
+                    <div className="stat-badge pending">
+                      <span className="stat-number">{atcRequests.filter(r => r.status === 'REQUESTED').length}</span>
+                      <span className="stat-label">PENDING</span>
+                    </div>
+                    <div className="stat-badge active">
+                      <span className="stat-number">{atcRequests.filter(r => r.status === 'ACCEPTED').length}</span>
+                      <span className="stat-label">IN PROGRESS</span>
+                    </div>
+                  </div>
+                </div>
                 <div className="atc-requests-list">
                   {atcRequests.length === 0 ? (
-                    <div className="no-requests">No active service requests</div>
+                    <div className="no-requests">
+                      <div className="no-requests-icon">✓</div>
+                      <div className="no-requests-text">No active service requests</div>
+                    </div>
                   ) : (
                     atcRequests.map((req, idx) => (
-                      <div key={idx} className={`atc-request-card ${req.status}`}>
+                      <div key={idx} className={`atc-request-card status-${req.status?.toLowerCase() || 'pending'}`}>
                         <div className="request-header">
-                          <span className="request-service">{req.service}</span>
-                          <span className={`request-status ${req.status}`}>{req.status?.toUpperCase()}</span>
+                          <span className="request-service">
+                            <span className="service-icon">
+                              {req.service === 'Fuel Service' && '⛽'}
+                              {req.service === 'Catering' && '🍽️'}
+                              {req.service === 'Baggage' && '🧳'}
+                              {req.service === 'Pushback' && '🚛'}
+                              {req.service === 'Ground Power' && '🔌'}
+                              {req.service === 'Cleaning' && '🧹'}
+                              {!['Fuel Service', 'Catering', 'Baggage', 'Pushback', 'Ground Power', 'Cleaning'].includes(req.service) && '🛠️'}
+                            </span>
+                            {req.service}
+                          </span>
+                          <span className={`request-status status-${req.status?.toLowerCase() || 'pending'}`}>
+                            {req.status?.toUpperCase() || 'PENDING'}
+                          </span>
                         </div>
                         <div className="request-details">
-                          <span>Flight: {req.flight}</span>
-                          <span>Stand: {req.stand}</span>
-                          <span>Time: {req.timestamp}</span>
+                          <div className="detail-item">
+                            <span className="detail-label">FLIGHT:</span>
+                            <span className="detail-value">{req.flight}</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">STAND:</span>
+                            <span className="detail-value">{req.stand}</span>
+                          </div>
+                          <div className="detail-item">
+                            <span className="detail-label">TIME:</span>
+                            <span className="detail-value">{req.timestamp}</span>
+                          </div>
                         </div>
                       </div>
                     ))
@@ -2364,10 +2467,19 @@ export default function App() {
           {atcActiveTab === 'efs' && (
             <div className="atc-efs-tab">
               <div className="efs-header">
-                <h2>ELECTRONIC FLIGHT STRIP SYSTEM</h2>
-                <button className="add-test-strip-btn" onClick={addTestFlightStrip}>
-                  + Add Test Strip
-                </button>
+                <h2>✈️ ELECTRONIC FLIGHT STRIP SYSTEM - {selectedAirport}</h2>
+                <div className="efs-controls">
+                  <div className="efs-stats">
+                    <div className="efs-stat">
+                      <span className="efs-stat-value">{(atcFlightStrips.waiting?.length || 0) + (atcFlightStrips.cleared?.length || 0) + (atcFlightStrips.taxi?.length || 0)}</span>
+                      <span className="efs-stat-label">TOTAL STRIPS</span>
+                    </div>
+                  </div>
+                  <button className="add-test-strip-btn" onClick={addTestFlightStrip}>
+                    <span className="btn-icon">➕</span>
+                    ADD TEST STRIP
+                  </button>
+                </div>
               </div>
               <div className="efs-columns">
                 <div 
@@ -2377,40 +2489,47 @@ export default function App() {
                 >
                   <div className="column-header">
                     <span className="column-icon">⏳</span>
-                    <span>WAITING FOR CLEARANCE</span>
+                    <span className="column-title">WAITING FOR CLEARANCE</span>
                     <span className="column-count">{atcFlightStrips.waiting?.length || 0}</span>
                   </div>
                   <div className="column-strips">
-                    {atcFlightStrips.waiting?.map(strip => (
-                      <div 
-                        key={strip.id} 
-                        className="flight-strip"
-                        draggable
-                        onDragStart={() => handleDragStart(strip, 'waiting')}
-                      >
-                        <div className="strip-header">
-                          <span className="strip-callsign">{strip.callsign}</span>
-                          <span className="strip-aircraft">{strip.aircraft}</span>
-                          <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
-                        </div>
-                        <div className="strip-route">
-                          <span>{strip.departure}</span>
-                          <span className="route-arrow">→</span>
-                          <span>{strip.destination}</span>
-                        </div>
-                        <div className="strip-details">
-                          <span>FL: {strip.altitude}</span>
-                          <span>SQK: {strip.squawk}</span>
-                          <span>{strip.filedAt}</span>
-                        </div>
-                        <textarea 
-                          className="strip-notes"
-                          placeholder="Notes..."
-                          value={strip.notes || ''}
-                          onChange={(e) => updateStripNotes(strip.id, e.target.value)}
-                        />
+                    {(!atcFlightStrips.waiting || atcFlightStrips.waiting.length === 0) ? (
+                      <div className="empty-column">
+                        <div className="empty-icon">⏳</div>
+                        <div className="empty-text">No flights waiting</div>
                       </div>
-                    ))}
+                    ) : (
+                      atcFlightStrips.waiting.map(strip => (
+                        <div 
+                          key={strip.id} 
+                          className="flight-strip"
+                          draggable
+                          onDragStart={() => handleDragStart(strip, 'waiting')}
+                        >
+                          <div className="strip-header">
+                            <span className="strip-callsign">{strip.callsign}</span>
+                            <span className="strip-aircraft">{strip.aircraft}</span>
+                            <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                          </div>
+                          <div className="strip-route">
+                            <span className="route-airport">{strip.departure}</span>
+                            <span className="route-arrow">→</span>
+                            <span className="route-airport">{strip.destination}</span>
+                          </div>
+                          <div className="strip-details">
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
+                          </div>
+                          <textarea 
+                            className="strip-notes"
+                            placeholder="Controller notes..."
+                            value={strip.notes || ''}
+                            onChange={(e) => updateStripNotes(strip.id, e.target.value)}
+                          />
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
@@ -2421,40 +2540,47 @@ export default function App() {
                 >
                   <div className="column-header">
                     <span className="column-icon">✓</span>
-                    <span>CLEARANCE RECEIVED</span>
+                    <span className="column-title">CLEARANCE RECEIVED</span>
                     <span className="column-count">{atcFlightStrips.cleared?.length || 0}</span>
                   </div>
                   <div className="column-strips">
-                    {atcFlightStrips.cleared?.map(strip => (
-                      <div 
-                        key={strip.id} 
-                        className="flight-strip"
-                        draggable
-                        onDragStart={() => handleDragStart(strip, 'cleared')}
-                      >
-                        <div className="strip-header">
-                          <span className="strip-callsign">{strip.callsign}</span>
-                          <span className="strip-aircraft">{strip.aircraft}</span>
-                          <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
-                        </div>
-                        <div className="strip-route">
-                          <span>{strip.departure}</span>
-                          <span className="route-arrow">→</span>
-                          <span>{strip.destination}</span>
-                        </div>
-                        <div className="strip-details">
-                          <span>FL: {strip.altitude}</span>
-                          <span>SQK: {strip.squawk}</span>
-                          <span>{strip.filedAt}</span>
-                        </div>
-                        <textarea 
-                          className="strip-notes"
-                          placeholder="Notes..."
-                          value={strip.notes || ''}
-                          onChange={(e) => updateStripNotes(strip.id, e.target.value)}
-                        />
+                    {(!atcFlightStrips.cleared || atcFlightStrips.cleared.length === 0) ? (
+                      <div className="empty-column">
+                        <div className="empty-icon">✓</div>
+                        <div className="empty-text">No cleared flights</div>
                       </div>
-                    ))}
+                    ) : (
+                      atcFlightStrips.cleared.map(strip => (
+                        <div 
+                          key={strip.id} 
+                          className="flight-strip"
+                          draggable
+                          onDragStart={() => handleDragStart(strip, 'cleared')}
+                        >
+                          <div className="strip-header">
+                            <span className="strip-callsign">{strip.callsign}</span>
+                            <span className="strip-aircraft">{strip.aircraft}</span>
+                            <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                          </div>
+                          <div className="strip-route">
+                            <span className="route-airport">{strip.departure}</span>
+                            <span className="route-arrow">→</span>
+                            <span className="route-airport">{strip.destination}</span>
+                          </div>
+                          <div className="strip-details">
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
+                          </div>
+                          <textarea 
+                            className="strip-notes"
+                            placeholder="Controller notes..."
+                            value={strip.notes || ''}
+                            onChange={(e) => updateStripNotes(strip.id, e.target.value)}
+                          />
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
@@ -2465,40 +2591,47 @@ export default function App() {
                 >
                   <div className="column-header">
                     <span className="column-icon">🛫</span>
-                    <span>READY FOR TAXI</span>
+                    <span className="column-title">READY FOR TAXI</span>
                     <span className="column-count">{atcFlightStrips.taxi?.length || 0}</span>
                   </div>
                   <div className="column-strips">
-                    {atcFlightStrips.taxi?.map(strip => (
-                      <div 
-                        key={strip.id} 
-                        className="flight-strip"
-                        draggable
-                        onDragStart={() => handleDragStart(strip, 'taxi')}
-                      >
-                        <div className="strip-header">
-                          <span className="strip-callsign">{strip.callsign}</span>
-                          <span className="strip-aircraft">{strip.aircraft}</span>
-                          <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
-                        </div>
-                        <div className="strip-route">
-                          <span>{strip.departure}</span>
-                          <span className="route-arrow">→</span>
-                          <span>{strip.destination}</span>
-                        </div>
-                        <div className="strip-details">
-                          <span>FL: {strip.altitude}</span>
-                          <span>SQK: {strip.squawk}</span>
-                          <span>{strip.filedAt}</span>
-                        </div>
-                        <textarea 
-                          className="strip-notes"
-                          placeholder="Notes..."
-                          value={strip.notes || ''}
-                          onChange={(e) => updateStripNotes(strip.id, e.target.value)}
-                        />
+                    {(!atcFlightStrips.taxi || atcFlightStrips.taxi.length === 0) ? (
+                      <div className="empty-column">
+                        <div className="empty-icon">🛫</div>
+                        <div className="empty-text">No flights ready for taxi</div>
                       </div>
-                    ))}
+                    ) : (
+                      atcFlightStrips.taxi.map(strip => (
+                        <div 
+                          key={strip.id} 
+                          className="flight-strip"
+                          draggable
+                          onDragStart={() => handleDragStart(strip, 'taxi')}
+                        >
+                          <div className="strip-header">
+                            <span className="strip-callsign">{strip.callsign}</span>
+                            <span className="strip-aircraft">{strip.aircraft}</span>
+                            <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                          </div>
+                          <div className="strip-route">
+                            <span className="route-airport">{strip.departure}</span>
+                            <span className="route-arrow">→</span>
+                            <span className="route-airport">{strip.destination}</span>
+                          </div>
+                          <div className="strip-details">
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
+                          </div>
+                          <textarea 
+                            className="strip-notes"
+                            placeholder="Controller notes..."
+                            value={strip.notes || ''}
+                            onChange={(e) => updateStripNotes(strip.id, e.target.value)}
+                          />
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
