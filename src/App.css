@@ -774,15 +774,13 @@ body {
 /* Partnership Carousel Styles */
 .partnerships-carousel {
   margin: clamp(3px, 0.8vmin, 8px) 0;
-  padding: clamp(6px, 1.5vmin, 14px);
+  padding: clamp(10px, 2vmin, 18px);
   background: rgba(45, 55, 72, 0.4);
   border-radius: clamp(8px, 1.5vmin, 14px);
   border: 1px solid rgba(255, 149, 0, 0.2);
-  min-height: clamp(140px, 30vmin, 260px);
-  max-height: min(40vmin, 320px);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  overflow: visible;
 }
 
 .partnerships-carousel h3 {
@@ -802,16 +800,14 @@ body {
   margin: 0 auto;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
 }
 
 .carousel-content {
   text-align: center;
   animation: fadeIn 0.8s ease-out;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: clamp(6px, 1.5vmin, 12px);
 }
 
 .partner-image {
@@ -837,27 +833,22 @@ body {
 .partner-info {
   display: flex;
   flex-direction: column;
-  gap: clamp(4px, 1vmin, 8px);
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+  gap: clamp(6px, 1.5vmin, 12px);
+  flex-shrink: 0;
 }
 
 .partner-info h4 {
   color: #ffffff;
-  font-size: clamp(0.75rem, 2.5vmin, 1rem);
+  font-size: clamp(0.85rem, 2.8vmin, 1.1rem);
   font-weight: 600;
   margin: 0;
-  flex-shrink: 0;
 }
 
 .partner-info p {
-  color: #a0a8b0;
-  font-size: clamp(0.65rem, 2vmin, 0.85rem);
-  line-height: 1.2;
+  color: #d1d5db;
+  font-size: clamp(0.75rem, 2.2vmin, 0.95rem);
+  line-height: 1.4;
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .partner-join-btn {
