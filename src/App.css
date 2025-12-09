@@ -9599,58 +9599,6 @@ body {
   cursor: pointer;
 }
 
-/* EFS Tab */
-.efs-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.add-test-strip-btn {
-  background: #10b981;
-  border: none;
-  color: #0a0a0a;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.efs-columns {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  min-height: 500px;
-}
-
-.efs-column {
-  background: #1a1a1a;
-  border-radius: 12px;
-  padding: 15px;
-  border: 2px solid #333;
-}
-
-.efs-column.waiting { border-color: #f59e0b; }
-.efs-column.cleared { border-color: #10b981; }
-.efs-column.taxi { border-color: #3b82f6; }
-
-.column-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #333;
-  margin-bottom: 15px;
-}
-
-.column-count {
-  margin-left: auto;
-  background: #333;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
 /* Drag and Drop Feedback */
 .efs-column.drag-over {
   background: rgba(16, 185, 129, 0.1);
