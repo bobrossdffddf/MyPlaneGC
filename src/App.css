@@ -8500,3 +8500,433 @@ body {
   font-weight: 600;
   font-size: 0.8rem;
 }
+/* ATC Mode Styles */
+.airport-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.atc-mode-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.atc-mode-btn:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: scale(1.02);
+}
+
+/* ATC Loading Screen */
+.atc-loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.atc-loading-container {
+  width: 100%;
+  max-width: 800px;
+  padding: 20px;
+}
+
+.atc-boot-animation {
+  background: #111;
+  border: 2px solid #10b981;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);
+}
+
+.terminal-header {
+  background: #10b981;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  color: #0a0a0a;
+  font-weight: 700;
+}
+
+.terminal-body {
+  padding: 30px;
+  font-family: 'Courier New', monospace;
+  color: #10b981;
+}
+
+.boot-lines {
+  margin-bottom: 30px;
+}
+
+.boot-line {
+  margin: 10px 0;
+  opacity: 0.6;
+}
+
+.boot-line.current {
+  opacity: 1;
+  animation: blink 0.5s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.5; }
+}
+
+.progress-container {
+  background: #1a1a1a;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #10b981;
+}
+
+.progress-bar-atc {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+}
+
+.progress-percent {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(16, 185, 129, 0.5);
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* ATC Mode Container */
+.atc-mode-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: #10b981;
+}
+
+.atc-header {
+  background: #111;
+  border-bottom: 2px solid #10b981;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.atc-header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.atc-logo {
+  font-size: 2rem;
+}
+
+.atc-title h1 {
+  color: #10b981;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.atc-airport {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.atc-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.atc-tab {
+  background: transparent;
+  border: 1px solid #10b981;
+  color: #10b981;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.atc-tab.active, .atc-tab:hover {
+  background: #10b981;
+  color: #0a0a0a;
+}
+
+.atc-header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.atc-user, .atc-time {
+  color: #6b7280;
+}
+
+.atc-exit-btn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.atc-exit-btn:hover {
+  background: #dc2626;
+}
+
+.atc-content {
+  padding: 30px;
+}
+
+/* Ground Crew Tab */
+.atc-section {
+  margin-bottom: 30px;
+}
+
+.atc-section h2 {
+  color: #10b981;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.atc-stands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.atc-stand-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.atc-stand-card.occupied {
+  border-color: #10b981;
+}
+
+.stand-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.stand-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.stand-status.occupied {
+  color: #10b981;
+}
+
+.stand-status.vacant {
+  color: #6b7280;
+}
+
+.stand-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.stand-actions button {
+  background: #10b981;
+  border: none;
+  color: #0a0a0a;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+/* EFS Tab */
+.efs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.add-test-strip-btn {
+  background: #10b981;
+  border: none;
+  color: #0a0a0a;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.efs-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  min-height: 500px;
+}
+
+.efs-column {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 15px;
+  border: 2px solid #333;
+}
+
+.efs-column.waiting { border-color: #f59e0b; }
+.efs-column.cleared { border-color: #10b981; }
+.efs-column.taxi { border-color: #3b82f6; }
+
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 15px;
+}
+
+.column-count {
+  margin-left: auto;
+  background: #333;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.flight-strip {
+  background: #252525;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  cursor: grab;
+}
+
+.flight-strip:active {
+  cursor: grabbing;
+}
+
+.strip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.strip-callsign {
+  font-weight: 700;
+  color: #10b981;
+  font-size: 1.1rem;
+}
+
+.strip-aircraft {
+  color: #6b7280;
+}
+
+.strip-delete {
+  background: #ef4444;
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.strip-route {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.route-arrow {
+  color: #10b981;
+}
+
+.strip-details {
+  display: flex;
+  gap: 15px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.strip-notes {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 5px;
+  color: #10b981;
+  padding: 8px;
+  resize: none;
+  height: 50px;
+  font-size: 0.8rem;
+}
+
+.no-requests {
+  color: #6b7280;
+  text-align: center;
+  padding: 20px;
+}
+
+.atc-requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.atc-request-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.request-service {
+  font-weight: 600;
+}
+
+.request-details {
+  display: flex;
+  gap: 15px;
+  color: #6b7280;
+  font-size: 0.85rem;
+}

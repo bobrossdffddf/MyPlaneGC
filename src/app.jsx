@@ -72,7 +72,20 @@ export default function App() {
     tailDirection: ''
   });
 
+  // ATC Mode state
+  const [atcMode, setAtcMode] = useState(false);
+  const [atcLoading, setAtcLoading] = useState(false);
+  const [atcLoadingProgress, setAtcLoadingProgress] = useState(0);
+  const [atcLoadingStep, setAtcLoadingStep] = useState('');
+  const [atcActiveTab, setAtcActiveTab] = useState('groundcrew');
+  const [atcFlightStrips, setAtcFlightStrips] = useState({ waiting: [], cleared: [], taxi: [] });
+  const [atcStands, setAtcStands] = useState({});
+  const [atcRequests, setAtcRequests] = useState([]);
+  const [atcHasAccess, setAtcHasAccess] = useState({});
+  const [draggedStrip, setDraggedStrip] = useState(null);
 
+  // Owner Discord ID for full access
+  const OWNER_DISCORD_ID = "848356730256883744";
 
   // Partnership carousel state
   const [currentPartnerIndex, setCurrentPartnerIndex] = useState(0);
@@ -1513,9 +1526,158 @@ export default function App() {
     if (mode === "groundcrew") {
       socket.emit("requestGroundCallsign", { userId: user?.id, airport: airport });
     }
-
-
   };
+
+  // ATC Mode Functions
+  const checkAtcAccess = async (airport) => {
+    try {
+      const res = await fetch(`/api/atc-access/${airport}`);
+      const data = await res.json();
+      setAtcHasAccess(prev => ({ ...prev, [airport]: data.hasAccess }));
+      return data;
+    } catch (error) {
+      console.error('Failed to check ATC access:', error);
+      return { hasAccess: false };
+    }
+  };
+
+  const enterAtcMode = async (airport) => {
+    // Check access first
+    const accessData = await checkAtcAccess(airport);
+    
+    if (!accessData.hasAccess) {
+      alert(`Access denied. Only the ATC for ${airport} can enter ATC Mode.\nCurrent ATC: ${accessData.currentAtc || 'Unknown'}`);
+      return;
+    }
+
+    setSelectedAirport(airport);
+    setAtcLoading(true);
+    setAtcLoadingProgress(0);
+    setAtcLoadingStep('Initializing systems...');
+
+    // Cool loading animation sequence
+    const loadingSteps = [
+      { progress: 10, step: 'CONNECTING TO ATC NETWORK...' },
+      { progress: 25, step: 'LOADING RADAR SYSTEMS...' },
+      { progress: 40, step: 'SYNCING FLIGHT DATA...' },
+      { progress: 55, step: 'INITIALIZING GROUND CONTROL...' },
+      { progress: 70, step: 'LOADING FLIGHT STRIPS...' },
+      { progress: 85, step: 'ESTABLISHING COMMUNICATIONS...' },
+      { progress: 95, step: 'SYSTEMS CHECK COMPLETE' },
+      { progress: 100, step: 'READY' }
+    ];
+
+    for (let i = 0; i < loadingSteps.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setAtcLoadingProgress(loadingSteps[i].progress);
+      setAtcLoadingStep(loadingSteps[i].step);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Join ATC room and get initial data
+    socket.emit("joinAtcMode", { 
+      airport, 
+      userId: user?.id, 
+      username: user?.username 
+    });
+
+    setAtcLoading(false);
+    setAtcMode(true);
+  };
+
+  const exitAtcMode = () => {
+    socket.emit("leaveAtcMode", { 
+      airport: selectedAirport, 
+      username: user?.username 
+    });
+    setAtcMode(false);
+    setAtcActiveTab('groundcrew');
+    setAtcFlightStrips({ waiting: [], cleared: [], taxi: [] });
+    setSelectedAirport("");
+  };
+
+  const handleDragStart = (strip, column) => {
+    setDraggedStrip({ strip, fromColumn: column });
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (toColumn) => {
+    if (draggedStrip && draggedStrip.fromColumn !== toColumn) {
+      socket.emit("moveFlightStrip", {
+        airport: selectedAirport,
+        stripId: draggedStrip.strip.id,
+        fromColumn: draggedStrip.fromColumn,
+        toColumn: toColumn
+      });
+    }
+    setDraggedStrip(null);
+  };
+
+  const updateStripNotes = (stripId, notes) => {
+    socket.emit("updateFlightStripNotes", {
+      airport: selectedAirport,
+      stripId,
+      notes
+    });
+  };
+
+  const deleteFlightStrip = (stripId) => {
+    socket.emit("deleteFlightStrip", {
+      airport: selectedAirport,
+      stripId
+    });
+  };
+
+  const addTestFlightStrip = () => {
+    socket.emit("addTestFlightStrip", { airport: selectedAirport });
+  };
+
+  const atcRequestService = (stand, service, flight) => {
+    socket.emit("atcServiceRequest", {
+      airport: selectedAirport,
+      stand,
+      service,
+      flight,
+      requestedBy: `ATC-${user?.username}`
+    });
+  };
+
+  // ATC Mode socket listeners
+  useEffect(() => {
+    if (!atcMode) return;
+
+    socket.on("atcInitialData", (data) => {
+      setAtcFlightStrips(data.flightStrips || { waiting: [], cleared: [], taxi: [] });
+      setAtcStands(data.stands || {});
+      setAtcRequests(data.requests || []);
+    });
+
+    socket.on("flightStripUpdate", (strips) => {
+      setAtcFlightStrips(strips);
+    });
+
+    socket.on("atcDataUpdate", (data) => {
+      console.log("ATC data update:", data);
+    });
+
+    socket.on("serviceUpdate", (requests) => {
+      setAtcRequests(requests);
+    });
+
+    socket.on("standUpdate", (stands) => {
+      setAtcStands(stands);
+    });
+
+    return () => {
+      socket.off("atcInitialData");
+      socket.off("flightStripUpdate");
+      socket.off("atcDataUpdate");
+    };
+  }, [atcMode]);
 
   const validateFlightNumber = (flightNum) => {
     // ICAO format: 3-letter airline code + flight number (e.g., AAL123, UAL456)
@@ -2073,6 +2235,280 @@ export default function App() {
     setSoundEnabled(!soundEnabled);
   };
 
+  // ATC Loading Screen
+  if (atcLoading) {
+    return (
+      <div className="atc-loading-screen">
+        <div className="atc-loading-container">
+          <div className="atc-boot-animation">
+            <div className="terminal-header">
+              <span className="terminal-title">ATC GROUND CONTROL SYSTEM</span>
+              <span className="terminal-version">v2.4.1</span>
+            </div>
+            <div className="terminal-body">
+              <div className="boot-lines">
+                <div className="boot-line">{'>'} INITIALIZING ATC GROUND CONTROL INTERFACE...</div>
+                <div className="boot-line">{'>'} CONNECTING TO PTFS DATA NETWORK...</div>
+                <div className="boot-line">{'>'} LOADING AIRPORT: {selectedAirport}</div>
+                <div className="boot-line current">{`> ${atcLoadingStep}`}</div>
+              </div>
+              <div className="progress-container">
+                <div className="progress-bar-atc" style={{ width: `${atcLoadingProgress}%` }}></div>
+              </div>
+              <div className="progress-percent">{atcLoadingProgress}%</div>
+            </div>
+            <div className="scanline"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ATC Mode UI
+  if (atcMode) {
+    return (
+      <div className="atc-mode-container">
+        <div className="atc-header">
+          <div className="atc-header-left">
+            <div className="atc-logo">🎧</div>
+            <div className="atc-title">
+              <h1>ATC GROUND CONTROL</h1>
+              <span className="atc-airport">{selectedAirport}</span>
+            </div>
+          </div>
+          <div className="atc-header-center">
+            <div className="atc-tabs">
+              <button 
+                className={`atc-tab ${atcActiveTab === 'groundcrew' ? 'active' : ''}`}
+                onClick={() => setAtcActiveTab('groundcrew')}
+              >
+                GROUND CREW
+              </button>
+              <button 
+                className={`atc-tab ${atcActiveTab === 'efs' ? 'active' : ''}`}
+                onClick={() => setAtcActiveTab('efs')}
+              >
+                EFS - FLIGHT STRIPS
+              </button>
+            </div>
+          </div>
+          <div className="atc-header-right">
+            <div className="atc-user">Welcome, {user?.username}</div>
+            <div className="atc-time">{getZuluTime()}</div>
+            <button className="atc-exit-btn" onClick={exitAtcMode}>
+              EXIT ATC MODE
+            </button>
+          </div>
+        </div>
+
+        <div className="atc-content">
+          {atcActiveTab === 'groundcrew' && (
+            <div className="atc-groundcrew-tab">
+              <div className="atc-section">
+                <h2>STAND MANAGEMENT</h2>
+                <div className="atc-stands-grid">
+                  {getAirportConfig(selectedAirport).stands.map(stand => {
+                    const standData = atcStands[stand];
+                    return (
+                      <div key={stand} className={`atc-stand-card ${standData ? 'occupied' : 'vacant'}`}>
+                        <div className="stand-header">
+                          <span className="stand-name">{stand}</span>
+                          <span className={`stand-status ${standData ? 'occupied' : 'vacant'}`}>
+                            {standData ? 'OCCUPIED' : 'VACANT'}
+                          </span>
+                        </div>
+                        {standData && (
+                          <div className="stand-details">
+                            <div className="flight-info">{standData.flight}</div>
+                            <div className="aircraft-info">{standData.aircraft}</div>
+                            <div className="pilot-info">Pilot: {standData.pilot}</div>
+                            <div className="stand-actions">
+                              <button onClick={() => atcRequestService(stand, 'Fuel', standData.flight)}>FUEL</button>
+                              <button onClick={() => atcRequestService(stand, 'Catering', standData.flight)}>CATERING</button>
+                              <button onClick={() => atcRequestService(stand, 'Baggage', standData.flight)}>BAGGAGE</button>
+                              <button onClick={() => atcRequestService(stand, 'Pushback', standData.flight)}>PUSHBACK</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="atc-section">
+                <h2>SERVICE REQUESTS</h2>
+                <div className="atc-requests-list">
+                  {atcRequests.length === 0 ? (
+                    <div className="no-requests">No active service requests</div>
+                  ) : (
+                    atcRequests.map((req, idx) => (
+                      <div key={idx} className={`atc-request-card ${req.status}`}>
+                        <div className="request-header">
+                          <span className="request-service">{req.service}</span>
+                          <span className={`request-status ${req.status}`}>{req.status?.toUpperCase()}</span>
+                        </div>
+                        <div className="request-details">
+                          <span>Flight: {req.flight}</span>
+                          <span>Stand: {req.stand}</span>
+                          <span>Time: {req.timestamp}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {atcActiveTab === 'efs' && (
+            <div className="atc-efs-tab">
+              <div className="efs-header">
+                <h2>ELECTRONIC FLIGHT STRIP SYSTEM</h2>
+                <button className="add-test-strip-btn" onClick={addTestFlightStrip}>
+                  + Add Test Strip
+                </button>
+              </div>
+              <div className="efs-columns">
+                <div 
+                  className="efs-column waiting"
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('waiting')}
+                >
+                  <div className="column-header">
+                    <span className="column-icon">⏳</span>
+                    <span>WAITING FOR CLEARANCE</span>
+                    <span className="column-count">{atcFlightStrips.waiting?.length || 0}</span>
+                  </div>
+                  <div className="column-strips">
+                    {atcFlightStrips.waiting?.map(strip => (
+                      <div 
+                        key={strip.id} 
+                        className="flight-strip"
+                        draggable
+                        onDragStart={() => handleDragStart(strip, 'waiting')}
+                      >
+                        <div className="strip-header">
+                          <span className="strip-callsign">{strip.callsign}</span>
+                          <span className="strip-aircraft">{strip.aircraft}</span>
+                          <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                        </div>
+                        <div className="strip-route">
+                          <span>{strip.departure}</span>
+                          <span className="route-arrow">→</span>
+                          <span>{strip.destination}</span>
+                        </div>
+                        <div className="strip-details">
+                          <span>FL: {strip.altitude}</span>
+                          <span>SQK: {strip.squawk}</span>
+                          <span>{strip.filedAt}</span>
+                        </div>
+                        <textarea 
+                          className="strip-notes"
+                          placeholder="Notes..."
+                          value={strip.notes || ''}
+                          onChange={(e) => updateStripNotes(strip.id, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div 
+                  className="efs-column cleared"
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('cleared')}
+                >
+                  <div className="column-header">
+                    <span className="column-icon">✓</span>
+                    <span>CLEARANCE RECEIVED</span>
+                    <span className="column-count">{atcFlightStrips.cleared?.length || 0}</span>
+                  </div>
+                  <div className="column-strips">
+                    {atcFlightStrips.cleared?.map(strip => (
+                      <div 
+                        key={strip.id} 
+                        className="flight-strip"
+                        draggable
+                        onDragStart={() => handleDragStart(strip, 'cleared')}
+                      >
+                        <div className="strip-header">
+                          <span className="strip-callsign">{strip.callsign}</span>
+                          <span className="strip-aircraft">{strip.aircraft}</span>
+                          <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                        </div>
+                        <div className="strip-route">
+                          <span>{strip.departure}</span>
+                          <span className="route-arrow">→</span>
+                          <span>{strip.destination}</span>
+                        </div>
+                        <div className="strip-details">
+                          <span>FL: {strip.altitude}</span>
+                          <span>SQK: {strip.squawk}</span>
+                          <span>{strip.filedAt}</span>
+                        </div>
+                        <textarea 
+                          className="strip-notes"
+                          placeholder="Notes..."
+                          value={strip.notes || ''}
+                          onChange={(e) => updateStripNotes(strip.id, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div 
+                  className="efs-column taxi"
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('taxi')}
+                >
+                  <div className="column-header">
+                    <span className="column-icon">🛫</span>
+                    <span>READY FOR TAXI</span>
+                    <span className="column-count">{atcFlightStrips.taxi?.length || 0}</span>
+                  </div>
+                  <div className="column-strips">
+                    {atcFlightStrips.taxi?.map(strip => (
+                      <div 
+                        key={strip.id} 
+                        className="flight-strip"
+                        draggable
+                        onDragStart={() => handleDragStart(strip, 'taxi')}
+                      >
+                        <div className="strip-header">
+                          <span className="strip-callsign">{strip.callsign}</span>
+                          <span className="strip-aircraft">{strip.aircraft}</span>
+                          <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                        </div>
+                        <div className="strip-route">
+                          <span>{strip.departure}</span>
+                          <span className="route-arrow">→</span>
+                          <span>{strip.destination}</span>
+                        </div>
+                        <div className="strip-details">
+                          <span>FL: {strip.altitude}</span>
+                          <span>SQK: {strip.squawk}</span>
+                          <span>{strip.filedAt}</span>
+                        </div>
+                        <textarea 
+                          className="strip-notes"
+                          placeholder="Notes..."
+                          value={strip.notes || ''}
+                          onChange={(e) => updateStripNotes(strip.id, e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="tablet-loading">
@@ -2194,21 +2630,32 @@ export default function App() {
                 .map((airport) => {
                   const counts = airportUserCounts[airport] || { pilots: 0, groundCrew: 0 };
                   return (
-                    <button
-                      key={airport}
-                      className="airport-card"
-                      onClick={() => setSelectedAirport(airport)}
-                    >
-                      <div className="airport-code">{airport}</div>
-                      <div className="airport-info">
-                        <div className="stands-count">{getAirportConfig(airport).stands.length} Stands</div>
-                        <div className="user-counts">
-                          <span className="pilot-count">👨‍✈️ {counts.pilots}</span>
-                          <span className="gc-count">👷‍♂️ {counts.groundCrew}</span>
+                    <div key={airport} className="airport-card-wrapper">
+                      <button
+                        className="airport-card"
+                        onClick={() => setSelectedAirport(airport)}
+                      >
+                        <div className="airport-code">{airport}</div>
+                        <div className="airport-info">
+                          <div className="stands-count">{getAirportConfig(airport).stands.length} Stands</div>
+                          <div className="user-counts">
+                            <span className="pilot-count">👨‍✈️ {counts.pilots}</span>
+                            <span className="gc-count">👷‍♂️ {counts.groundCrew}</span>
+                          </div>
+                          <div className="status-text">OPERATIONAL</div>
                         </div>
-                        <div className="status-text">OPERATIONAL</div>
-                      </div>
-                    </button>
+                      </button>
+                      <button
+                        className="atc-mode-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          enterAtcMode(airport);
+                        }}
+                        title="ATC Mode - Restricted Access"
+                      >
+                        🎧 ATC MODE
+                      </button>
+                    </div>
                   );
                 })}
             </div>

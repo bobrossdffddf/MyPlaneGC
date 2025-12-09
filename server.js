@@ -112,6 +112,27 @@ const broadcastUserCounts = () => {
 let ptfsAtisData = {}; // Store real ATIS data from PTFS
 const claimedCallsigns = {}; // Store callsign data
 
+// ATC Mode data storage
+let ptfsAtcData = {}; // Store ATC data per airport { airport: { callsign, username, ... } }
+let ptfsFlightPlans = {}; // Store flight plans per airport { airport: [flightPlans] }
+const OWNER_DISCORD_ID = "848356730256883744"; // Owner has full access to all ATC modes
+
+// Initialize flight strips storage for ATC mode
+const atcFlightStrips = {}; // { airport: { waiting: [], cleared: [], taxi: [] } }
+
+const initializeAtcData = (airport) => {
+  if (!atcFlightStrips[airport]) {
+    atcFlightStrips[airport] = {
+      waiting: [],
+      cleared: [],
+      taxi: []
+    };
+  }
+  if (!ptfsFlightPlans[airport]) {
+    ptfsFlightPlans[airport] = [];
+  }
+};
+
 // Parse ATIS content to extract useful information
 // Ground crew callsign management with sequential numbering
 const assignGroundCrewCallsign = (airport, userId) => {
@@ -275,6 +296,55 @@ const connectToPTFSWebSocket = () => {
 
         console.log(`📡 ATIS update for ${atisInfo.airport}: INFO ${atisInfo.letter}`);
       }
+
+      // Handle ATC data
+      if (message.t === 'ATC') {
+        const atcInfo = message.d;
+        ptfsAtcData[atcInfo.airport] = {
+          callsign: atcInfo.callsign || atcInfo.username,
+          username: atcInfo.username,
+          position: atcInfo.position || 'Ground',
+          frequency: atcInfo.frequency,
+          timestamp: new Date().toISOString()
+        };
+        
+        // Emit to ATC mode users
+        io.to(`atc-${atcInfo.airport}`).emit("atcDataUpdate", ptfsAtcData[atcInfo.airport]);
+        console.log(`🎧 ATC update for ${atcInfo.airport}: ${atcInfo.callsign || atcInfo.username}`);
+      }
+
+      // Handle Flight Plan data
+      if (message.t === 'FLIGHTPLAN' || message.t === 'FP') {
+        const fpInfo = message.d;
+        const airport = fpInfo.departure || fpInfo.origin;
+        
+        if (airport) {
+          initializeAtcData(airport);
+          
+          const flightStrip = {
+            id: `FP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            callsign: fpInfo.callsign || fpInfo.aircraft,
+            aircraft: fpInfo.aircraft || fpInfo.type,
+            departure: fpInfo.departure || fpInfo.origin,
+            destination: fpInfo.destination || fpInfo.arrival,
+            route: fpInfo.route || '',
+            altitude: fpInfo.altitude || fpInfo.cruiseAlt || '',
+            squawk: fpInfo.squawk || '',
+            remarks: fpInfo.remarks || '',
+            notes: '',
+            status: 'waiting',
+            timestamp: new Date().toISOString(),
+            filedAt: new Date().toLocaleTimeString()
+          };
+
+          // Add to waiting column
+          atcFlightStrips[airport].waiting.push(flightStrip);
+          
+          // Emit to ATC mode users
+          io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
+          console.log(`✈️ Flight plan filed for ${airport}: ${flightStrip.callsign}`);
+        }
+      }
     } catch (error) {
       console.error('Error parsing PTFS WebSocket message:', error);
     }
@@ -316,6 +386,76 @@ app.get('/api/user', (req, res) => {
   } else {
     res.status(401).json({ error: 'Not authenticated' });
   }
+});
+
+// ATC Mode access check - only allow the ATC for that airport or the owner
+app.get('/api/atc-access/:airport', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Not authenticated', hasAccess: false });
+  }
+  
+  const { airport } = req.params;
+  const userId = req.user.id;
+  
+  // Owner always has access
+  if (userId === OWNER_DISCORD_ID) {
+    return res.json({ 
+      hasAccess: true, 
+      reason: 'owner',
+      atcData: ptfsAtcData[airport] || null
+    });
+  }
+  
+  // Check if there's an active ATC for this airport from PTFS WebSocket
+  const atcForAirport = ptfsAtcData[airport];
+  
+  if (atcForAirport) {
+    // Check if the user's Discord username matches the ATC username
+    const userMatches = req.user.username && 
+      (req.user.username.toLowerCase() === atcForAirport.username?.toLowerCase() ||
+       req.user.username.toLowerCase() === atcForAirport.callsign?.toLowerCase());
+    
+    if (userMatches) {
+      return res.json({ 
+        hasAccess: true, 
+        reason: 'active_atc',
+        atcData: atcForAirport
+      });
+    }
+  }
+  
+  // No active ATC detected or user doesn't match - check if PTFS has ATC
+  if (!atcForAirport) {
+    // For demo/testing: allow if no ATC is currently active (optional - remove in production)
+    return res.json({ 
+      hasAccess: true, 
+      reason: 'no_active_atc',
+      atcData: null
+    });
+  }
+  
+  return res.json({ 
+    hasAccess: false, 
+    reason: 'not_authorized',
+    currentAtc: atcForAirport?.callsign || atcForAirport?.username
+  });
+});
+
+// Get ATC data for an airport
+app.get('/api/atc-data/:airport', (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+  
+  const { airport } = req.params;
+  initializeAtcData(airport);
+  
+  res.json({
+    atcInfo: ptfsAtcData[airport] || null,
+    flightStrips: atcFlightStrips[airport] || { waiting: [], cleared: [], taxi: [] },
+    stands: airportData[airport]?.stands || {},
+    requests: airportData[airport]?.requests || []
+  });
 });
 
 // Aircraft data API with comprehensive realistic data
@@ -765,6 +905,151 @@ io.on("connection", (socket) => {
       
       console.log(`Ground callsign ${callsign} assigned to user ${userId} at ${airport}`);
     }
+  });
+
+  // ATC Mode socket events
+  socket.on("joinAtcMode", (data) => {
+    const { airport, userId, username } = data;
+    
+    if (airport) {
+      socket.join(`atc-${airport}`);
+      initializeAtcData(airport);
+      
+      // Send initial data
+      socket.emit("atcInitialData", {
+        flightStrips: atcFlightStrips[airport],
+        stands: airportData[airport]?.stands || {},
+        requests: airportData[airport]?.requests || [],
+        atcInfo: ptfsAtcData[airport] || null
+      });
+      
+      console.log(`🎧 ${username} joined ATC mode for ${airport}`);
+    }
+  });
+
+  socket.on("leaveAtcMode", (data) => {
+    const { airport, username } = data;
+    if (airport) {
+      socket.leave(`atc-${airport}`);
+      console.log(`🎧 ${username} left ATC mode for ${airport}`);
+    }
+  });
+
+  socket.on("moveFlightStrip", (data) => {
+    const { airport, stripId, fromColumn, toColumn } = data;
+    
+    if (!airport || !atcFlightStrips[airport]) return;
+    
+    const strips = atcFlightStrips[airport];
+    const fromArray = strips[fromColumn];
+    const toArray = strips[toColumn];
+    
+    if (!fromArray || !toArray) return;
+    
+    const stripIndex = fromArray.findIndex(s => s.id === stripId);
+    if (stripIndex === -1) return;
+    
+    const [strip] = fromArray.splice(stripIndex, 1);
+    strip.status = toColumn;
+    strip.movedAt = new Date().toLocaleTimeString();
+    toArray.push(strip);
+    
+    io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
+    console.log(`✈️ Flight strip ${strip.callsign} moved to ${toColumn} at ${airport}`);
+  });
+
+  socket.on("updateFlightStripNotes", (data) => {
+    const { airport, stripId, notes } = data;
+    
+    if (!airport || !atcFlightStrips[airport]) return;
+    
+    const strips = atcFlightStrips[airport];
+    for (const column of ['waiting', 'cleared', 'taxi']) {
+      const strip = strips[column].find(s => s.id === stripId);
+      if (strip) {
+        strip.notes = notes;
+        io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
+        break;
+      }
+    }
+  });
+
+  socket.on("deleteFlightStrip", (data) => {
+    const { airport, stripId } = data;
+    
+    if (!airport || !atcFlightStrips[airport]) return;
+    
+    const strips = atcFlightStrips[airport];
+    for (const column of ['waiting', 'cleared', 'taxi']) {
+      const index = strips[column].findIndex(s => s.id === stripId);
+      if (index !== -1) {
+        const deleted = strips[column].splice(index, 1)[0];
+        io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
+        console.log(`🗑️ Flight strip ${deleted.callsign} deleted at ${airport}`);
+        break;
+      }
+    }
+  });
+
+  socket.on("atcServiceRequest", (data) => {
+    const { airport, stand, service, flight, requestedBy } = data;
+    
+    if (!airport || !airportData[airport]) {
+      initializeAirportData(airport);
+    }
+    
+    const serviceRequest = {
+      id: Date.now(),
+      stand,
+      service,
+      flight,
+      status: "pending",
+      timestamp: new Date().toLocaleTimeString(),
+      requestedBy,
+      source: 'atc'
+    };
+    
+    airportData[airport].requests.push(serviceRequest);
+    io.to(airport).emit("serviceUpdate", airportData[airport].requests);
+    io.to(`atc-${airport}`).emit("serviceUpdate", airportData[airport].requests);
+    
+    io.to(airport).emit("chatUpdate", {
+      text: `ATC requested ${service} service for ${flight} at ${stand}`,
+      sender: "ATC CONTROL",
+      stand: stand,
+      airport: airport,
+      timestamp: new Date().toLocaleTimeString(),
+      mode: "system",
+      priority: "high"
+    });
+  });
+
+  // Add a test flight strip (for testing without real PTFS data)
+  socket.on("addTestFlightStrip", (data) => {
+    const { airport } = data;
+    
+    if (!airport) return;
+    initializeAtcData(airport);
+    
+    const testStrip = {
+      id: `FP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      callsign: `TEST${Math.floor(Math.random() * 9000) + 1000}`,
+      aircraft: ['A320', 'B737', 'B777', 'A380'][Math.floor(Math.random() * 4)],
+      departure: airport,
+      destination: ['IZOL', 'IPPH', 'IGRV', 'ISAU'][Math.floor(Math.random() * 4)],
+      route: 'DIRECT',
+      altitude: `FL${Math.floor(Math.random() * 20 + 25) * 10}`,
+      squawk: `${Math.floor(Math.random() * 7000) + 1000}`,
+      remarks: '',
+      notes: '',
+      status: 'waiting',
+      timestamp: new Date().toISOString(),
+      filedAt: new Date().toLocaleTimeString()
+    };
+    
+    atcFlightStrips[airport].waiting.push(testStrip);
+    io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
+    console.log(`✈️ Test flight strip added for ${airport}: ${testStrip.callsign}`);
   });
 
   socket.on("disconnect", () => {
