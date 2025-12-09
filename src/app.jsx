@@ -1544,7 +1544,7 @@ export default function App() {
   const enterAtcMode = async (airport) => {
     // Check access first
     const accessData = await checkAtcAccess(airport);
-
+    
     if (!accessData.hasAccess) {
       alert(`Access denied. Only the ATC for ${airport} can enter ATC Mode.\nCurrent ATC: ${accessData.currentAtc || 'Unknown'}`);
       return;
@@ -2471,7 +2471,7 @@ export default function App() {
                 <div className="efs-controls">
                   <div className="efs-stats">
                     <div className="efs-stat">
-                      <span className="efs-stat-value">{atcFlightStrips.waiting?.length + atcFlightStrips.cleared?.length + atcFlightStrips.taxi?.length}</span>
+                      <span className="efs-stat-value">{(atcFlightStrips.waiting?.length || 0) + (atcFlightStrips.cleared?.length || 0) + (atcFlightStrips.taxi?.length || 0)}</span>
                       <span className="efs-stat-label">TOTAL STRIPS</span>
                     </div>
                   </div>
@@ -2507,33 +2507,19 @@ export default function App() {
                           onDragStart={() => handleDragStart(strip, 'waiting')}
                         >
                           <div className="strip-header">
-                            <div className="strip-callsign">{strip.callsign}</div>
+                            <span className="strip-callsign">{strip.callsign}</span>
+                            <span className="strip-aircraft">{strip.aircraft}</span>
                             <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
                           </div>
-                          <div className="strip-info">
-                            <div className="strip-aircraft">
-                              <span className="info-label">A/C:</span>
-                              <span className="info-value">{strip.aircraft || 'N/A'}</span>
-                            </div>
-                            <div className="strip-route">
-                              <span className="route-airport">{strip.departure || 'N/A'}</span>
-                              <span className="route-arrow">→</span>
-                              <span className="route-airport">{strip.destination || 'N/A'}</span>
-                            </div>
+                          <div className="strip-route">
+                            <span className="route-airport">{strip.departure}</span>
+                            <span className="route-arrow">→</span>
+                            <span className="route-airport">{strip.destination}</span>
                           </div>
                           <div className="strip-details">
-                            <div className="detail-item">
-                              <span className="detail-label">ALT:</span>
-                              <span className="detail-value">{strip.altitude || 'N/A'}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">SQK:</span>
-                              <span className="detail-value">{strip.squawk || 'N/A'}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">TIME:</span>
-                              <span className="detail-value">{strip.filedAt}</span>
-                            </div>
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
                           </div>
                           <textarea 
                             className="strip-notes"
@@ -2572,33 +2558,19 @@ export default function App() {
                           onDragStart={() => handleDragStart(strip, 'cleared')}
                         >
                           <div className="strip-header">
-                            <div className="strip-callsign">{strip.callsign}</div>
+                            <span className="strip-callsign">{strip.callsign}</span>
+                            <span className="strip-aircraft">{strip.aircraft}</span>
                             <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
                           </div>
-                          <div className="strip-info">
-                            <div className="strip-aircraft">
-                              <span className="info-label">A/C:</span>
-                              <span className="info-value">{strip.aircraft || 'N/A'}</span>
-                            </div>
-                            <div className="strip-route">
-                              <span className="route-airport">{strip.departure || 'N/A'}</span>
-                              <span className="route-arrow">→</span>
-                              <span className="route-airport">{strip.destination || 'N/A'}</span>
-                            </div>
+                          <div className="strip-route">
+                            <span className="route-airport">{strip.departure}</span>
+                            <span className="route-arrow">→</span>
+                            <span className="route-airport">{strip.destination}</span>
                           </div>
                           <div className="strip-details">
-                            <div className="detail-item">
-                              <span className="detail-label">ALT:</span>
-                              <span className="detail-value">{strip.altitude || 'N/A'}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">SQK:</span>
-                              <span className="detail-value">{strip.squawk || 'N/A'}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">TIME:</span>
-                              <span className="detail-value">{strip.filedAt}</span>
-                            </div>
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
                           </div>
                           <textarea 
                             className="strip-notes"
@@ -2637,33 +2609,19 @@ export default function App() {
                           onDragStart={() => handleDragStart(strip, 'taxi')}
                         >
                           <div className="strip-header">
-                            <div className="strip-callsign">{strip.callsign}</div>
+                            <span className="strip-callsign">{strip.callsign}</span>
+                            <span className="strip-aircraft">{strip.aircraft}</span>
                             <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
                           </div>
-                          <div className="strip-info">
-                            <div className="strip-aircraft">
-                              <span className="info-label">A/C:</span>
-                              <span className="info-value">{strip.aircraft || 'N/A'}</span>
-                            </div>
-                            <div className="strip-route">
-                              <span className="route-airport">{strip.departure || 'N/A'}</span>
-                              <span className="route-arrow">→</span>
-                              <span className="route-airport">{strip.destination || 'N/A'}</span>
-                            </div>
+                          <div className="strip-route">
+                            <span className="route-airport">{strip.departure}</span>
+                            <span className="route-arrow">→</span>
+                            <span className="route-airport">{strip.destination}</span>
                           </div>
                           <div className="strip-details">
-                            <div className="detail-item">
-                              <span className="detail-label">ALT:</span>
-                              <span className="detail-value">{strip.altitude || 'N/A'}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">SQK:</span>
-                              <span className="detail-value">{strip.squawk || 'N/A'}</span>
-                            </div>
-                            <div className="detail-item">
-                              <span className="detail-label">TIME:</span>
-                              <span className="detail-value">{strip.filedAt}</span>
-                            </div>
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
                           </div>
                           <textarea 
                             className="strip-notes"
@@ -4283,7 +4241,7 @@ export default function App() {
                           <option value="Ground 2">Ground 2</option>
                           <option value="Ground 3">Ground 3</option>
                           <option value="Ground 4">Ground 4</option>
-                          <option value="Ground 5</option>
+                          <option value="Ground 5">Ground 5</option>
                           <option value="Fuel Team">Fuel Team</option>
                           <option value="Catering Team">Catering Team</option>
                           <option value="Baggage Team">Baggage Team</option>
