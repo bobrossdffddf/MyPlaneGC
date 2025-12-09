@@ -753,8 +753,9 @@ io.on("connection", (socket) => {
       claimedAt: new Date().toLocaleTimeString()
     };
 
-    // Emit to users at the same airport only
+    // Emit to users at the same airport and ATC
     io.to(airport).emit("standUpdate", airportData[airport].stands);
+    io.to(`atc-${airport}`).emit("standUpdate", airportData[airport].stands);
 
     // Notify users at the same airport
     io.to(airport).emit("chatUpdate", {
@@ -797,6 +798,7 @@ io.on("connection", (socket) => {
 
     airportData[req.airport].requests.push(serviceRequest);
     io.to(req.airport).emit("serviceUpdate", airportData[req.airport].requests);
+    io.to(`atc-${req.airport}`).emit("serviceUpdate", airportData[req.airport].requests);
 
     // Notify users at the same airport with pilot color coding
     io.to(req.airport).emit("chatUpdate", {
@@ -827,6 +829,7 @@ io.on("connection", (socket) => {
       airportData[airport].requests[requestId].handledAt = new Date().toLocaleTimeString();
 
       io.to(airport).emit("serviceUpdate", airportData[airport].requests);
+      io.to(`atc-${airport}`).emit("serviceUpdate", airportData[airport].requests);
 
       // Notify users at the same airport with ground crew color
       const request = airportData[airport].requests[requestId];
@@ -857,6 +860,7 @@ io.on("connection", (socket) => {
 
       delete airportData[airport].stands[stand];
       io.to(airport).emit("standUpdate", airportData[airport].stands);
+      io.to(`atc-${airport}`).emit("standUpdate", airportData[airport].stands);
 
       io.to(airport).emit("chatUpdate", {
         text: `${removedBy} has removed ${flightNumber} from ${stand} (was piloted by ${pilot})`,
@@ -883,6 +887,7 @@ io.on("connection", (socket) => {
       airportData[airport].requests[requestId].assignedAt = new Date().toLocaleTimeString();
 
       io.to(airport).emit("serviceUpdate", airportData[airport].requests);
+      io.to(`atc-${airport}`).emit("serviceUpdate", airportData[airport].requests);
 
       const request = airportData[airport].requests[requestId];
       io.to(airport).emit("chatUpdate", {

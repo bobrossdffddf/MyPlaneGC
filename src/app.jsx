@@ -85,6 +85,7 @@ export default function App() {
   const [draggedStrip, setDraggedStrip] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
   const [atcAddPlaneForm, setAtcAddPlaneForm] = useState({ standId: null, flight: '', aircraft: '' });
+  const [atcCommMinimized, setAtcCommMinimized] = useState(false);
 
   // Owner Discord ID for full access
   const OWNER_DISCORD_ID = "848356730256883744";
@@ -2720,6 +2721,73 @@ export default function App() {
               </div>
             </div>
           )}
+        </div>
+
+        <div className={`comm-panel atc-comm-panel ${atcCommMinimized ? 'minimized' : ''}`}>
+          <div className="comm-header">
+            <div className="comm-header-content">
+              <h3>ATC COMMUNICATIONS</h3>
+              <div className="comm-status">ONLINE</div>
+            </div>
+            <div
+              className="comm-minimized-indicator"
+              onClick={() => setAtcCommMinimized(false)}
+            >
+              <span>💬</span>
+              <span>C</span>
+              <span>O</span>
+              <span>M</span>
+              <span>M</span>
+              <span>S</span>
+            </div>
+            <button
+              onClick={() => setAtcCommMinimized(!atcCommMinimized)}
+              className="comm-minimize-btn"
+              title={atcCommMinimized ? "Expand Communications" : "Minimize Communications"}
+            >
+              {atcCommMinimized ? "◀" : "▶"}
+            </button>
+          </div>
+
+          <div className="messages-area">
+            {messages
+              .filter(msg => {
+                if (msg.airport && msg.airport !== selectedAirport) return false;
+                return true;
+              })
+              .slice(-20)
+              .map((msg, i) => (
+                <div key={i} className={`message ${msg.mode || 'system'}`}>
+                  <div className="message-header">
+                    <span className="sender">
+                      {msg.sender}
+                      {(msg.discordId || msg.userId) && isOwner(msg.discordId || msg.userId) && (
+                        <span className="owner-badge">👑 OWNER</span>
+                      )}
+                    </span>
+                    <span className="time">{msg.timestamp}</span>
+                  </div>
+                  <div className="message-content">{msg.text}</div>
+                </div>
+              ))}
+          </div>
+
+          <div className="input-area">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+              placeholder="Type your message..."
+              className="message-input"
+            />
+            <button
+              onClick={sendMessage}
+              className="send-btn"
+              disabled={!input.trim()}
+            >
+              SEND
+            </button>
+          </div>
         </div>
       </div>
     );
