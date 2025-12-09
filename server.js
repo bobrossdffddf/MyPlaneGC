@@ -803,7 +803,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ PTFS Ground Services System running on port ${PORT}`);
   console.log(`🔗 Access at: http://localhost:${PORT}`);
