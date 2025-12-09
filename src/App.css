@@ -654,90 +654,92 @@ body {
   font-size: 0.9rem;
 }
 
-/* Login Screen - FLUID RESPONSIVE */
+/* Login Screen - FLUID RESPONSIVE with GRID for guaranteed visibility */
 .tablet-login {
+  --login-padding: clamp(10px, 3vmin, 30px);
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  padding: clamp(10px, 5vw, 40px);
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: var(--login-padding);
   background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2a2f3e 100%);
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .login-content {
   text-align: center;
   max-width: 550px;
   width: 100%;
-  padding: clamp(15px, 4vw, 35px);
+  max-height: calc(100dvh - 2 * var(--login-padding));
+  padding: clamp(12px, 3vmin, 30px);
   background: rgba(26, 31, 46, 0.95);
-  border-radius: clamp(16px, 4vw, 28px);
+  border-radius: clamp(14px, 3vmin, 24px);
   border: 1px solid rgba(255, 149, 0, 0.3);
   backdrop-filter: blur(20px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   animation: slideInUp 0.8s ease-out;
   box-sizing: border-box;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(8px, 2vw, 16px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(6px, 1.5vmin, 14px);
   overflow: hidden;
 }
 
 .brand-header {
-  margin-bottom: clamp(5px, 2vw, 15px);
-  flex-shrink: 0;
+  margin-bottom: clamp(4px, 1vmin, 10px);
 }
 
 .brand-icon {
-  font-size: clamp(2.2rem, 10vw, 4rem);
-  margin-bottom: clamp(6px, 1.5vw, 12px);
+  font-size: clamp(1.8rem, 8vmin, 3.5rem);
+  margin-bottom: clamp(4px, 1vmin, 10px);
   animation: float 3s ease-in-out infinite;
 }
 
 .brand-header h1 {
-  font-size: clamp(1.6rem, 7vw, 2.5rem);
+  font-size: clamp(1.4rem, 6vmin, 2.2rem);
   font-weight: 700;
   color: #ff9500;
   letter-spacing: 0.1em;
-  margin-bottom: clamp(6px, 1.5vw, 12px);
+  margin-bottom: clamp(4px, 1vmin, 8px);
 }
 
 .brand-subtitle {
   color: #a0a8b0;
-  font-size: clamp(0.75rem, 3vw, 1.1rem);
-  margin-bottom: clamp(3px, 1vw, 8px);
-  line-height: 1.4;
+  font-size: clamp(0.7rem, 2.5vmin, 1rem);
+  margin-bottom: clamp(2px, 0.5vmin, 6px);
+  line-height: 1.3;
 }
 
 .system-version {
   color: #6b7280;
-  font-size: clamp(0.65rem, 2.5vw, 0.85rem);
+  font-size: clamp(0.6rem, 2vmin, 0.8rem);
   font-family: 'SF Mono', monospace;
 }
 
 .discord-auth-btn {
   background: linear-gradient(135deg, #5865f2, #7289da);
   border: none;
-  border-radius: clamp(10px, 2.5vw, 16px);
-  padding: clamp(10px, 2.5vw, 16px) clamp(14px, 4vw, 32px);
+  border-radius: clamp(10px, 2vmin, 14px);
+  padding: clamp(10px, 2vmin, 14px) clamp(14px, 3vmin, 28px);
   color: white;
-  font-size: clamp(0.75rem, 2.8vw, 1rem);
+  font-size: clamp(0.7rem, 2.5vmin, 0.95rem);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(6px, 1.5vw, 12px);
-  margin: clamp(10px, 2vw, 20px) auto 0;
+  gap: clamp(6px, 1.5vmin, 10px);
+  margin: clamp(8px, 1.5vmin, 16px) auto 0;
   text-transform: uppercase;
   letter-spacing: 0.02em;
   box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3);
   width: 100%;
-  max-width: 450px;
+  max-width: 400px;
   box-sizing: border-box;
-  flex-shrink: 0;
   white-space: nowrap;
 }
 
@@ -747,77 +749,84 @@ body {
 }
 
 .auth-icon {
-  font-size: clamp(0.9rem, 3vw, 1.3rem);
-  flex-shrink: 0;
+  font-size: clamp(0.8rem, 2.5vmin, 1.1rem);
 }
 
 .auth-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(8px, 2vw, 16px);
-  padding: clamp(12px, 2vw, 25px) 0 0;
+  gap: clamp(6px, 1.5vmin, 12px);
+  padding: clamp(8px, 1.5vmin, 16px) 0 0;
   min-height: auto;
   position: relative;
-  flex-shrink: 0;
   width: 100%;
 }
 
 .security-note {
   color: #6b7280;
-  font-size: clamp(0.65rem, 2.5vw, 0.85rem);
-  margin-top: clamp(4px, 1vw, 8px);
+  font-size: clamp(0.6rem, 2vmin, 0.8rem);
+  margin-top: clamp(4px, 0.8vmin, 8px);
   white-space: normal;
   word-wrap: break-word;
 }
 
 /* Partnership Carousel Styles */
 .partnerships-carousel {
-  margin: clamp(5px, 1.5vw, 12px) 0;
-  padding: clamp(10px, 2.5vw, 18px);
+  margin: clamp(4px, 1vmin, 10px) 0;
+  padding: clamp(8px, 2vmin, 16px);
   background: rgba(45, 55, 72, 0.4);
-  border-radius: clamp(12px, 3vw, 18px);
+  border-radius: clamp(10px, 2vmin, 16px);
   border: 1px solid rgba(255, 149, 0, 0.2);
-  flex-shrink: 1;
-  min-height: auto;
+  min-height: clamp(120px, 25vmin, 220px);
+  max-height: min(32vmin, 280px);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .partnerships-carousel h3 {
   color: #ff9500;
-  font-size: clamp(0.8rem, 2.8vw, 1.1rem);
+  font-size: clamp(0.7rem, 2.5vmin, 1rem);
   font-weight: 600;
   text-align: center;
-  margin-bottom: clamp(6px, 1.5vw, 12px);
+  margin-bottom: clamp(4px, 1vmin, 10px);
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  flex-shrink: 0;
 }
 
 .carousel-container {
   position: relative;
   max-width: 500px;
   margin: 0 auto;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .carousel-content {
   text-align: center;
   animation: fadeIn 0.8s ease-out;
-  max-height: 30vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .partner-image {
   width: 100%;
-  height: clamp(80px, 15vw, 140px);
+  height: clamp(60px, 12vmin, 120px);
   object-fit: contain;
   object-position: center;
-  border-radius: clamp(10px, 2.5vw, 15px);
-  margin-bottom: clamp(6px, 1.5vw, 12px);
+  border-radius: clamp(8px, 2vmin, 12px);
+  margin-bottom: clamp(4px, 1vmin, 10px);
   border: 2px solid rgba(255, 149, 0, 0.3);
   transition: all 0.3s ease;
   background: rgba(45, 55, 72, 0.8);
-  padding: clamp(4px, 1vw, 8px);
+  padding: clamp(3px, 0.8vmin, 6px);
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .partner-image:hover {
@@ -828,21 +837,27 @@ body {
 .partner-info {
   display: flex;
   flex-direction: column;
-  gap: clamp(6px, 1.5vw, 10px);
+  gap: clamp(4px, 1vmin, 8px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .partner-info h4 {
   color: #ffffff;
-  font-size: clamp(0.85rem, 3vw, 1.15rem);
+  font-size: clamp(0.75rem, 2.5vmin, 1rem);
   font-weight: 600;
   margin: 0;
+  flex-shrink: 0;
 }
 
 .partner-info p {
   color: #a0a8b0;
-  font-size: clamp(0.7rem, 2.5vw, 0.95rem);
-  line-height: 1.3;
+  font-size: clamp(0.65rem, 2vmin, 0.85rem);
+  line-height: 1.2;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .partner-join-btn {
