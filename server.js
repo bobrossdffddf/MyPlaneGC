@@ -1024,6 +1024,47 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("atcAssignStand", (data) => {
+    const { airport, stand, flightNumber, aircraft, assignedBy } = data;
+    
+    if (!airport || !airportData[airport]) {
+      initializeAirportData(airport);
+    }
+    
+    // Check if stand is available
+    if (airportData[airport].stands[stand] && airportData[airport].stands[stand].occupied) {
+      socket.emit("error", { message: "Stand already occupied" });
+      return;
+    }
+    
+    // Assign the stand
+    airportData[airport].stands[stand] = {
+      flight: flightNumber,
+      aircraft: aircraft,
+      pilot: `ATC-${assignedBy}`,
+      userId: `atc_${Date.now()}`,
+      occupied: true,
+      claimedAt: new Date().toLocaleTimeString(),
+      atcAssigned: true
+    };
+    
+    // Broadcast updates
+    io.to(airport).emit("standUpdate", airportData[airport].stands);
+    io.to(`atc-${airport}`).emit("standUpdate", airportData[airport].stands);
+    
+    io.to(airport).emit("chatUpdate", {
+      text: `ATC assigned ${flightNumber} (${aircraft}) to ${stand}`,
+      sender: "ATC CONTROL",
+      stand: stand,
+      airport: airport,
+      timestamp: new Date().toLocaleTimeString(),
+      mode: "system",
+      priority: "high"
+    });
+    
+    console.log(`🎧 ATC ${assignedBy} assigned ${flightNumber} to ${stand} at ${airport}`);
+  });
+
   // Add a test flight strip (for testing without real PTFS data)
   socket.on("addTestFlightStrip", (data) => {
     const { airport } = data;
