@@ -1587,6 +1587,11 @@ export default function App() {
 
     setAtcLoading(false);
     setAtcMode(true);
+
+    // Show construction notice
+    setTimeout(() => {
+      alert("This area is still under construction. We are aware of most bugs.");
+    }, 100);
   };
 
   const exitAtcMode = () => {
