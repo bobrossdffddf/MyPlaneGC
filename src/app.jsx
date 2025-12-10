@@ -2586,7 +2586,7 @@ export default function App() {
                       atcFlightStrips.waiting.map(strip => (
                         <div 
                           key={strip.id} 
-                          className="flight-strip"
+                          className="flight-strip waiting"
                           draggable
                           onDragStart={(e) => handleDragStart(strip, 'waiting', e)}
                           onDragEnd={handleDragEnd}
@@ -2602,9 +2602,9 @@ export default function App() {
                             <span className="route-airport">{strip.destination}</span>
                           </div>
                           <div className="strip-details">
-                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
-                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
-                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude || 'N/A'}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk || 'N/A'}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt || 'N/A'}</span>
                           </div>
                           <textarea 
                             className="strip-notes"
@@ -2639,7 +2639,7 @@ export default function App() {
                       atcFlightStrips.cleared.map(strip => (
                         <div 
                           key={strip.id} 
-                          className="flight-strip"
+                          className="flight-strip cleared"
                           draggable
                           onDragStart={(e) => handleDragStart(strip, 'cleared', e)}
                           onDragEnd={handleDragEnd}
@@ -2655,9 +2655,9 @@ export default function App() {
                             <span className="route-airport">{strip.destination}</span>
                           </div>
                           <div className="strip-details">
-                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
-                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
-                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude || 'N/A'}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk || 'N/A'}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt || 'N/A'}</span>
                           </div>
                           <textarea 
                             className="strip-notes"
@@ -2692,7 +2692,7 @@ export default function App() {
                       atcFlightStrips.taxi.map(strip => (
                         <div 
                           key={strip.id} 
-                          className="flight-strip"
+                          className="flight-strip taxi"
                           draggable
                           onDragStart={(e) => handleDragStart(strip, 'taxi', e)}
                           onDragEnd={handleDragEnd}
@@ -2708,9 +2708,9 @@ export default function App() {
                             <span className="route-airport">{strip.destination}</span>
                           </div>
                           <div className="strip-details">
-                            <span className="detail-item"><strong>FL:</strong> {strip.altitude}</span>
-                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk}</span>
-                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt}</span>
+                            <span className="detail-item"><strong>FL:</strong> {strip.altitude || 'N/A'}</span>
+                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk || 'N/A'}</span>
+                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt || 'N/A'}</span>
                           </div>
                           <textarea 
                             className="strip-notes"
