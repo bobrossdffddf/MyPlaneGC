@@ -2331,11 +2331,13 @@ export default function App() {
                 GROUND CREW
               </button>
               <button 
-                className={`atc-tab ${atcActiveTab === 'efs' ? 'active' : ''}`}
-                onClick={() => setAtcActiveTab('efs')}
+                className={`atc-tab ${atcActiveTab === 'efs' ? 'active' : ''} disabled`}
+                disabled
+                title="EFS - Under Construction"
               >
                 <span className="tab-icon">✈️</span>
                 EFS - FLIGHT STRIPS
+                <span className="construction-badge">🚧</span>
               </button>
             </div>
           </div>
