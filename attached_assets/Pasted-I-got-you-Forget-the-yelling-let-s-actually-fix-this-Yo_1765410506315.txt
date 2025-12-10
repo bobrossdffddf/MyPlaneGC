@@ -1,0 +1,123 @@
+I got you.
+Forget the yelling — let’s **actually fix** this.
+
+You keep posting the SAME generic Passport error.
+That error **never** shows the real Discord error.
+So **OF COURSE** it keeps printing the same thing.
+
+The key point:
+
+# ⭐ YOUR CURRENT SETUP IS *NOT PRINTING THE REAL ERROR*.
+
+So you keep seeing only:
+
+```
+InternalOAuthError: Failed to obtain access token
+```
+
+This tells us **nothing**.
+
+We need the **DISCORD RESPONSE**, not Passport's wrapper.
+
+Until we see Discord’s real error, we are blind. Period.
+
+So let’s fix that.
+
+---
+
+# ✅ STOP — DO THIS EXACTLY AS SHOWN
+
+Replace your callback route with this.
+NOT similar.
+NOT partial.
+**EXACTLY this block:**
+
+```js
+router.get("/auth/discord/callback", (req, res, next) => {
+  passport.authenticate("discord", (err, user, info) => {
+    console.log("==== DISCORD OAUTH RAW ERROR ====");
+    console.log(err);
+    console.log("=================================");
+
+    if (err) {
+      return res.status(500).send("DISCORD ERROR: " + JSON.stringify(err, null, 2));
+    }
+
+    if (!user) {
+      return res.status(401).send("No user returned");
+    }
+
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+      return res.redirect("/");
+    });
+  })(req, res, next);
+});
+```
+
+### ❗ THIS WILL FORCE PASSPORT TO PRINT THE ACTUAL DISCORD ERROR
+
+Not the generic wrapper.
+Not “InternalOAuthError.”
+The **real JSON response** from Discord’s token API.
+
+---
+
+# 🟥 WHAT TO DO AFTER
+
+1. Redeploy on Render
+2. Trigger Discord login
+3. You will now see something like:
+
+```
+{ error: "invalid_grant", error_description: "code has expired" }
+```
+
+or
+
+```
+{ error: "invalid_client", error_description: "Incorrect client secret" }
+```
+
+or
+
+```
+{ error: "unsupported_scheme" }
+```
+
+or
+
+```
+{ error: "redirect_uri_mismatch" }
+```
+
+or something else — **but now we’ll finally know.**
+
+Paste THAT result here.
+
+---
+
+# ⚠️ WHY YOUR LOGS STILL ONLY SHOW “InternalOAuthError”
+
+Because your current callback route uses:
+
+```js
+passport.authenticate("discord")
+```
+
+WITHOUT a custom callback function.
+So Passport SWALLOWS the real Discord error and prints only the generic message.
+
+That’s why nothing changes no matter what you do.
+
+This is not Render hiding things.
+
+This is **Passport hiding the actual Discord error**.
+
+---
+
+# 👉 After you install the patch above, come back with the REAL Discord error.
+
+I’ll fix it instantly once I see that JSON.
+
+You're 1 step away from the real diagnosis.

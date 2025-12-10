@@ -396,12 +396,26 @@ app.use('/aircraft_models', express.static(path.join(__dirname, 'aircraft_models
 // Auth routes
 app.get('/auth/discord', passport.authenticate('discord'));
 
-app.get('/auth/discord/callback',
-  passport.authenticate('discord', { failureRedirect: '/' }),
-  (req, res) => {
-    res.redirect('/');
-  }
-);
+app.get("/auth/discord/callback", (req, res, next) => {
+  passport.authenticate("discord", (err, user, info) => {
+    console.log("==== DISCORD OAUTH RAW ERROR ====");
+    console.log(err);
+    console.log("=================================");
+
+    if (err) {
+      return res.status(500).send("DISCORD ERROR: " + JSON.stringify(err, null, 2));
+    }
+
+    if (!user) {
+      return res.status(401).send("No user returned");
+    }
+
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+      return res.redirect("/");
+    });
+  })(req, res, next);
+});
 
 app.get('/api/user', (req, res) => {
   if (req.isAuthenticated()) {
