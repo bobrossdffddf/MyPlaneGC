@@ -45,10 +45,13 @@ const getCallbackURL = () => {
     return `${process.env.RENDER_EXTERNAL_URL}/auth/discord/callback`;
   }
   if (process.env.REPLIT_DEV_DOMAIN) {
-    return `https://${process.env.REPLIT_DEV_DOMAIN}/auth/discord/callback`;
+    // Remove any port from the domain
+    const domain = process.env.REPLIT_DEV_DOMAIN.split(':')[0];
+    return `https://${domain}/auth/discord/callback`;
   }
   if (process.env.REPLIT_DOMAINS) {
-    const domain = process.env.REPLIT_DOMAINS.split(',')[0];
+    // Remove any port from the domain
+    const domain = process.env.REPLIT_DOMAINS.split(',')[0].split(':')[0];
     return `https://${domain}/auth/discord/callback`;
   }
   // Fallback for local development
