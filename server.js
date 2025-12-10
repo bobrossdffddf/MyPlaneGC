@@ -36,15 +36,31 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Discord Strategy
+// Discord Strategy - Dynamic callback URL based on environment
+const getCallbackURL = () => {
+  if (process.env.DISCORD_CALLBACK_URL) {
+    return process.env.DISCORD_CALLBACK_URL;
+  }
+  if (process.env.RENDER_EXTERNAL_URL) {
+    return `${process.env.RENDER_EXTERNAL_URL}/auth/discord/callback`;
+  }
+  if (process.env.REPLIT_DOMAINS) {
+    const domain = process.env.REPLIT_DOMAINS.split(',')[0];
+    return `https://${domain}/auth/discord/callback`;
+  }
+  return '/auth/discord/callback';
+};
+
 passport.use(new DiscordStrategy({
   clientID: process.env.DISCORD_CLIENT_ID || 'your-discord-client-id',
   clientSecret: process.env.DISCORD_CLIENT_SECRET || 'your-discord-client-secret',
-  callbackURL: process.env.DISCORD_CALLBACK_URL || '/auth/discord/callback',
+  callbackURL: getCallbackURL(),
   scope: ['identify']
 }, (accessToken, refreshToken, profile, done) => {
   return done(null, profile);
 }));
+
+console.log('🔐 Discord OAuth callback URL:', getCallbackURL());
 
 passport.serializeUser((user, done) => {
   done(null, user);
@@ -76,10 +92,10 @@ const connectedUsers = new Map();
 const getUserCounts = () => {
   const counts = {};
 
-  // Initialize all airports with zero counts
+  // Initialize all airports with zero counts (including atc)
   const allAirports = ["IRFD", "IZOL", "IPPH", "IGRV", "ISAU", "IBTH", "ISKP", "IGAR", "IBLT", "IMLR", "ITRC", "IDCS", "ITKO", "IJAF", "ISCM", "IHEN", "ILAR", "IIAB", "IPAP"];
   allAirports.forEach(airport => {
-    counts[airport] = { pilots: 0, groundCrew: 0 };
+    counts[airport] = { pilots: 0, groundCrew: 0, atc: 0 };
   });
 
   // Count users by airport and mode
@@ -773,6 +789,9 @@ io.on("connection", (socket) => {
     // Only broadcast to users at the same airport and ensure airport is set
     if (msg.airport && airportData[msg.airport]) {
       msg.airport = msg.airport; // Ensure airport is preserved in message
+      
+      // Broadcast only to the airport room - ATC users are also in this room
+      // so they'll receive messages without needing a separate emit
       io.to(msg.airport).emit("chatUpdate", msg);
 
       // Log chat messages to console
@@ -913,12 +932,57 @@ io.on("connection", (socket) => {
   });
 
   // ATC Mode socket events
+  // ATC mode allows users to view and manage the airport from a controller perspective
+  // We preserve the user's original mode/airport and restore it when leaving ATC
   socket.on("joinAtcMode", (data) => {
     const { airport, userId, username } = data;
     
     if (airport) {
-      socket.join(`atc-${airport}`);
+      initializeAirportData(airport);
       initializeAtcData(airport);
+      
+      const currentUserInfo = connectedUsers.get(socket.id);
+      
+      // Leave any previous ATC rooms if switching airports in ATC mode
+      if (currentUserInfo && currentUserInfo.atcAirport && currentUserInfo.atcAirport !== airport) {
+        socket.leave(`atc-${currentUserInfo.atcAirport}`);
+        // Leave the old ATC airport room if we had joined it
+        if (currentUserInfo.atcAirport !== currentUserInfo.originalAirport) {
+          socket.leave(currentUserInfo.atcAirport);
+        }
+      }
+      
+      // Join the ATC-specific room
+      socket.join(`atc-${airport}`);
+      
+      // Join the main airport room for the ATC airport (if different from original)
+      const originalAirport = currentUserInfo?.airport || currentUserInfo?.originalAirport;
+      if (airport !== originalAirport) {
+        socket.join(airport);
+      }
+      
+      if (currentUserInfo) {
+        // User has existing mode - save original state if not already saved
+        if (!currentUserInfo.originalMode) {
+          currentUserInfo.originalMode = currentUserInfo.mode;
+          currentUserInfo.originalAirport = currentUserInfo.airport;
+        }
+        currentUserInfo.inAtcMode = true;
+        currentUserInfo.atcAirport = airport;
+      } else {
+        // User entered ATC directly without prior mode selection
+        connectedUsers.set(socket.id, {
+          userId,
+          username,
+          airport,
+          mode: 'atc',
+          inAtcMode: true,
+          atcAirport: airport,
+          originalMode: null, // No original mode - pure ATC user
+          originalAirport: null
+        });
+        broadcastUserCounts();
+      }
       
       // Send initial data
       socket.emit("atcInitialData", {
@@ -935,7 +999,32 @@ io.on("connection", (socket) => {
   socket.on("leaveAtcMode", (data) => {
     const { airport, username } = data;
     if (airport) {
+      // Leave the ATC-specific room
       socket.leave(`atc-${airport}`);
+      
+      const currentUserInfo = connectedUsers.get(socket.id);
+      if (currentUserInfo) {
+        // Leave the ATC airport room if it's different from our original airport
+        if (currentUserInfo.originalAirport && airport !== currentUserInfo.originalAirport) {
+          socket.leave(airport);
+        }
+        
+        // Restore original state or clean up
+        if (currentUserInfo.originalMode) {
+          // User had an original mode - restore it
+          currentUserInfo.mode = currentUserInfo.originalMode;
+          currentUserInfo.airport = currentUserInfo.originalAirport;
+          currentUserInfo.inAtcMode = false;
+          currentUserInfo.atcAirport = null;
+          currentUserInfo.originalMode = null;
+          currentUserInfo.originalAirport = null;
+        } else {
+          // Pure ATC user - remove them entirely
+          connectedUsers.delete(socket.id);
+          broadcastUserCounts();
+        }
+      }
+      
       console.log(`🎧 ${username} left ATC mode for ${airport}`);
     }
   });

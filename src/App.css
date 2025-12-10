@@ -8709,22 +8709,29 @@ body {
 .atc-header {
   background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
   border-bottom: 3px solid #10b981;
-  padding: 15px 30px;
+  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
+  flex-wrap: nowrap;
+  gap: 15px;
+  min-height: 70px;
+  position: relative;
+  z-index: 100;
 }
 
 .atc-header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .atc-logo {
-  font-size: 2.5rem;
+  font-size: 2rem;
   animation: pulse 2s infinite;
+  flex-shrink: 0;
 }
 
 @keyframes pulse {
@@ -8734,15 +8741,16 @@ body {
 
 .atc-title h1 {
   color: #10b981;
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   margin: 0;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  white-space: nowrap;
 }
 
 .atc-airport {
   color: #fbbf24;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
 }
@@ -8752,30 +8760,33 @@ body {
   flex: 1;
   display: flex;
   justify-content: center;
+  min-width: 0;
 }
 
 .atc-tabs {
   display: flex;
-  gap: 15px;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .atc-tab {
   background: transparent;
   border: 2px solid #10b981;
   color: #10b981;
-  padding: 12px 30px;
+  padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .atc-tab .tab-icon {
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .atc-tab.active {
@@ -8793,7 +8804,8 @@ body {
 .atc-header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .atc-user, .atc-time {
@@ -8801,27 +8813,30 @@ body {
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 6px;
+  padding: 6px 12px;
   background: rgba(16, 185, 129, 0.1);
   border-radius: 8px;
   border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .atc-exit-btn {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   border: none;
   color: white;
-  padding: 12px 24px;
+  padding: 10px 16px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.3s;
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+  white-space: nowrap;
 }
 
 .atc-exit-btn:hover {
