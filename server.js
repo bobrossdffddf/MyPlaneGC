@@ -44,11 +44,15 @@ const getCallbackURL = () => {
   if (process.env.RENDER_EXTERNAL_URL) {
     return `${process.env.RENDER_EXTERNAL_URL}/auth/discord/callback`;
   }
+  if (process.env.REPLIT_DEV_DOMAIN) {
+    return `https://${process.env.REPLIT_DEV_DOMAIN}/auth/discord/callback`;
+  }
   if (process.env.REPLIT_DOMAINS) {
     const domain = process.env.REPLIT_DOMAINS.split(',')[0];
     return `https://${domain}/auth/discord/callback`;
   }
-  return '/auth/discord/callback';
+  // Fallback for local development
+  return 'http://localhost:5000/auth/discord/callback';
 };
 
 passport.use(new DiscordStrategy({
