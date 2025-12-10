@@ -1,0 +1,31 @@
+✅ User connected: iapOzXqr1IbyToibAAAH
+✅ User connected: v7omiJ9t4eRX2NeGAAAJ
+InternalOAuthError: Failed to obtain access token
+    at OAuth2Strategy._createOAuthError (/opt/render/project/src/node_modules/passport-oauth2/lib/strategy.js:423:17)
+    at /opt/render/project/src/node_modules/passport-oauth2/lib/strategy.js:177:45
+    at /opt/render/project/src/node_modules/oauth/lib/oauth2.js:196:18
+    at passBackControl (/opt/render/project/src/node_modules/oauth/lib/oauth2.js:132:9)
+    at IncomingMessage.<anonymous> (/opt/render/project/src/node_modules/oauth/lib/oauth2.js:157:7)
+    at IncomingMessage.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+✅ User connected: nMrLLoK42r6ac7AvAAAL
+❌ Unknown user disconnected: nMrLLoK42r6ac7AvAAAL
+InternalOAuthError: Failed to obtain access token
+    at OAuth2Strategy._createOAuthError (/opt/render/project/src/node_modules/passport-oauth2/lib/strategy.js:423:17)
+    at /opt/render/project/src/node_modules/passport-oauth2/lib/strategy.js:177:45
+    at /opt/render/project/src/node_modules/oauth/lib/oauth2.js:196:18
+    at passBackControl (/opt/render/project/src/node_modules/oauth/lib/oauth2.js:132:9)
+    at IncomingMessage.<anonymous> (/opt/render/project/src/node_modules/oauth/lib/oauth2.js:157:7)
+    at IncomingMessage.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+InternalOAuthError: Failed to obtain access token
+    at OAuth2Strategy._createOAuthError (/opt/render/project/src/node_modules/passport-oauth2/lib/strategy.js:423:17)
+    at /opt/render/project/src/node_modules/passport-oauth2/lib/strategy.js:177:45
+    at /opt/render/project/src/node_modules/oauth/lib/oauth2.js:196:18
+    at passBackControl (/opt/render/project/src/node_modules/oauth/lib/oauth2.js:132:9)
+    at IncomingMessage.<anonymous> (/opt/render/project/src/node_modules/oauth/lib/oauth2.js:157:7)
+    at IncomingMessage.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
