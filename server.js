@@ -393,14 +393,76 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.use('/aircraft_svgs', express.static(path.join(__dirname, 'aircraft_svgs')));
 app.use('/aircraft_models', express.static(path.join(__dirname, 'aircraft_models')));
 
-// Auth routes
-app.get('/auth/discord', passport.authenticate('discord'));
-
-app.get("/auth/discord/callback", (req, res, next) => {
+// Retry logic with exponential backoff for rate limiting
+const authenticateWithRetry = (req, res, next, retryCount = 0, maxRetries = 3) => {
   passport.authenticate("discord", (err, user, info) => {
     console.log("==== DISCORD OAUTH RAW ERROR ====");
     console.log(err);
     console.log("=================================");
+
+    // Check if it's a rate limit error (429)
+    if (err && err.oauthError && err.oauthError.statusCode === 429) {
+      if (retryCount < maxRetries) {
+        // Calculate exponential backoff: 2^retryCount seconds
+        const delayMs = Math.pow(2, retryCount) * 1000;
+        console.log(`⏳ Rate limited (429). Retrying in ${delayMs / 1000}s (attempt ${retryCount + 1}/${maxRetries})`);
+
+        // Show a user-friendly retry page with auto-redirect
+        const retryUrl = `/auth/discord/callback?code=${req.query.code}&state=${req.query.state}&retry=${retryCount + 1}`;
+        return res.send(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Discord Authentication - Retrying...</title>
+              <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                .container { max-width: 400px; margin: 0 auto; }
+                .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+                @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <h2>Discord Authentication</h2>
+                <p>Server is being rate-limited. Retrying...</p>
+                <p>Attempt ${retryCount + 1} of ${maxRetries}</p>
+                <div class="spinner"></div>
+                <p>Please wait. You'll be redirected shortly.</p>
+              </div>
+              <script>
+                setTimeout(() => {
+                  window.location.href = '${retryUrl}';
+                }, ${delayMs});
+              </script>
+            </body>
+          </html>
+        `);
+      } else {
+        console.log(`❌ Rate limit persisted after ${maxRetries} retries`);
+        return res.status(429).send(`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>Discord Authentication Failed</title>
+              <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+                .container { max-width: 400px; margin: 0 auto; }
+                a { color: #3498db; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <h2>Authentication Failed</h2>
+                <p>Discord is rate-limiting requests. This is a temporary issue.</p>
+                <p><strong>Please try again in 1-2 minutes.</strong></p>
+                <p><a href="/">Back to Home</a></p>
+              </div>
+            </body>
+          </html>
+        `);
+      }
+    }
 
     if (err) {
       return res.status(500).send("DISCORD ERROR: " + JSON.stringify(err, null, 2));
@@ -415,6 +477,14 @@ app.get("/auth/discord/callback", (req, res, next) => {
       return res.redirect("/");
     });
   })(req, res, next);
+};
+
+// Auth routes
+app.get('/auth/discord', passport.authenticate('discord'));
+
+app.get("/auth/discord/callback", (req, res, next) => {
+  const retryCount = parseInt(req.query.retry || 0);
+  authenticateWithRetry(req, res, next, retryCount);
 });
 
 app.get('/api/user', (req, res) => {
