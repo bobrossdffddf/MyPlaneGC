@@ -10142,14 +10142,14 @@ body {
   color: #ef4444;
 }
 
-/* Input styling for flight strips */
+/* Input styling for flight strips - Enhanced visibility */
 .strip-top-bar input.strip-callsign {
   font-size: 0.95rem;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: 0.5px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #4a4a4a;
   border-radius: 4px;
   outline: none;
   padding: 4px 6px;
@@ -10162,17 +10162,18 @@ body {
 
 .strip-top-bar input.strip-callsign:focus {
   border-color: #ff9500;
-  background: rgba(255, 149, 0, 0.1);
+  background: rgba(255, 149, 0, 0.15);
+  box-shadow: 0 0 8px rgba(255, 149, 0, 0.3);
 }
 
 .strip-top-bar input.strip-type {
-  background: #2a2a2a;
-  color: #9ca3af;
+  background: #3a3a3a;
+  color: #d1d5db;
   padding: 4px 6px;
   border-radius: 4px;
   font-size: 0.7rem;
   font-weight: 600;
-  border: 1px solid rgba(156, 163, 175, 0.2);
+  border: 2px solid #5a5a5a;
   outline: none;
   font-family: inherit;
   width: 70px;
@@ -10184,6 +10185,7 @@ body {
 
 .strip-top-bar input.strip-type:focus {
   border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
 }
 
 /* Route Line */
@@ -10200,10 +10202,10 @@ input.route-dep, input.route-arr {
   font-size: 0.8rem;
   font-weight: 700;
   color: #22c55e;
-  background: rgba(34, 197, 94, 0.12);
+  background: rgba(34, 197, 94, 0.2);
   padding: 4px 8px;
   border-radius: 4px;
-  border: 1px solid rgba(34, 197, 94, 0.25);
+  border: 2px solid rgba(34, 197, 94, 0.5);
   outline: none;
   font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
   width: 52px;
@@ -10216,7 +10218,8 @@ input.route-dep, input.route-arr {
 
 input.route-dep:focus, input.route-arr:focus {
   border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.3);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
 }
 
 .route-dep, .route-arr {
@@ -10271,8 +10274,12 @@ input.route-dep:focus, input.route-arr:focus {
   margin-bottom: 8px;
 }
 
+.strip-data-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .data-cell {
-  background: #141414;
+  background: #1e1e1e;
   padding: 6px 4px;
   border-radius: 4px;
   display: flex;
@@ -10280,31 +10287,48 @@ input.route-dep:focus, input.route-arr:focus {
   align-items: center;
   overflow: hidden;
   min-width: 0;
+  border: 1px solid #3a3a3a;
 }
 
 .data-label {
   font-size: 0.6rem;
-  color: #6b7280;
+  color: #9ca3af;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   margin-bottom: 2px;
+  font-weight: 600;
 }
 
 .data-value {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #e0e0e0;
+  color: #ffffff;
   text-align: center;
   word-break: break-all;
   max-width: 100%;
 }
 
+.timer-cell {
+  background: linear-gradient(135deg, #1a1a2e 0%, #252540 100%);
+  border-color: #4a4a6a;
+}
+
+.timer-cell .data-label {
+  color: #a5b4fc;
+}
+
+.timer-value {
+  color: #60a5fa !important;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+
 input.data-value {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #e0e0e0;
-  background: transparent;
-  border: 1px solid transparent;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #4a4a4a;
   border-radius: 3px;
   outline: none;
   padding: 2px 4px;
@@ -10317,11 +10341,11 @@ input.data-value {
 
 input.data-value:focus {
   border-color: #ff9500;
-  background: rgba(255, 149, 0, 0.1);
+  background: rgba(255, 149, 0, 0.15);
 }
 
 input.data-value::placeholder {
-  color: #4a4a4a;
+  color: #6b7280;
 }
 
 /* Squawk cell with randomize button */
@@ -10352,14 +10376,14 @@ input.data-value::placeholder {
   background: rgba(255, 149, 0, 0.4);
 }
 
-/* Notes Input */
+/* Notes Input - Enhanced visibility */
 .strip-notes-input {
   width: 100%;
-  background: #0f0f0f;
-  border: 1px solid #2a2a2a;
+  background: #1a1a1a;
+  border: 2px solid #3a3a3a;
   border-radius: 4px;
   padding: 6px 8px;
-  color: #9ca3af;
+  color: #d1d5db;
   font-size: 0.75rem;
   resize: none;
   height: 40px;
@@ -10370,11 +10394,12 @@ input.data-value::placeholder {
 .strip-notes-input:focus {
   outline: none;
   border-color: #22c55e;
-  background: #141414;
+  background: #1e1e1e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
 }
 
 .strip-notes-input::placeholder {
-  color: #4a4a4a;
+  color: #6b7280;
 }
 
 /* Responsive adjustments for smaller strips */

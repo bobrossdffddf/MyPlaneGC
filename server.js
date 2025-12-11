@@ -392,7 +392,9 @@ const connectToPTFSWebSocket = () => {
             notes: '',
             status: 'waiting',
             timestamp: new Date().toISOString(),
-            filedAt: new Date().toLocaleTimeString()
+            filedAt: new Date().toLocaleTimeString(),
+            columnEnteredAt: Date.now(),
+            isNew: true
           };
 
           // Add to waiting column
@@ -401,6 +403,9 @@ const connectToPTFSWebSocket = () => {
           // Emit to ATC mode users at the departure airport
           io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
           console.log(`✈️ Flight plan filed for ${airport}: ${flightStrip.callsign} -> ${flightStrip.destination}`);
+          
+          // Clear isNew flag after first broadcast to prevent repeated alerts
+          flightStrip.isNew = false;
         }
       }
     } catch (error) {
@@ -1221,6 +1226,7 @@ io.on("connection", (socket) => {
     const [strip] = fromArray.splice(stripIndex, 1);
     strip.status = toColumn;
     strip.movedAt = new Date().toLocaleTimeString();
+    strip.columnEnteredAt = Date.now();
     toArray.push(strip);
     
     io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
@@ -1368,7 +1374,8 @@ io.on("connection", (socket) => {
       notes: '',
       status: 'waiting',
       timestamp: new Date().toISOString(),
-      filedAt: new Date().toLocaleTimeString()
+      filedAt: new Date().toLocaleTimeString(),
+      columnEnteredAt: Date.now()
     };
     
     atcFlightStrips[airport].waiting.push(blankStrip);

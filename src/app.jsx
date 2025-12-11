@@ -1588,6 +1588,7 @@ export default function App() {
 
     setAtcLoading(false);
     setAtcMode(true);
+    setAtcCommMinimized(true);
 
     // Show construction notice
     setTimeout(() => {
@@ -1750,6 +1751,40 @@ export default function App() {
     });
 
     socket.on("flightStripUpdate", (strips) => {
+      // Play sound for new flight plans (before updating state)
+      if (soundEnabled && strips.waiting) {
+        const newStrips = strips.waiting.filter(s => s.isNew);
+        if (newStrips.length > 0) {
+          try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(1100, audioContext.currentTime + 0.1);
+            oscillator.frequency.setValueAtTime(880, audioContext.currentTime + 0.2);
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+          } catch (e) {
+            console.log('Flight plan sound failed:', e);
+          }
+          
+          // Clear isNew flag after playing sound to prevent repeat triggers
+          newStrips.forEach(strip => {
+            strip.isNew = false;
+          });
+        }
+      }
+      
       setAtcFlightStrips(strips);
     });
 
@@ -1805,6 +1840,15 @@ export default function App() {
   const getZuluTime = () => {
     const now = new Date();
     return now.toISOString().substring(11, 19) + "Z";
+  };
+
+  const formatElapsedTime = (columnEnteredAt) => {
+    if (!columnEnteredAt) return '--:--';
+    const elapsed = Math.floor((currentTime.getTime() - columnEnteredAt) / 1000);
+    if (elapsed < 0) return '00:00';
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   const sendMessage = () => {
@@ -2730,7 +2774,7 @@ export default function App() {
                               title="Destination airport"
                             />
                           </div>
-                          <div className="strip-data-grid">
+                          <div className="strip-data-grid strip-data-grid-4">
                             <div className="data-cell">
                               <span className="data-label">FL</span>
                               <input 
@@ -2761,8 +2805,12 @@ export default function App() {
                               </div>
                             </div>
                             <div className="data-cell">
-                              <span className="data-label">TIME</span>
+                              <span className="data-label">FILED</span>
                               <span className="data-value">{strip.filedAt || '--:--'}</span>
+                            </div>
+                            <div className="data-cell timer-cell">
+                              <span className="data-label">⏱ WAIT</span>
+                              <span className="data-value timer-value">{formatElapsedTime(strip.columnEnteredAt)}</span>
                             </div>
                           </div>
                           <textarea 
@@ -2854,7 +2902,7 @@ export default function App() {
                               title="Destination airport"
                             />
                           </div>
-                          <div className="strip-data-grid">
+                          <div className="strip-data-grid strip-data-grid-4">
                             <div className="data-cell">
                               <span className="data-label">FL</span>
                               <input 
@@ -2885,8 +2933,12 @@ export default function App() {
                               </div>
                             </div>
                             <div className="data-cell">
-                              <span className="data-label">TIME</span>
+                              <span className="data-label">FILED</span>
                               <span className="data-value">{strip.filedAt || '--:--'}</span>
+                            </div>
+                            <div className="data-cell timer-cell">
+                              <span className="data-label">⏱ CLR</span>
+                              <span className="data-value timer-value">{formatElapsedTime(strip.columnEnteredAt)}</span>
                             </div>
                           </div>
                           <textarea 
@@ -2977,7 +3029,7 @@ export default function App() {
                               title="Destination airport"
                             />
                           </div>
-                          <div className="strip-data-grid">
+                          <div className="strip-data-grid strip-data-grid-4">
                             <div className="data-cell">
                               <span className="data-label">FL</span>
                               <input 
@@ -3008,8 +3060,12 @@ export default function App() {
                               </div>
                             </div>
                             <div className="data-cell">
-                              <span className="data-label">TIME</span>
+                              <span className="data-label">FILED</span>
                               <span className="data-value">{strip.filedAt || '--:--'}</span>
+                            </div>
+                            <div className="data-cell timer-cell">
+                              <span className="data-label">⏱ TAXI</span>
+                              <span className="data-value timer-value">{formatElapsedTime(strip.columnEnteredAt)}</span>
                             </div>
                           </div>
                           <textarea 
