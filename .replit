@@ -60,3 +60,8 @@ externalPort = 5000
 
 [agent]
 expertMode = true
+
+[userenv]
+
+[userenv.shared]
+VITE_OWNER_DISCORD_ID = "848356730256883744"

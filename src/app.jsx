@@ -155,7 +155,7 @@ export default function App() {
 
   // Check if user is the owner based on Discord ID
   const isOwner = (discordId) => {
-    return discordId === "848356730256883744";
+    return discordId === import.meta.env.VITE_OWNER_DISCORD_ID;
   };
 
   const handleMcduKey = (key) => {
