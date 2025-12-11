@@ -2871,7 +2871,7 @@ export default function App() {
               <span className="auth-text">AUTHENTICATE WITH DISCORD</span>
             </button>
             <div className="security-note">Secure authentication required for access</div>
-            <div className="made-possible-by">made possible by awdev</div>
+            <div className="made-possible-by">Made possible by awdev!</div>
           </div>
         </div>
       </div>
