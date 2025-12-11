@@ -143,6 +143,41 @@ const OWNER_DISCORD_ID = "848356730256883744"; // Owner has full access to all A
 // Initialize flight strips storage for ATC mode
 const atcFlightStrips = {}; // { airport: { waiting: [], cleared: [], taxi: [] } }
 
+// Auto-delete flight strips after 30 minutes
+const FLIGHT_STRIP_EXPIRY_MS = 30 * 60 * 1000; // 30 minutes
+
+const cleanupExpiredFlightStrips = () => {
+  const now = Date.now();
+  
+  for (const airport in atcFlightStrips) {
+    let changed = false;
+    
+    for (const column of ['waiting', 'cleared', 'taxi']) {
+      if (!atcFlightStrips[airport][column]) continue;
+      
+      const originalLength = atcFlightStrips[airport][column].length;
+      atcFlightStrips[airport][column] = atcFlightStrips[airport][column].filter(strip => {
+        const stripAge = now - (strip.columnEnteredAt || now);
+        return stripAge < FLIGHT_STRIP_EXPIRY_MS;
+      });
+      
+      if (atcFlightStrips[airport][column].length !== originalLength) {
+        changed = true;
+        const deleted = originalLength - atcFlightStrips[airport][column].length;
+        console.log(`🗑️ Auto-deleted ${deleted} expired flight strip(s) from ${column} column at ${airport}`);
+      }
+    }
+    
+    // Notify ATC users if strips were deleted
+    if (changed) {
+      io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
+    }
+  }
+};
+
+// Run cleanup every minute
+setInterval(cleanupExpiredFlightStrips, 60 * 1000);
+
 const initializeAtcData = (airport) => {
   if (!atcFlightStrips[airport]) {
     atcFlightStrips[airport] = {
@@ -865,7 +900,17 @@ app.get("/", (req, res) => {
 
 // Socket.io handling
 io.on("connection", (socket) => {
+  // Will log username after authentication
   console.log("✅ User connected:", socket.id);
+  
+  // Handle user authentication info for better logging
+  socket.on("setUserInfo", ({ username, userId }) => {
+    const userData = connectedUsers.get(socket.id) || {};
+    userData.username = username;
+    userData.userId = userId;
+    connectedUsers.set(socket.id, userData);
+    console.log(`✅ User authenticated: ${username} (${userId})`);
+  });
 
   // Send current state to new client
   socket.emit("standUpdate", airportData);

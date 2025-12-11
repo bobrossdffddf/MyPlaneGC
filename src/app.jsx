@@ -162,7 +162,12 @@ export default function App() {
 
   // Check if user is the owner based on Discord ID
   const isOwner = (discordId) => {
-    return discordId === import.meta.env.VITE_OWNER_DISCORD_ID;
+    return discordId === OWNER_DISCORD_ID;
+  };
+  
+  // Check if the current logged-in user is the owner (for "Owner" display in chat)
+  const isCurrentUserOwner = () => {
+    return user?.id === OWNER_DISCORD_ID;
   };
 
   const handleMcduKey = (key) => {
@@ -1391,6 +1396,11 @@ export default function App() {
           const userData = await res.json();
           console.log('User data received:', userData.username);
           setUser(userData);
+          // Send user info to server for logging with usernames instead of socket IDs
+          socket.emit("setUserInfo", { 
+            username: userData.username, 
+            userId: userData.id 
+          });
         } else if (isMounted) {
           setUser(null);
         }
