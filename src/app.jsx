@@ -2826,7 +2826,7 @@ export default function App() {
             <div className="brand-icon">🛩️</div>
             <h1>MyPlane</h1>
             <div className="brand-subtitle">Professional Aviation Ground Operations</div>
-            <div className="system-version">Version 1.2.5 | Made by @justawacko_</div>
+            <div className="system-version">Version 1.3 | Made by @justawacko_</div>
           </div>
           <div className="partnerships-carousel">
             <h3>OUR PARTNERS</h3>
@@ -2871,6 +2871,7 @@ export default function App() {
               <span className="auth-text">AUTHENTICATE WITH DISCORD</span>
             </button>
             <div className="security-note">Secure authentication required for access</div>
+            <div className="made-possible-by">made possible by awdev</div>
           </div>
         </div>
       </div>
