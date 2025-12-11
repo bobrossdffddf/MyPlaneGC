@@ -2644,7 +2644,7 @@ export default function App() {
                   </div>
                 </div>
                 <div className="efs-toolbar-right">
-                  <span className="efs-auto-info">Strips auto-created from flight plans</span>
+                  <span className="efs-auto-info">Strips are auto-created from flight plans use this button to create a new stip.</span>
                   <button className="efs-add-strip-btn" onClick={addBlankFlightStrip}>
                     <span className="btn-plus">+</span>
                     <span className="btn-text">NEW STRIP</span>
