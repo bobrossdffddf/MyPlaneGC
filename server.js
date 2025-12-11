@@ -320,40 +320,75 @@ const connectToPTFSWebSocket = () => {
         console.log(`📡 ATIS update for ${atisInfo.airport}: INFO ${atisInfo.letter}`);
       }
 
-      // Handle ATC data
-      if (message.t === 'ATC') {
-        const atcInfo = message.d;
-        ptfsAtcData[atcInfo.airport] = {
-          callsign: atcInfo.callsign || atcInfo.username,
-          username: atcInfo.username,
-          position: atcInfo.position || 'Ground',
-          frequency: atcInfo.frequency,
-          timestamp: new Date().toISOString()
-        };
-        
-        // Emit to ATC mode users
-        io.to(`atc-${atcInfo.airport}`).emit("atcDataUpdate", ptfsAtcData[atcInfo.airport]);
-        console.log(`🎧 ATC update for ${atcInfo.airport}: ${atcInfo.callsign || atcInfo.username}`);
+      // Handle Controllers data (Position[])
+      if (message.t === 'CONTROLLERS') {
+        const positions = message.d;
+        if (Array.isArray(positions)) {
+          // Group positions by airport for processing
+          const airportsUpdated = new Set();
+          
+          // Process each controller position
+          positions.forEach(position => {
+            const airport = position.airport;
+            if (airport) {
+              // Initialize airport ATC data structure if needed
+              if (!ptfsAtcData[airport]) {
+                ptfsAtcData[airport] = {
+                  positions: {},
+                  timestamp: new Date().toISOString()
+                };
+              }
+              
+              // Store data per position type (GND, TWR, CTR)
+              const positionType = position.position || 'GND';
+              ptfsAtcData[airport].positions[positionType] = {
+                holder: position.holder,
+                claimable: position.claimable,
+                queue: position.queue || []
+              };
+              ptfsAtcData[airport].timestamp = new Date().toISOString();
+              
+              // Set primary controller info (prefer TWR over GND)
+              if (position.holder) {
+                if (!ptfsAtcData[airport].username || positionType === 'TWR') {
+                  ptfsAtcData[airport].callsign = position.holder;
+                  ptfsAtcData[airport].username = position.holder;
+                  ptfsAtcData[airport].position = positionType;
+                }
+              }
+              
+              airportsUpdated.add(airport);
+            }
+          });
+          
+          // Emit updates to all affected airports
+          airportsUpdated.forEach(airport => {
+            io.to(`atc-${airport}`).emit("atcDataUpdate", ptfsAtcData[airport]);
+          });
+          
+          console.log(`🎧 Controllers update received: ${positions.length} positions for ${airportsUpdated.size} airports`);
+        }
       }
 
-      // Handle Flight Plan data
-      if (message.t === 'FLIGHTPLAN' || message.t === 'FP') {
+      // Handle Flight Plan data - using correct event type and field names per API docs
+      if (message.t === 'FLIGHT_PLAN' || message.t === 'EVENT_FLIGHT_PLAN') {
         const fpInfo = message.d;
-        const airport = fpInfo.departure || fpInfo.origin;
+        // API uses 'departing' field for departure airport
+        const airport = fpInfo.departing;
         
         if (airport) {
           initializeAtcData(airport);
           
           const flightStrip = {
             id: `FP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            callsign: fpInfo.callsign || fpInfo.aircraft,
-            aircraft: fpInfo.aircraft || fpInfo.type,
-            departure: fpInfo.departure || fpInfo.origin,
-            destination: fpInfo.destination || fpInfo.arrival,
-            route: fpInfo.route || '',
-            altitude: fpInfo.altitude || fpInfo.cruiseAlt || '',
-            squawk: fpInfo.squawk || '',
-            remarks: fpInfo.remarks || '',
+            callsign: fpInfo.callsign || fpInfo.realcallsign,
+            aircraft: fpInfo.aircraft,
+            departure: fpInfo.departing,
+            destination: fpInfo.arriving,
+            route: fpInfo.route || 'N/A',
+            altitude: fpInfo.flightlevel ? `FL${fpInfo.flightlevel}` : '',
+            flightRules: fpInfo.flightrules || 'IFR',
+            robloxName: fpInfo.robloxName,
             notes: '',
             status: 'waiting',
             timestamp: new Date().toISOString(),
@@ -363,9 +398,9 @@ const connectToPTFSWebSocket = () => {
           // Add to waiting column
           atcFlightStrips[airport].waiting.push(flightStrip);
           
-          // Emit to ATC mode users
+          // Emit to ATC mode users at the departure airport
           io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
-          console.log(`✈️ Flight plan filed for ${airport}: ${flightStrip.callsign}`);
+          console.log(`✈️ Flight plan filed for ${airport}: ${flightStrip.callsign} -> ${flightStrip.destination}`);
         }
       }
     } catch (error) {
@@ -495,8 +530,23 @@ app.get('/api/user', (req, res) => {
   }
 });
 
-// ATC Mode access check - only allow the ATC for that airport or the owner
-app.get('/api/atc-access/:airport', (req, res) => {
+// Helper function to check if a Discord user is currently a controller using PTFS API
+const checkIsController = async (discordId) => {
+  try {
+    const response = await fetch(`https://24data.ptfs.app/is-controller/${discordId}`);
+    if (response.ok) {
+      const result = await response.json();
+      return result === true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking controller status:', error);
+    return false;
+  }
+};
+
+// ATC Mode access check - uses PTFS /is-controller API and local WebSocket data
+app.get('/api/atc-access/:airport', async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Not authenticated', hasAccess: false });
   }
@@ -513,7 +563,38 @@ app.get('/api/atc-access/:airport', (req, res) => {
     });
   }
   
-  // Check if there's an active ATC for this airport from PTFS WebSocket
+  // Check using PTFS /is-controller API to verify this Discord user is a controller
+  const isController = await checkIsController(userId);
+  
+  if (isController) {
+    // User is verified as an active controller via PTFS API
+    // Now check if they're controlling the specific airport requested
+    const atcForAirport = ptfsAtcData[airport];
+    
+    if (atcForAirport) {
+      // Check if the user's Discord username matches the ATC for this airport
+      const userMatches = req.user.username && 
+        (req.user.username.toLowerCase() === atcForAirport.username?.toLowerCase() ||
+         req.user.username.toLowerCase() === atcForAirport.callsign?.toLowerCase());
+      
+      if (userMatches) {
+        return res.json({ 
+          hasAccess: true, 
+          reason: 'active_atc_verified',
+          atcData: atcForAirport
+        });
+      }
+    }
+    
+    // User is a controller but not for this specific airport
+    return res.json({ 
+      hasAccess: false, 
+      reason: 'controller_different_airport',
+      currentAtc: atcForAirport?.callsign || atcForAirport?.username || null
+    });
+  }
+  
+  // Check local WebSocket data as fallback
   const atcForAirport = ptfsAtcData[airport];
   
   if (atcForAirport) {
@@ -529,22 +610,19 @@ app.get('/api/atc-access/:airport', (req, res) => {
         atcData: atcForAirport
       });
     }
-  }
-  
-  // No active ATC detected or user doesn't match - check if PTFS has ATC
-  if (!atcForAirport) {
-    // For demo/testing: allow if no ATC is currently active (optional - remove in production)
+    
     return res.json({ 
-      hasAccess: true, 
-      reason: 'no_active_atc',
-      atcData: null
+      hasAccess: false, 
+      reason: 'not_authorized',
+      currentAtc: atcForAirport?.callsign || atcForAirport?.username
     });
   }
   
+  // No active ATC detected for this airport
   return res.json({ 
-    hasAccess: false, 
-    reason: 'not_authorized',
-    currentAtc: atcForAirport?.callsign || atcForAirport?.username
+    hasAccess: true, 
+    reason: 'no_active_atc',
+    atcData: null
   });
 });
 
@@ -922,15 +1000,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("serviceAction", (data) => {
-    const { requestId, action, crewMember } = data;
+    const { requestId, action, crewMember, airport: dataAirport } = data;
     const userInfo = connectedUsers.get(socket.id);
 
-    if (!userInfo || !userInfo.airport || !airportData[userInfo.airport]) {
-      socket.emit("error", { message: "Invalid airport or user not properly connected" });
-      return;
-    }
+    // Use airport from data payload, fallback to user's airport (for ATC mode compatibility)
+    const airport = dataAirport || userInfo?.airport || userInfo?.atcAirport;
 
-    const airport = userInfo.airport;
+    if (!airport || !airportData[airport]) {
+      // Initialize airport data if needed
+      if (airport) {
+        initializeAirportData(airport);
+      } else {
+        socket.emit("error", { message: "Invalid airport or user not properly connected" });
+        return;
+      }
+    }
 
     const request = airportData[airport].requests.find(r => r.id === requestId);
     if (request) {
@@ -950,6 +1034,8 @@ io.on("connection", (socket) => {
         mode: "groundcrew",
         priority: "normal"
       });
+    } else {
+      console.log(`Service action failed: Request ${requestId} not found at ${airport}`);
     }
   });
 

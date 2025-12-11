@@ -1156,11 +1156,12 @@ export default function App() {
   };
 
   // Function to assign crew to a task
-  const assignCrewToTask = (requestIndex, assignedCrewCallsign) => {
-    if (requestIndex === -1) return;
+  const assignCrewToTask = (request, assignedCrewCallsign) => {
+    if (!request || !request.id) return;
     socket.emit("assignCrewToTask", {
-      requestIndex: requestIndex,
-      assignedCrewCallsign: assignedCrewCallsign,
+      requestId: request.id,
+      assignedCrew: assignedCrewCallsign,
+      assignedBy: user?.username || groundCrewCallsign,
       airport: selectedAirport
     });
   };
@@ -1942,8 +1943,8 @@ export default function App() {
     setShowPushbackForm(false);
   };
 
-  const handleServiceAction = (requestId, action) => {
-    socket.emit("serviceAction", { requestId, action, crewMember: user?.username, airport: selectedAirport });
+  const handleServiceAction = (request, action) => {
+    socket.emit("serviceAction", { requestId: request.id, action, crewMember: user?.username, airport: selectedAirport });
   };
 
   const generatePermitId = (permitType) => {
@@ -4379,7 +4380,7 @@ export default function App() {
                           className="crew-assignment-select"
                           onChange={(e) => {
                             if (e.target.value) {
-                              assignCrewToTask(requests.indexOf(request), e.target.value);
+                              assignCrewToTask(request, e.target.value);
                               e.target.value = "";
                             }
                           }}
@@ -4395,7 +4396,7 @@ export default function App() {
                           <option value="Maintenance Team">Maintenance Team</option>
                         </select>
                         <button
-                          onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                          onClick={() => handleServiceAction(request, "ACCEPTED")}
                           className="action-btn urgent small"
                         >
                           TAKE TASK
@@ -4403,7 +4404,7 @@ export default function App() {
                       </div>
                     ) : (
                       <button
-                        onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                        onClick={() => handleServiceAction(request, "ACCEPTED")}
                         className="action-btn urgent"
                       >
                         IMMEDIATE RESPONSE
@@ -4457,7 +4458,7 @@ export default function App() {
                           className="crew-assignment-select"
                           onChange={(e) => {
                             if (e.target.value) {
-                              assignCrewToTask(requests.indexOf(request), e.target.value);
+                              assignCrewToTask(request, e.target.value);
                               e.target.value = "";
                             }
                           }}
@@ -4473,7 +4474,7 @@ export default function App() {
                           <option value="Maintenance Team">Maintenance Team</option>
                         </select>
                         <button
-                          onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                          onClick={() => handleServiceAction(request, "ACCEPTED")}
                           className="action-btn high small"
                         >
                           TAKE TASK
@@ -4481,7 +4482,7 @@ export default function App() {
                       </div>
                     ) : (
                       <button
-                        onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                        onClick={() => handleServiceAction(request, "ACCEPTED")}
                         className="action-btn high"
                       >
                         ACCEPT & ASSIGN
@@ -4535,7 +4536,7 @@ export default function App() {
                           className="crew-assignment-select"
                           onChange={(e) => {
                             if (e.target.value) {
-                              assignCrewToTask(requests.indexOf(request), e.target.value);
+                              assignCrewToTask(request, e.target.value);
                               e.target.value = "";
                             }
                           }}
@@ -4551,7 +4552,7 @@ export default function App() {
                           <option value="Maintenance Team">Maintenance Team</option>
                         </select>
                         <button
-                          onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                          onClick={() => handleServiceAction(request, "ACCEPTED")}
                           className="action-btn standard small"
                         >
                           TAKE TASK
@@ -4559,7 +4560,7 @@ export default function App() {
                       </div>
                     ) : (
                       <button
-                        onClick={() => handleServiceAction(requests.indexOf(request), "ACCEPTED")}
+                        onClick={() => handleServiceAction(request, "ACCEPTED")}
                         className="action-btn standard"
                       >
                         ASSIGN CREW
@@ -4608,7 +4609,7 @@ export default function App() {
                       )}
                     </div>
                     <button
-                      onClick={() => handleServiceAction(requests.indexOf(request), "COMPLETED")}
+                      onClick={() => handleServiceAction(request, "COMPLETED")}
                       className="action-btn complete"
                     >
                       MARK COMPLETE
