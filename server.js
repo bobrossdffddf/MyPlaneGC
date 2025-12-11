@@ -1348,22 +1348,22 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Add a test flight strip (for testing without real PTFS data)
-  socket.on("addTestFlightStrip", (data) => {
+  // Add a blank flight strip for manual entry
+  socket.on("addBlankFlightStrip", (data) => {
     const { airport } = data;
     
     if (!airport) return;
     initializeAtcData(airport);
     
-    const testStrip = {
-      id: `FP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      callsign: `TEST${Math.floor(Math.random() * 9000) + 1000}`,
-      aircraft: ['A320', 'B737', 'B777', 'A380'][Math.floor(Math.random() * 4)],
+    const blankStrip = {
+      id: `STRIP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      callsign: '',
+      aircraft: '',
       departure: airport,
-      destination: ['IZOL', 'IPPH', 'IGRV', 'ISAU'][Math.floor(Math.random() * 4)],
-      route: 'DIRECT',
-      altitude: `FL${Math.floor(Math.random() * 20 + 25) * 10}`,
-      squawk: `${Math.floor(Math.random() * 7000) + 1000}`,
+      destination: '',
+      route: '',
+      altitude: '',
+      squawk: '',
       remarks: '',
       notes: '',
       status: 'waiting',
@@ -1371,9 +1371,9 @@ io.on("connection", (socket) => {
       filedAt: new Date().toLocaleTimeString()
     };
     
-    atcFlightStrips[airport].waiting.push(testStrip);
+    atcFlightStrips[airport].waiting.push(blankStrip);
     io.to(`atc-${airport}`).emit("flightStripUpdate", atcFlightStrips[airport]);
-    console.log(`✈️ Test flight strip added for ${airport}: ${testStrip.callsign}`);
+    console.log(`✈️ Blank flight strip added for ${airport}`);
   });
 
   socket.on("atcAddPlane", (data) => {

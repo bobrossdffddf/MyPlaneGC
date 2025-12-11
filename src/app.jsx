@@ -1686,8 +1686,8 @@ export default function App() {
     });
   };
 
-  const addTestFlightStrip = () => {
-    socket.emit("addTestFlightStrip", { airport: selectedAirport });
+  const addBlankFlightStrip = () => {
+    socket.emit("addBlankFlightStrip", { airport: selectedAirport });
   };
 
   const atcRequestService = (stand, service, flight) => {
@@ -2617,11 +2617,8 @@ export default function App() {
               <div className="efs-toolbar">
                 <div className="efs-toolbar-left">
                   <div className="efs-title-section">
-                    <div className="efs-radar-icon">
-                      <div className="radar-sweep"></div>
-                    </div>
                     <div className="efs-title-text">
-                      <h2>ELECTRONIC FLIGHT STRIPS</h2>
+                      <h2>FLIGHT STRIP BOARD</h2>
                       <span className="efs-airport-badge">{selectedAirport}</span>
                     </div>
                   </div>
@@ -2647,9 +2644,10 @@ export default function App() {
                   </div>
                 </div>
                 <div className="efs-toolbar-right">
-                  <button className="efs-add-strip-btn" onClick={addTestFlightStrip}>
+                  <span className="efs-auto-info">Strips auto-created from flight plans</span>
+                  <button className="efs-add-strip-btn" onClick={addBlankFlightStrip}>
                     <span className="btn-plus">+</span>
-                    <span className="btn-text">ADD STRIP</span>
+                    <span className="btn-text">NEW STRIP</span>
                   </button>
                 </div>
               </div>
