@@ -1673,6 +1673,22 @@ export default function App() {
     });
   };
 
+  const atcRemoveServiceRequest = (requestId) => {
+    socket.emit("atcRemoveServiceRequest", {
+      airport: selectedAirport,
+      requestId,
+      removedBy: `ATC-${user?.username}`
+    });
+  };
+
+  const atcCompleteServiceRequest = (requestId) => {
+    socket.emit("atcCompleteServiceRequest", {
+      airport: selectedAirport,
+      requestId,
+      completedBy: `ATC-${user?.username}`
+    });
+  };
+
   const atcAddPlaneToStand = (standId) => {
     if (!atcAddPlaneForm.flight || !atcAddPlaneForm.aircraft) {
       alert("Please enter both flight number and aircraft type");
@@ -2172,16 +2188,16 @@ export default function App() {
   };
 
   const removeServiceRequest = (standId, service) => {
-    // Find and remove the specific service request
-    const requestIndex = requests.findIndex(r =>
+    // Find and remove the specific service request by stable ID
+    const request = requests.find(r =>
       r.stand === standId &&
       r.service === service &&
       r.status === "REQUESTED"
     );
 
-    if (requestIndex !== -1) {
+    if (request) {
       socket.emit("serviceAction", {
-        requestId: requestIndex,
+        requestId: request.id,
         action: "CANCELLED",
         crewMember: user?.username
       });
@@ -2331,13 +2347,11 @@ export default function App() {
                 GROUND CREW
               </button>
               <button 
-                className={`atc-tab ${atcActiveTab === 'efs' ? 'active' : ''} disabled`}
-                disabled
-                title="EFS - Under Construction"
+                className={`atc-tab ${atcActiveTab === 'efs' ? 'active' : ''}`}
+                onClick={() => setAtcActiveTab('efs')}
               >
                 <span className="tab-icon">✈️</span>
                 EFS - FLIGHT STRIPS
-                <span className="construction-badge">🚧</span>
               </button>
             </div>
           </div>
@@ -2508,8 +2522,8 @@ export default function App() {
                       <div className="no-requests-text">No active service requests</div>
                     </div>
                   ) : (
-                    atcRequests.map((req, idx) => (
-                      <div key={idx} className={`atc-request-card status-${req.status?.toLowerCase() || 'pending'}`}>
+                    atcRequests.filter(r => r.status !== 'COMPLETED').map((req, idx) => (
+                      <div key={req.id || idx} className={`atc-request-card status-${req.status?.toLowerCase() || 'pending'}`}>
                         <div className="request-header">
                           <span className="request-service">
                             <span className="service-icon">
@@ -2540,6 +2554,28 @@ export default function App() {
                             <span className="detail-label">TIME:</span>
                             <span className="detail-value">{req.timestamp}</span>
                           </div>
+                          {req.source === 'atc' && (
+                            <div className="detail-item">
+                              <span className="detail-label">SOURCE:</span>
+                              <span className="detail-value atc-source">ATC</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="request-actions">
+                          <button 
+                            className="request-action-btn complete"
+                            onClick={() => atcCompleteServiceRequest(req.id)}
+                            title="Mark as completed"
+                          >
+                            ✓ Complete
+                          </button>
+                          <button 
+                            className="request-action-btn remove"
+                            onClick={() => atcRemoveServiceRequest(req.id)}
+                            title="Remove request"
+                          >
+                            ✕ Remove
+                          </button>
                         </div>
                       </div>
                     ))
@@ -2550,67 +2586,120 @@ export default function App() {
           )}
 
           {atcActiveTab === 'efs' && (
-            <div className="atc-efs-tab">
-              <div className="efs-header">
-                <h2>✈️ ELECTRONIC FLIGHT STRIP SYSTEM - {selectedAirport}</h2>
-                <div className="efs-controls">
-                  <div className="efs-stats">
-                    <div className="efs-stat">
-                      <span className="efs-stat-value">{(atcFlightStrips.waiting?.length || 0) + (atcFlightStrips.cleared?.length || 0) + (atcFlightStrips.taxi?.length || 0)}</span>
-                      <span className="efs-stat-label">TOTAL STRIPS</span>
+            <div className="atc-efs-tab-redesigned">
+              <div className="efs-toolbar">
+                <div className="efs-toolbar-left">
+                  <div className="efs-title-section">
+                    <div className="efs-radar-icon">
+                      <div className="radar-sweep"></div>
+                    </div>
+                    <div className="efs-title-text">
+                      <h2>ELECTRONIC FLIGHT STRIPS</h2>
+                      <span className="efs-airport-badge">{selectedAirport}</span>
                     </div>
                   </div>
-                  <button className="add-test-strip-btn" onClick={addTestFlightStrip}>
-                    <span className="btn-icon">➕</span>
-                    ADD TEST STRIP
+                </div>
+                <div className="efs-toolbar-center">
+                  <div className="efs-stats-bar">
+                    <div className="efs-stat-item waiting">
+                      <span className="stat-count">{atcFlightStrips.waiting?.length || 0}</span>
+                      <span className="stat-label">PENDING</span>
+                    </div>
+                    <div className="efs-stat-item cleared">
+                      <span className="stat-count">{atcFlightStrips.cleared?.length || 0}</span>
+                      <span className="stat-label">CLEARED</span>
+                    </div>
+                    <div className="efs-stat-item taxi">
+                      <span className="stat-count">{atcFlightStrips.taxi?.length || 0}</span>
+                      <span className="stat-label">TAXI</span>
+                    </div>
+                    <div className="efs-stat-item total">
+                      <span className="stat-count">{(atcFlightStrips.waiting?.length || 0) + (atcFlightStrips.cleared?.length || 0) + (atcFlightStrips.taxi?.length || 0)}</span>
+                      <span className="stat-label">TOTAL</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="efs-toolbar-right">
+                  <button className="efs-add-strip-btn" onClick={addTestFlightStrip}>
+                    <span className="btn-plus">+</span>
+                    <span className="btn-text">ADD STRIP</span>
                   </button>
                 </div>
               </div>
-              <div className="efs-columns">
+
+              <div className="efs-board">
                 <div 
-                  className={`efs-column waiting ${dragOverColumn === 'waiting' ? 'drag-over' : ''}`}
+                  className={`efs-lane pending-lane ${dragOverColumn === 'waiting' ? 'drag-over' : ''}`}
                   onDragOver={(e) => handleDragOver(e, 'waiting')}
                   onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop('waiting')}
                 >
-                  <div className="column-header">
-                    <span className="column-icon">⏳</span>
-                    <span className="column-title">WAITING FOR CLEARANCE</span>
-                    <span className="column-count">{atcFlightStrips.waiting?.length || 0}</span>
+                  <div className="lane-header">
+                    <div className="lane-indicator pending"></div>
+                    <span className="lane-title">PENDING CLEARANCE</span>
+                    <span className="lane-count">{atcFlightStrips.waiting?.length || 0}</span>
                   </div>
-                  <div className="column-strips">
+                  <div className="lane-content">
                     {(!atcFlightStrips.waiting || atcFlightStrips.waiting.length === 0) ? (
-                      <div className="empty-column">
-                        <div className="empty-icon">⏳</div>
-                        <div className="empty-text">No flights waiting</div>
+                      <div className="lane-empty">
+                        <div className="empty-placeholder">
+                          <div className="empty-icon-modern">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <path d="M12 8v4l3 3"/>
+                              <circle cx="12" cy="12" r="9"/>
+                            </svg>
+                          </div>
+                          <span>No pending flights</span>
+                        </div>
                       </div>
                     ) : (
                       atcFlightStrips.waiting.map(strip => (
                         <div 
                           key={strip.id} 
-                          className="flight-strip waiting"
+                          className="efs-strip pending"
                           draggable
                           onDragStart={(e) => handleDragStart(strip, 'waiting', e)}
                           onDragEnd={handleDragEnd}
                         >
-                          <div className="strip-header">
+                          <div className="strip-top-bar">
                             <span className="strip-callsign">{strip.callsign}</span>
-                            <span className="strip-aircraft">{strip.aircraft}</span>
-                            <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                            <span className="strip-type">{strip.aircraft}</span>
+                            <button className="strip-close" onClick={() => deleteFlightStrip(strip.id)}>
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                              </svg>
+                            </button>
                           </div>
-                          <div className="strip-route">
-                            <span className="route-airport">{strip.departure}</span>
-                            <span className="route-arrow">→</span>
-                            <span className="route-airport">{strip.destination}</span>
+                          <div className="strip-route-line">
+                            <span className="route-dep">{strip.departure}</span>
+                            <div className="route-line">
+                              <div className="route-dot start"></div>
+                              <div className="route-dash"></div>
+                              <svg className="route-plane" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                              </svg>
+                              <div className="route-dash"></div>
+                              <div className="route-dot end"></div>
+                            </div>
+                            <span className="route-arr">{strip.destination}</span>
                           </div>
-                          <div className="strip-details">
-                            <span className="detail-item"><strong>FL:</strong> {strip.altitude || 'N/A'}</span>
-                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk || 'N/A'}</span>
-                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt || 'N/A'}</span>
+                          <div className="strip-data-grid">
+                            <div className="data-cell">
+                              <span className="data-label">FL</span>
+                              <span className="data-value">{strip.altitude || '---'}</span>
+                            </div>
+                            <div className="data-cell">
+                              <span className="data-label">SQK</span>
+                              <span className="data-value">{strip.squawk || '----'}</span>
+                            </div>
+                            <div className="data-cell">
+                              <span className="data-label">TIME</span>
+                              <span className="data-value">{strip.filedAt || '--:--'}</span>
+                            </div>
                           </div>
                           <textarea 
-                            className="strip-notes"
-                            placeholder="Controller notes..."
+                            className="strip-notes-input"
+                            placeholder="Add notes..."
                             value={strip.notes || ''}
                             onChange={(e) => updateStripNotes(strip.id, e.target.value)}
                           />
@@ -2621,49 +2710,77 @@ export default function App() {
                 </div>
 
                 <div 
-                  className={`efs-column cleared ${dragOverColumn === 'cleared' ? 'drag-over' : ''}`}
+                  className={`efs-lane cleared-lane ${dragOverColumn === 'cleared' ? 'drag-over' : ''}`}
                   onDragOver={(e) => handleDragOver(e, 'cleared')}
                   onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop('cleared')}
                 >
-                  <div className="column-header">
-                    <span className="column-icon">✓</span>
-                    <span className="column-title">CLEARANCE RECEIVED</span>
-                    <span className="column-count">{atcFlightStrips.cleared?.length || 0}</span>
+                  <div className="lane-header">
+                    <div className="lane-indicator cleared"></div>
+                    <span className="lane-title">CLEARANCE DELIVERED</span>
+                    <span className="lane-count">{atcFlightStrips.cleared?.length || 0}</span>
                   </div>
-                  <div className="column-strips">
+                  <div className="lane-content">
                     {(!atcFlightStrips.cleared || atcFlightStrips.cleared.length === 0) ? (
-                      <div className="empty-column">
-                        <div className="empty-icon">✓</div>
-                        <div className="empty-text">No cleared flights</div>
+                      <div className="lane-empty">
+                        <div className="empty-placeholder">
+                          <div className="empty-icon-modern">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <path d="M9 12l2 2 4-4"/>
+                              <circle cx="12" cy="12" r="9"/>
+                            </svg>
+                          </div>
+                          <span>No cleared flights</span>
+                        </div>
                       </div>
                     ) : (
                       atcFlightStrips.cleared.map(strip => (
                         <div 
                           key={strip.id} 
-                          className="flight-strip cleared"
+                          className="efs-strip cleared"
                           draggable
                           onDragStart={(e) => handleDragStart(strip, 'cleared', e)}
                           onDragEnd={handleDragEnd}
                         >
-                          <div className="strip-header">
+                          <div className="strip-top-bar">
                             <span className="strip-callsign">{strip.callsign}</span>
-                            <span className="strip-aircraft">{strip.aircraft}</span>
-                            <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                            <span className="strip-type">{strip.aircraft}</span>
+                            <button className="strip-close" onClick={() => deleteFlightStrip(strip.id)}>
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                              </svg>
+                            </button>
                           </div>
-                          <div className="strip-route">
-                            <span className="route-airport">{strip.departure}</span>
-                            <span className="route-arrow">→</span>
-                            <span className="route-airport">{strip.destination}</span>
+                          <div className="strip-route-line">
+                            <span className="route-dep">{strip.departure}</span>
+                            <div className="route-line">
+                              <div className="route-dot start"></div>
+                              <div className="route-dash"></div>
+                              <svg className="route-plane" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                              </svg>
+                              <div className="route-dash"></div>
+                              <div className="route-dot end"></div>
+                            </div>
+                            <span className="route-arr">{strip.destination}</span>
                           </div>
-                          <div className="strip-details">
-                            <span className="detail-item"><strong>FL:</strong> {strip.altitude || 'N/A'}</span>
-                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk || 'N/A'}</span>
-                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt || 'N/A'}</span>
+                          <div className="strip-data-grid">
+                            <div className="data-cell">
+                              <span className="data-label">FL</span>
+                              <span className="data-value">{strip.altitude || '---'}</span>
+                            </div>
+                            <div className="data-cell">
+                              <span className="data-label">SQK</span>
+                              <span className="data-value">{strip.squawk || '----'}</span>
+                            </div>
+                            <div className="data-cell">
+                              <span className="data-label">TIME</span>
+                              <span className="data-value">{strip.filedAt || '--:--'}</span>
+                            </div>
                           </div>
                           <textarea 
-                            className="strip-notes"
-                            placeholder="Controller notes..."
+                            className="strip-notes-input"
+                            placeholder="Add notes..."
                             value={strip.notes || ''}
                             onChange={(e) => updateStripNotes(strip.id, e.target.value)}
                           />
@@ -2674,49 +2791,76 @@ export default function App() {
                 </div>
 
                 <div 
-                  className={`efs-column taxi ${dragOverColumn === 'taxi' ? 'drag-over' : ''}`}
+                  className={`efs-lane taxi-lane ${dragOverColumn === 'taxi' ? 'drag-over' : ''}`}
                   onDragOver={(e) => handleDragOver(e, 'taxi')}
                   onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop('taxi')}
                 >
-                  <div className="column-header">
-                    <span className="column-icon">🛫</span>
-                    <span className="column-title">READY FOR TAXI</span>
-                    <span className="column-count">{atcFlightStrips.taxi?.length || 0}</span>
+                  <div className="lane-header">
+                    <div className="lane-indicator taxi"></div>
+                    <span className="lane-title">TAXI / DEPARTURE</span>
+                    <span className="lane-count">{atcFlightStrips.taxi?.length || 0}</span>
                   </div>
-                  <div className="column-strips">
+                  <div className="lane-content">
                     {(!atcFlightStrips.taxi || atcFlightStrips.taxi.length === 0) ? (
-                      <div className="empty-column">
-                        <div className="empty-icon">🛫</div>
-                        <div className="empty-text">No flights ready for taxi</div>
+                      <div className="lane-empty">
+                        <div className="empty-placeholder">
+                          <div className="empty-icon-modern">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                            </svg>
+                          </div>
+                          <span>No departures</span>
+                        </div>
                       </div>
                     ) : (
                       atcFlightStrips.taxi.map(strip => (
                         <div 
                           key={strip.id} 
-                          className="flight-strip taxi"
+                          className="efs-strip taxi"
                           draggable
                           onDragStart={(e) => handleDragStart(strip, 'taxi', e)}
                           onDragEnd={handleDragEnd}
                         >
-                          <div className="strip-header">
+                          <div className="strip-top-bar">
                             <span className="strip-callsign">{strip.callsign}</span>
-                            <span className="strip-aircraft">{strip.aircraft}</span>
-                            <button className="strip-delete" onClick={() => deleteFlightStrip(strip.id)}>×</button>
+                            <span className="strip-type">{strip.aircraft}</span>
+                            <button className="strip-close" onClick={() => deleteFlightStrip(strip.id)}>
+                              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                              </svg>
+                            </button>
                           </div>
-                          <div className="strip-route">
-                            <span className="route-airport">{strip.departure}</span>
-                            <span className="route-arrow">→</span>
-                            <span className="route-airport">{strip.destination}</span>
+                          <div className="strip-route-line">
+                            <span className="route-dep">{strip.departure}</span>
+                            <div className="route-line">
+                              <div className="route-dot start"></div>
+                              <div className="route-dash"></div>
+                              <svg className="route-plane" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                              </svg>
+                              <div className="route-dash"></div>
+                              <div className="route-dot end"></div>
+                            </div>
+                            <span className="route-arr">{strip.destination}</span>
                           </div>
-                          <div className="strip-details">
-                            <span className="detail-item"><strong>FL:</strong> {strip.altitude || 'N/A'}</span>
-                            <span className="detail-item"><strong>SQK:</strong> {strip.squawk || 'N/A'}</span>
-                            <span className="detail-item"><strong>TIME:</strong> {strip.filedAt || 'N/A'}</span>
+                          <div className="strip-data-grid">
+                            <div className="data-cell">
+                              <span className="data-label">FL</span>
+                              <span className="data-value">{strip.altitude || '---'}</span>
+                            </div>
+                            <div className="data-cell">
+                              <span className="data-label">SQK</span>
+                              <span className="data-value">{strip.squawk || '----'}</span>
+                            </div>
+                            <div className="data-cell">
+                              <span className="data-label">TIME</span>
+                              <span className="data-value">{strip.filedAt || '--:--'}</span>
+                            </div>
                           </div>
                           <textarea 
-                            className="strip-notes"
-                            placeholder="Controller notes..."
+                            className="strip-notes-input"
+                            placeholder="Add notes..."
                             value={strip.notes || ''}
                             onChange={(e) => updateStripNotes(strip.id, e.target.value)}
                           />

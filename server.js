@@ -899,10 +899,9 @@ io.on("connection", (socket) => {
     // Initialize airport data if needed
     initializeAirportData(req.airport);
 
-    const requestId = airportData[req.airport].requests.length;
     const serviceRequest = {
       ...req,
-      id: requestId,
+      id: Date.now() + Math.random().toString(36).substr(2, 9),
       requestedBy: socket.id
     };
 
@@ -933,16 +932,15 @@ io.on("connection", (socket) => {
 
     const airport = userInfo.airport;
 
-    if (airportData[airport].requests[requestId]) {
-      airportData[airport].requests[requestId].status = action;
-      airportData[airport].requests[requestId].handledBy = crewMember;
-      airportData[airport].requests[requestId].handledAt = new Date().toLocaleTimeString();
+    const request = airportData[airport].requests.find(r => r.id === requestId);
+    if (request) {
+      request.status = action;
+      request.handledBy = crewMember;
+      request.handledAt = new Date().toLocaleTimeString();
 
       io.to(airport).emit("serviceUpdate", airportData[airport].requests);
       io.to(`atc-${airport}`).emit("serviceUpdate", airportData[airport].requests);
 
-      // Notify users at the same airport with ground crew color
-      const request = airportData[airport].requests[requestId];
       io.to(airport).emit("chatUpdate", {
         text: `${crewMember} has ${action.toLowerCase()} ${request.service} service for ${request.flight}`,
         sender: "GROUND CREW",
@@ -991,15 +989,15 @@ io.on("connection", (socket) => {
       return;
     }
 
-    if (airportData[airport].requests[requestId]) {
-      airportData[airport].requests[requestId].assignedCrew = assignedCrew;
-      airportData[airport].requests[requestId].assignedBy = assignedBy;
-      airportData[airport].requests[requestId].assignedAt = new Date().toLocaleTimeString();
+    const request = airportData[airport].requests.find(r => r.id === requestId);
+    if (request) {
+      request.assignedCrew = assignedCrew;
+      request.assignedBy = assignedBy;
+      request.assignedAt = new Date().toLocaleTimeString();
 
       io.to(airport).emit("serviceUpdate", airportData[airport].requests);
       io.to(`atc-${airport}`).emit("serviceUpdate", airportData[airport].requests);
 
-      const request = airportData[airport].requests[requestId];
       io.to(airport).emit("chatUpdate", {
         text: `${assignedBy} assigned ${request.service} for ${request.flight} to ${assignedCrew}`,
         sender: "GROUND SUPERVISOR",
@@ -1188,7 +1186,7 @@ io.on("connection", (socket) => {
       stand,
       service,
       flight,
-      status: "pending",
+      status: "REQUESTED",
       timestamp: new Date().toLocaleTimeString(),
       requestedBy,
       source: 'atc'
@@ -1207,6 +1205,61 @@ io.on("connection", (socket) => {
       mode: "system",
       priority: "high"
     });
+  });
+
+  socket.on("atcRemoveServiceRequest", (data) => {
+    const { airport, requestId, removedBy } = data;
+    
+    if (!airport || !airportData[airport]) {
+      socket.emit("error", { message: "Invalid airport" });
+      return;
+    }
+    
+    const requestIndex = airportData[airport].requests.findIndex(r => r.id === requestId);
+    if (requestIndex !== -1) {
+      const request = airportData[airport].requests[requestIndex];
+      airportData[airport].requests.splice(requestIndex, 1);
+      
+      io.to(airport).emit("serviceUpdate", airportData[airport].requests);
+      io.to(`atc-${airport}`).emit("serviceUpdate", airportData[airport].requests);
+      
+      io.to(airport).emit("chatUpdate", {
+        text: `${removedBy} removed ${request.service} request for ${request.flight}`,
+        sender: "ATC CONTROL",
+        stand: request.stand,
+        airport: airport,
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "system"
+      });
+    }
+  });
+
+  socket.on("atcCompleteServiceRequest", (data) => {
+    const { airport, requestId, completedBy } = data;
+    
+    if (!airport || !airportData[airport]) {
+      socket.emit("error", { message: "Invalid airport" });
+      return;
+    }
+    
+    const request = airportData[airport].requests.find(r => r.id === requestId);
+    if (request) {
+      request.status = "COMPLETED";
+      request.completedBy = completedBy;
+      request.completedAt = new Date().toLocaleTimeString();
+      
+      io.to(airport).emit("serviceUpdate", airportData[airport].requests);
+      io.to(`atc-${airport}`).emit("serviceUpdate", airportData[airport].requests);
+      
+      io.to(airport).emit("chatUpdate", {
+        text: `${completedBy} marked ${request.service} for ${request.flight} as completed`,
+        sender: "ATC CONTROL",
+        stand: request.stand,
+        airport: airport,
+        timestamp: new Date().toLocaleTimeString(),
+        mode: "system"
+      });
+    }
   });
 
   // Add a test flight strip (for testing without real PTFS data)
