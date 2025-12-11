@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import { getAirportConfig } from "./airportConfig.js";
 import "./App.css";
@@ -78,6 +78,13 @@ export default function App() {
   const [atcLoadingProgress, setAtcLoadingProgress] = useState(0);
   const [atcLoadingStep, setAtcLoadingStep] = useState('');
   const [atcActiveTab, setAtcActiveTab] = useState('groundcrew');
+
+  // Mode loading states for Ground Crew and Pilot
+  const [modeLoading, setModeLoading] = useState(false);
+  const [modeLoadingProgress, setModeLoadingProgress] = useState(0);
+  const [modeLoadingStep, setModeLoadingStep] = useState('');
+  const [modeLoadingType, setModeLoadingType] = useState(null);
+  const modeAnimationTokenRef = useRef(0);
   const [atcFlightStrips, setAtcFlightStrips] = useState({ waiting: [], cleared: [], taxi: [] });
   const [atcStands, setAtcStands] = useState({});
   const [atcRequests, setAtcRequests] = useState([]);
@@ -1516,13 +1523,15 @@ export default function App() {
 
   const selectMode = (mode, airport) => {
     console.log('Selecting mode:', mode, 'for airport:', airport);
+    
+    // Immediately set mode and airport, emit socket events
     setUserMode(mode);
     setSelectedAirport(airport);
 
     // Reset callsign when switching modes
     setAssignedCallsign("");
     setGroundCallsignCounter(1);
-    setGroundCrewCallsign(""); // Reset ground crew callsign as well
+    setGroundCrewCallsign("");
 
     socket.emit("userMode", { mode, airport, userId: user?.id });
 
@@ -1530,6 +1539,53 @@ export default function App() {
     if (mode === "groundcrew") {
       socket.emit("requestGroundCallsign", { userId: user?.id, airport: airport });
     }
+
+    // Start loading animation overlay (non-blocking)
+    // Increment token to cancel any previous animation
+    const currentToken = ++modeAnimationTokenRef.current;
+    
+    setModeLoading(true);
+    setModeLoadingType(mode);
+    setModeLoadingProgress(0);
+    setModeLoadingStep('Initializing...');
+
+    // Define loading steps based on mode
+    const loadingSteps = mode === 'pilot' ? [
+      { progress: 10, step: 'CONNECTING TO FLIGHT SYSTEMS...' },
+      { progress: 25, step: 'LOADING AIRCRAFT DATABASE...' },
+      { progress: 40, step: 'INITIALIZING COCKPIT SYSTEMS...' },
+      { progress: 55, step: 'SYNCING FLIGHT DOCUMENTS...' },
+      { progress: 70, step: 'LOADING CHECKLISTS...' },
+      { progress: 85, step: 'ESTABLISHING RADIO FREQUENCIES...' },
+      { progress: 95, step: 'PREFLIGHT CHECK COMPLETE' },
+      { progress: 100, step: 'CLEARED FOR OPERATIONS' }
+    ] : [
+      { progress: 10, step: 'CONNECTING TO GROUND CONTROL...' },
+      { progress: 25, step: 'LOADING EQUIPMENT STATUS...' },
+      { progress: 40, step: 'SYNCING STAND ASSIGNMENTS...' },
+      { progress: 55, step: 'INITIALIZING SERVICE SYSTEMS...' },
+      { progress: 70, step: 'LOADING RAMP OPERATIONS...' },
+      { progress: 85, step: 'ESTABLISHING GROUND FREQUENCY...' },
+      { progress: 95, step: 'EQUIPMENT CHECK COMPLETE' },
+      { progress: 100, step: 'READY FOR OPERATIONS' }
+    ];
+
+    // Run animation with non-blocking timers and token-based cancellation
+    const runAnimation = async () => {
+      for (let i = 0; i < loadingSteps.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 250));
+        // Check if this animation is still current
+        if (modeAnimationTokenRef.current !== currentToken) return;
+        setModeLoadingProgress(loadingSteps[i].progress);
+        setModeLoadingStep(loadingSteps[i].step);
+      }
+      await new Promise(resolve => setTimeout(resolve, 300));
+      // Only dismiss if this is still the current animation
+      if (modeAnimationTokenRef.current === currentToken) {
+        setModeLoading(false);
+      }
+    };
+    runAnimation();
   };
 
   // ATC Mode Functions
@@ -2370,6 +2426,38 @@ export default function App() {
 
   const toggleSound = () => {
     setSoundEnabled(!soundEnabled);
+  };
+
+  // Mode Loading Overlay Component (non-blocking)
+  const renderModeLoadingOverlay = () => {
+    if (!modeLoading) return null;
+    return (
+      <div className={`mode-loading-screen overlay ${modeLoadingType}`}>
+        <div className="mode-loading-container">
+          <div className="mode-boot-animation">
+            <div className="boot-logo">{modeLoadingType === 'pilot' ? '👨‍✈️' : '👷‍♂️'}</div>
+            <div>
+              <div className="boot-title">
+                {modeLoadingType === 'pilot' ? 'Flight Operations' : 'Ground Operations'}
+              </div>
+              <div className="boot-subtitle">
+                {modeLoadingType === 'pilot' ? 'Pilot Systems Interface' : 'Ground Crew Management'}
+              </div>
+            </div>
+            <div className="boot-progress-wrapper">
+              <div className={`boot-progress-bar ${modeLoadingType}`}>
+                <div 
+                  className={`boot-progress-fill ${modeLoadingType}`} 
+                  style={{ width: `${modeLoadingProgress}%` }}
+                ></div>
+              </div>
+              <div className="boot-status">{modeLoadingStep}</div>
+            </div>
+            <div className={`boot-airport-badge ${modeLoadingType}`}>{selectedAirport}</div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // ATC Loading Screen - iPad/Laptop Style Boot
@@ -4841,6 +4929,7 @@ export default function App() {
 
   return (
     <div className="tablet-interface">
+      {renderModeLoadingOverlay()}
       {showPushbackForm && (
         <div className="pushback-modal-overlay">
           <div className="pushback-modal">

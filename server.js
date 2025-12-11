@@ -392,7 +392,7 @@ const connectToPTFSWebSocket = () => {
             notes: '',
             status: 'waiting',
             timestamp: new Date().toISOString(),
-            filedAt: new Date().toLocaleTimeString(),
+            filedAt: new Date().toISOString().substring(11, 19) + 'Z',
             columnEnteredAt: Date.now(),
             isNew: true
           };

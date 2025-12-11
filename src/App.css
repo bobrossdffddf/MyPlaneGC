@@ -10446,3 +10446,587 @@ input.data-value::placeholder {
     font-size: 0.7rem;
   }
 }
+
+/* ===== MODE LOADING SCREENS ===== */
+.mode-loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: modeLoadingFadeIn 0.3s ease-out;
+}
+
+.mode-loading-screen.overlay {
+  pointer-events: none;
+  animation: modeLoadingFadeIn 0.3s ease-out, modeLoadingFadeOut 0.3s ease-out 2s forwards;
+}
+
+@keyframes modeLoadingFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modeLoadingFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.mode-loading-screen.pilot {
+  background: linear-gradient(135deg, #0a1628 0%, #1a2744 50%, #0f2847 100%);
+}
+
+.mode-loading-screen.groundcrew {
+  background: linear-gradient(135deg, #0a1a0f 0%, #1a3420 50%, #0f2816 100%);
+}
+
+.mode-loading-container {
+  text-align: center;
+  padding: 60px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.mode-boot-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.mode-boot-animation .boot-logo {
+  font-size: 5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.mode-loading-screen.pilot .boot-title {
+  color: #3b82f6;
+}
+
+.mode-loading-screen.groundcrew .boot-title {
+  color: #22c55e;
+}
+
+.mode-loading-screen .boot-subtitle {
+  color: #9ca3af;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+.boot-progress-bar.pilot {
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.boot-progress-bar.groundcrew {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.boot-progress-fill.pilot {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+}
+
+.boot-progress-fill.groundcrew {
+  background: linear-gradient(90deg, #22c55e, #4ade80, #22c55e);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+}
+
+.boot-airport-badge.pilot {
+  background: rgba(59, 130, 246, 0.2);
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  color: #60a5fa;
+}
+
+.boot-airport-badge.groundcrew {
+  background: rgba(34, 197, 94, 0.2);
+  border: 2px solid rgba(34, 197, 94, 0.5);
+  color: #4ade80;
+}
+
+/* ===== COMPREHENSIVE MOBILE SUPPORT ===== */
+@media (max-width: 768px) {
+  /* Base container fixes */
+  .tablet-container {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .tablet-header {
+    flex-wrap: wrap;
+    padding: 10px 15px;
+    gap: 8px;
+    height: auto;
+    min-height: auto;
+  }
+
+  .header-left {
+    order: 1;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-center {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-right {
+    order: 2;
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .app-title {
+    font-size: 1rem;
+  }
+
+  .nav-tabs {
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-tab {
+    padding: 8px 12px;
+    font-size: 0.7rem;
+  }
+
+  /* Main content area */
+  .tablet-content {
+    flex-direction: column;
+    height: calc(100vh - 120px);
+    height: calc(100dvh - 120px);
+  }
+
+  .main-area {
+    flex: 1;
+    height: auto;
+    max-height: none;
+    padding: 15px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Communication panel */
+  .comm-panel {
+    width: 100%;
+    height: 250px;
+    min-height: 200px;
+    border-left: none;
+    border-top: 1px solid rgba(255, 149, 0, 0.3);
+  }
+
+  .comm-panel.minimized {
+    height: 50px;
+    min-height: 50px;
+  }
+
+  /* Airport selection grid */
+  .airports-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .airport-card-wrapper {
+    flex-direction: column;
+  }
+
+  .airport-card {
+    padding: 15px;
+    min-height: auto;
+  }
+
+  .airport-code {
+    font-size: 1.5rem;
+  }
+
+  .atc-mode-btn {
+    width: 100%;
+    padding: 8px;
+    font-size: 0.75rem;
+  }
+
+  /* Role selection */
+  .tablet-mode-select {
+    padding: 20px 15px;
+    overflow-y: auto;
+  }
+
+  .mode-select-content {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .role-cards {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .role-card {
+    width: 100%;
+    padding: 20px;
+    min-height: auto;
+  }
+
+  .role-icon {
+    font-size: 2.5rem;
+  }
+
+  .role-title {
+    font-size: 1.1rem;
+  }
+
+  .role-description {
+    font-size: 0.85rem;
+  }
+
+  /* Services grid */
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .service-btn {
+    padding: 12px 8px;
+    font-size: 0.75rem;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .service-icon {
+    font-size: 1.5rem;
+  }
+
+  /* Stand cards */
+  .stands-grid, .stands-grid-professional {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+
+  .stand-card, .stand-card-professional {
+    padding: 12px;
+  }
+
+  /* Input fields */
+  .input-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .input-field input,
+  .input-field select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+  }
+
+  /* ATC Mode */
+  .atc-header {
+    flex-wrap: wrap;
+    padding: 10px 15px;
+    gap: 10px;
+  }
+
+  .atc-header-left {
+    flex: 1;
+  }
+
+  .atc-header-center {
+    order: 3;
+    width: 100%;
+  }
+
+  .atc-header-right {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  .atc-tabs {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .atc-tab {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+
+  .atc-title h1 {
+    font-size: 1rem;
+  }
+
+  .atc-exit-btn {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+
+  /* EFS Flight Strips */
+  .efs-columns {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .efs-column {
+    min-height: 200px;
+    max-height: 400px;
+  }
+
+  .efs-strip {
+    padding: 10px;
+  }
+
+  .strip-callsign {
+    font-size: 0.9rem;
+  }
+
+  /* Priority columns */
+  .priority-columns {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  /* Checklists */
+  .checklist-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .phase-selector {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .phase-btn {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+
+  /* Permits */
+  .permit-form {
+    padding: 15px;
+  }
+
+  .permit-form-inner {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .permit-fields {
+    grid-template-columns: 1fr;
+  }
+
+  /* Messages */
+  .message {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+
+  .chat-input-container {
+    padding: 10px;
+  }
+
+  .chat-input {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* Mode loading screens */
+  .mode-loading-container,
+  .atc-loading-container {
+    padding: 30px 20px;
+  }
+
+  .boot-logo {
+    font-size: 4rem !important;
+  }
+
+  .boot-title {
+    font-size: 1.5rem !important;
+  }
+
+  .boot-progress-wrapper {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  .tablet-header {
+    padding: 8px 10px;
+  }
+
+  .app-title {
+    font-size: 0.9rem;
+  }
+
+  .nav-tab {
+    padding: 6px 8px;
+    font-size: 0.65rem;
+  }
+
+  .main-area {
+    padding: 10px;
+  }
+
+  .airports-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .airport-card {
+    padding: 12px;
+  }
+
+  .airport-code {
+    font-size: 1.3rem;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .service-btn {
+    padding: 10px 6px;
+    font-size: 0.7rem;
+  }
+
+  .stands-grid, .stands-grid-professional {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .atc-tab {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .efs-column-header h3 {
+    font-size: 0.8rem;
+  }
+
+  .strip-data-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .boot-logo {
+    font-size: 3rem !important;
+  }
+
+  .boot-title {
+    font-size: 1.2rem !important;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .service-btn,
+  .nav-tab,
+  .role-card,
+  .airport-card,
+  .atc-tab,
+  .phase-btn,
+  .stand-card,
+  .stand-card-professional {
+    min-height: 44px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .service-btn:active,
+  .nav-tab:active,
+  .role-card:active,
+  .airport-card:active,
+  .atc-tab:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  /* Prevent text selection on touch */
+  .role-card,
+  .airport-card,
+  .service-btn {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .tablet-container {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .tablet-header {
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+
+  .bottom-nav,
+  .chat-input-container {
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .tablet-header {
+    padding: 5px 15px;
+  }
+
+  .nav-tab {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+
+  .tablet-content {
+    flex-direction: row;
+    height: calc(100vh - 60px);
+  }
+
+  .main-area {
+    flex: 1;
+  }
+
+  .comm-panel {
+    width: 280px;
+    height: 100%;
+    border-top: none;
+    border-left: 1px solid rgba(255, 149, 0, 0.3);
+  }
+
+  .role-cards {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .role-card {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .mode-loading-container,
+  .atc-loading-container {
+    padding: 20px;
+  }
+
+  .boot-logo {
+    font-size: 3rem !important;
+  }
+}
