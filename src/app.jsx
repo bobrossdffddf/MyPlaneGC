@@ -1645,6 +1645,32 @@ export default function App() {
     setDraggedStrip(null);
   };
 
+  // Generate randomized squawk code avoiding forbidden codes (7500, 7600, 7700)
+  const generateSquawk = () => {
+    const forbiddenCodes = ['7500', '7600', '7700'];
+    let squawk = '';
+    do {
+      squawk = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    } while (forbiddenCodes.includes(squawk));
+    return squawk;
+  };
+
+  // Update flight strip field
+  const updateStripField = (stripId, column, field, value) => {
+    setAtcFlightStrips(prev => ({
+      ...prev,
+      [column]: prev[column].map(strip => 
+        strip.id === stripId ? { ...strip, [field]: value } : strip
+      )
+    }));
+  };
+
+  // Randomize squawk code
+  const randomizeSquawk = (stripId, column) => {
+    const newSquawk = generateSquawk();
+    updateStripField(stripId, column, 'squawk', newSquawk);
+  };
+
   const updateStripNotes = (stripId, notes) => {
     socket.emit("updateFlightStripNotes", {
       airport: selectedAirport,
@@ -2663,8 +2689,18 @@ export default function App() {
                           onDragEnd={handleDragEnd}
                         >
                           <div className="strip-top-bar">
-                            <span className="strip-callsign">{strip.callsign}</span>
-                            <span className="strip-type">{strip.aircraft}</span>
+                            <input 
+                              className="strip-callsign" 
+                              value={strip.callsign} 
+                              onChange={(e) => updateStripField(strip.id, 'waiting', 'callsign', e.target.value)}
+                              title="Flight callsign"
+                            />
+                            <input 
+                              className="strip-type" 
+                              value={strip.aircraft} 
+                              onChange={(e) => updateStripField(strip.id, 'waiting', 'aircraft', e.target.value)}
+                              title="Aircraft type"
+                            />
                             <button className="strip-close" onClick={() => deleteFlightStrip(strip.id)}>
                               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M18 6L6 18M6 6l12 12"/>
@@ -2672,7 +2708,13 @@ export default function App() {
                             </button>
                           </div>
                           <div className="strip-route-line">
-                            <span className="route-dep">{strip.departure}</span>
+                            <input 
+                              className="route-dep" 
+                              value={strip.departure} 
+                              onChange={(e) => updateStripField(strip.id, 'waiting', 'departure', e.target.value)}
+                              maxLength="4"
+                              title="Departure airport"
+                            />
                             <div className="route-line">
                               <div className="route-dot start"></div>
                               <div className="route-dash"></div>
@@ -2682,16 +2724,43 @@ export default function App() {
                               <div className="route-dash"></div>
                               <div className="route-dot end"></div>
                             </div>
-                            <span className="route-arr">{strip.destination}</span>
+                            <input 
+                              className="route-arr" 
+                              value={strip.destination} 
+                              onChange={(e) => updateStripField(strip.id, 'waiting', 'destination', e.target.value)}
+                              maxLength="4"
+                              title="Destination airport"
+                            />
                           </div>
                           <div className="strip-data-grid">
                             <div className="data-cell">
                               <span className="data-label">FL</span>
-                              <span className="data-value">{strip.altitude || '---'}</span>
+                              <input 
+                                className="data-value" 
+                                value={strip.altitude || ''} 
+                                onChange={(e) => updateStripField(strip.id, 'waiting', 'altitude', e.target.value)}
+                                placeholder="---"
+                                maxLength="5"
+                              />
                             </div>
                             <div className="data-cell">
                               <span className="data-label">SQK</span>
-                              <span className="data-value">{strip.squawk || '----'}</span>
+                              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                <input 
+                                  className="data-value" 
+                                  value={strip.squawk || ''} 
+                                  onChange={(e) => updateStripField(strip.id, 'waiting', 'squawk', e.target.value)}
+                                  placeholder="----"
+                                  maxLength="4"
+                                />
+                                <button 
+                                  onClick={() => randomizeSquawk(strip.id, 'waiting')}
+                                  style={{ padding: '2px 6px', fontSize: '10px', cursor: 'pointer' }}
+                                  title="Randomize squawk"
+                                >
+                                  🎲
+                                </button>
+                              </div>
                             </div>
                             <div className="data-cell">
                               <span className="data-label">TIME</span>
@@ -2744,8 +2813,18 @@ export default function App() {
                           onDragEnd={handleDragEnd}
                         >
                           <div className="strip-top-bar">
-                            <span className="strip-callsign">{strip.callsign}</span>
-                            <span className="strip-type">{strip.aircraft}</span>
+                            <input 
+                              className="strip-callsign" 
+                              value={strip.callsign} 
+                              onChange={(e) => updateStripField(strip.id, 'cleared', 'callsign', e.target.value)}
+                              title="Flight callsign"
+                            />
+                            <input 
+                              className="strip-type" 
+                              value={strip.aircraft} 
+                              onChange={(e) => updateStripField(strip.id, 'cleared', 'aircraft', e.target.value)}
+                              title="Aircraft type"
+                            />
                             <button className="strip-close" onClick={() => deleteFlightStrip(strip.id)}>
                               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M18 6L6 18M6 6l12 12"/>
@@ -2753,7 +2832,13 @@ export default function App() {
                             </button>
                           </div>
                           <div className="strip-route-line">
-                            <span className="route-dep">{strip.departure}</span>
+                            <input 
+                              className="route-dep" 
+                              value={strip.departure} 
+                              onChange={(e) => updateStripField(strip.id, 'cleared', 'departure', e.target.value)}
+                              maxLength="4"
+                              title="Departure airport"
+                            />
                             <div className="route-line">
                               <div className="route-dot start"></div>
                               <div className="route-dash"></div>
@@ -2763,16 +2848,43 @@ export default function App() {
                               <div className="route-dash"></div>
                               <div className="route-dot end"></div>
                             </div>
-                            <span className="route-arr">{strip.destination}</span>
+                            <input 
+                              className="route-arr" 
+                              value={strip.destination} 
+                              onChange={(e) => updateStripField(strip.id, 'cleared', 'destination', e.target.value)}
+                              maxLength="4"
+                              title="Destination airport"
+                            />
                           </div>
                           <div className="strip-data-grid">
                             <div className="data-cell">
                               <span className="data-label">FL</span>
-                              <span className="data-value">{strip.altitude || '---'}</span>
+                              <input 
+                                className="data-value" 
+                                value={strip.altitude || ''} 
+                                onChange={(e) => updateStripField(strip.id, 'cleared', 'altitude', e.target.value)}
+                                placeholder="---"
+                                maxLength="5"
+                              />
                             </div>
                             <div className="data-cell">
                               <span className="data-label">SQK</span>
-                              <span className="data-value">{strip.squawk || '----'}</span>
+                              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                <input 
+                                  className="data-value" 
+                                  value={strip.squawk || ''} 
+                                  onChange={(e) => updateStripField(strip.id, 'cleared', 'squawk', e.target.value)}
+                                  placeholder="----"
+                                  maxLength="4"
+                                />
+                                <button 
+                                  onClick={() => randomizeSquawk(strip.id, 'cleared')}
+                                  style={{ padding: '2px 6px', fontSize: '10px', cursor: 'pointer' }}
+                                  title="Randomize squawk"
+                                >
+                                  🎲
+                                </button>
+                              </div>
                             </div>
                             <div className="data-cell">
                               <span className="data-label">TIME</span>
@@ -2824,8 +2936,18 @@ export default function App() {
                           onDragEnd={handleDragEnd}
                         >
                           <div className="strip-top-bar">
-                            <span className="strip-callsign">{strip.callsign}</span>
-                            <span className="strip-type">{strip.aircraft}</span>
+                            <input 
+                              className="strip-callsign" 
+                              value={strip.callsign} 
+                              onChange={(e) => updateStripField(strip.id, 'taxi', 'callsign', e.target.value)}
+                              title="Flight callsign"
+                            />
+                            <input 
+                              className="strip-type" 
+                              value={strip.aircraft} 
+                              onChange={(e) => updateStripField(strip.id, 'taxi', 'aircraft', e.target.value)}
+                              title="Aircraft type"
+                            />
                             <button className="strip-close" onClick={() => deleteFlightStrip(strip.id)}>
                               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M18 6L6 18M6 6l12 12"/>
@@ -2833,7 +2955,13 @@ export default function App() {
                             </button>
                           </div>
                           <div className="strip-route-line">
-                            <span className="route-dep">{strip.departure}</span>
+                            <input 
+                              className="route-dep" 
+                              value={strip.departure} 
+                              onChange={(e) => updateStripField(strip.id, 'taxi', 'departure', e.target.value)}
+                              maxLength="4"
+                              title="Departure airport"
+                            />
                             <div className="route-line">
                               <div className="route-dot start"></div>
                               <div className="route-dash"></div>
@@ -2843,16 +2971,43 @@ export default function App() {
                               <div className="route-dash"></div>
                               <div className="route-dot end"></div>
                             </div>
-                            <span className="route-arr">{strip.destination}</span>
+                            <input 
+                              className="route-arr" 
+                              value={strip.destination} 
+                              onChange={(e) => updateStripField(strip.id, 'taxi', 'destination', e.target.value)}
+                              maxLength="4"
+                              title="Destination airport"
+                            />
                           </div>
                           <div className="strip-data-grid">
                             <div className="data-cell">
                               <span className="data-label">FL</span>
-                              <span className="data-value">{strip.altitude || '---'}</span>
+                              <input 
+                                className="data-value" 
+                                value={strip.altitude || ''} 
+                                onChange={(e) => updateStripField(strip.id, 'taxi', 'altitude', e.target.value)}
+                                placeholder="---"
+                                maxLength="5"
+                              />
                             </div>
                             <div className="data-cell">
                               <span className="data-label">SQK</span>
-                              <span className="data-value">{strip.squawk || '----'}</span>
+                              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                <input 
+                                  className="data-value" 
+                                  value={strip.squawk || ''} 
+                                  onChange={(e) => updateStripField(strip.id, 'taxi', 'squawk', e.target.value)}
+                                  placeholder="----"
+                                  maxLength="4"
+                                />
+                                <button 
+                                  onClick={() => randomizeSquawk(strip.id, 'taxi')}
+                                  style={{ padding: '2px 6px', fontSize: '10px', cursor: 'pointer' }}
+                                  title="Randomize squawk"
+                                >
+                                  🎲
+                                </button>
+                              </div>
                             </div>
                             <div className="data-cell">
                               <span className="data-label">TIME</span>
