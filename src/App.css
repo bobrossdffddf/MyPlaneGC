@@ -9792,7 +9792,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  height: calc(100vh - 160px);
+  min-height: calc(100vh - 160px);
   background: #0c0c0c;
   border-radius: 4px;
   padding: 16px;
@@ -9950,8 +9950,8 @@ body {
   gap: 12px;
   flex: 1;
   overflow-x: auto;
-  overflow-y: hidden;
-  min-height: 0;
+  overflow-y: visible;
+  min-height: 400px;
   padding-bottom: 8px;
 }
 
@@ -10046,7 +10046,7 @@ body {
 .lane-content {
   flex: 1;
   padding: 10px;
-  overflow-y: auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -10091,6 +10091,8 @@ body {
   border-left: 4px solid transparent;
   overflow: hidden;
   box-sizing: border-box;
+  flex-shrink: 0;
+  min-height: 120px;
 }
 
 .efs-strip:active {
