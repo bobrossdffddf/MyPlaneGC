@@ -65,3 +65,34 @@ Preferred communication style: Simple, everyday language.
 - `passport` / `passport-discord`: Authentication middleware
 - `ws`: WebSocket client for external API connection
 - `dotenv`: Environment variable management
+
+## Ground Crew Manager (GCM) Mode
+
+### Overview
+Ground Crew Manager mode is a privileged administrative interface for managing ground crew operations at airports. Access is restricted to the certified owner only.
+
+### Access Control
+- **Owner Discord ID**: `848356730256883744`
+- **Server-side verification**: All GCM socket handlers verify the caller's authenticated session from `connectedUsers` map
+- **No client-side trust**: Manager identity is derived exclusively from server-verified session data
+- **Security model**: Prevents privilege escalation by rejecting unauthenticated or unauthorized socket requests
+
+### Features
+1. **Online Crew Tab**: View all online ground crew members with their callsigns, usernames, and current assignments
+2. **Gate Manager Tab**: Interactive gate/stand management with occupancy status
+3. **Assignment System**: Assign crew to teams, planes, or gates with popup notifications
+4. **Removal System**: Remove crew members from service with system notifications
+
+### Socket Events
+- `joinGcmMode`: Owner joins GCM mode (triggers manager online notification to ground crew)
+- `leaveGcmMode`: Owner leaves GCM mode
+- `gcmAssignToCrew`: Assign crew member to a team
+- `gcmAssignToPlane`: Assign crew member to service a specific aircraft
+- `gcmAssignToGate`: Assign crew member to a specific gate
+- `gcmRemoveFromCrew`: Remove crew member from service
+
+### Recent Changes (December 2025)
+- Implemented server-side access control for all GCM handlers
+- Removed fallback to client-supplied user identifiers
+- Manager and target user metadata now derived from server-verified `connectedUsers` data
+- Added popup notifications for ground crew when manager comes online or issues assignments
