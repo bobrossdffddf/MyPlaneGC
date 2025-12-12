@@ -1461,6 +1461,273 @@ io.on("connection", (socket) => {
     console.log(`❌ ATC removed plane from ${stand} at ${airport}`);
   });
 
+  // Owner Discord ID for GCM access control
+  const GCM_OWNER_DISCORD_ID = "848356730256883744";
+
+  // Ground Crew Manager (GCM) Socket Handlers
+  socket.on("joinGcmMode", (data) => {
+    const { airport } = data;
+    if (!airport) return;
+    
+    // Server-side access control - MUST have authenticated session
+    const userInfo = connectedUsers.get(socket.id);
+    if (!userInfo || !userInfo.userId) {
+      socket.emit("error", { message: "Access denied. Authentication required." });
+      console.log(`🚫 GCM access denied - no authenticated session`);
+      return;
+    }
+    
+    // Verify the authenticated user is the owner - no fallback to client data
+    if (userInfo.userId !== GCM_OWNER_DISCORD_ID) {
+      socket.emit("error", { message: "Access denied. GCM mode is restricted to certified managers only." });
+      console.log(`🚫 GCM access denied for user ${userInfo.username} (${userInfo.userId})`);
+      return;
+    }
+    
+    initializeAirportData(airport);
+    socket.join(`gcm-${airport}`);
+    
+    // Use server-verified username, not client-provided
+    const verifiedUsername = userInfo.username;
+    console.log(`👔 GCM ${verifiedUsername} joined management for ${airport}`);
+    
+    // Notify all ground crew at this airport that a manager is online
+    // Use server-verified username only
+    io.to(airport).emit("gcmManagerOnline", {
+      airport,
+      managerUsername: verifiedUsername,
+      message: "A Ground Crew Manager is now online! This user has been certified. Please listen to their orders. If you refuse you CAN be removed from service. Please report any misuse to @justawacko_"
+    });
+    
+    // Send current online crew list to the manager
+    const onlineCrew = [];
+    for (const [socketId, userData] of connectedUsers) {
+      if (userData.airport === airport && userData.mode === 'groundcrew') {
+        // Get their callsign
+        let callsign = '';
+        if (airportData[airport].groundCrewCallsigns) {
+          for (const [cs, uid] of airportData[airport].groundCrewCallsigns) {
+            if (uid === userData.userId) {
+              callsign = cs;
+              break;
+            }
+          }
+        }
+        onlineCrew.push({
+          socketId,
+          userId: userData.userId,
+          username: userData.username,
+          callsign: callsign || 'Unassigned',
+          assignment: userData.gcmAssignment || null
+        });
+      }
+    }
+    socket.emit("gcmOnlineCrewUpdate", onlineCrew);
+  });
+
+  socket.on("leaveGcmMode", (data) => {
+    const { airport } = data;
+    if (!airport) return;
+    
+    // Use server-verified username from connectedUsers
+    const userInfo = connectedUsers.get(socket.id);
+    const verifiedUsername = userInfo?.username || 'Unknown';
+    
+    socket.leave(`gcm-${airport}`);
+    console.log(`👔 GCM ${verifiedUsername} left management for ${airport}`);
+  });
+
+  socket.on("gcmAssignToCrew", (data) => {
+    const { airport, targetUserId, crewTeam } = data;
+    if (!airport) return;
+    
+    // Server-side access control - verify the caller is the owner with authenticated session
+    const callerInfo = connectedUsers.get(socket.id);
+    if (!callerInfo || !callerInfo.userId || callerInfo.userId !== GCM_OWNER_DISCORD_ID) {
+      socket.emit("error", { message: "Access denied. Only certified managers can assign crew." });
+      return;
+    }
+    
+    // Use server-verified manager username
+    const verifiedManagerName = callerInfo.username;
+    
+    // Find the target user's socket and derive target info from server-side data
+    for (const [socketId, userData] of connectedUsers) {
+      if (userData.userId === targetUserId && userData.airport === airport) {
+        // Derive target info from server-verified connectedUsers data
+        const verifiedTargetCallsign = getGroundCrewCallsign(airport, userData.userId) || 'Unknown';
+        const verifiedTargetUsername = userData.username || 'Unknown';
+        
+        userData.gcmAssignment = `Crew: ${crewTeam}`;
+        
+        // Notify the user of their assignment - use server-verified data only
+        io.to(socketId).emit("gcmAssignmentReceived", {
+          type: 'crew',
+          crewTeam,
+          assignedBy: verifiedManagerName,
+          message: `You have been assigned to ${crewTeam} by ${verifiedManagerName}`
+        });
+        
+        console.log(`👔 GCM: ${verifiedTargetCallsign} assigned to ${crewTeam} by ${verifiedManagerName}`);
+        break;
+      }
+    }
+    
+    // Update the GCM with fresh crew list
+    sendGcmCrewUpdate(airport);
+  });
+
+  socket.on("gcmAssignToPlane", (data) => {
+    const { airport, targetUserId, flight, gate } = data;
+    if (!airport) return;
+    
+    // Server-side access control - verify the caller is the owner with authenticated session
+    const callerInfo = connectedUsers.get(socket.id);
+    if (!callerInfo || !callerInfo.userId || callerInfo.userId !== GCM_OWNER_DISCORD_ID) {
+      socket.emit("error", { message: "Access denied. Only certified managers can assign crew." });
+      return;
+    }
+    
+    // Use server-verified manager username
+    const verifiedManagerName = callerInfo.username;
+    
+    for (const [socketId, userData] of connectedUsers) {
+      if (userData.userId === targetUserId && userData.airport === airport) {
+        // Derive target info from server-verified connectedUsers data
+        const verifiedTargetCallsign = getGroundCrewCallsign(airport, userData.userId) || 'Unknown';
+        
+        userData.gcmAssignment = `Plane: ${flight} at ${gate}`;
+        
+        io.to(socketId).emit("gcmAssignmentReceived", {
+          type: 'plane',
+          flight,
+          gate,
+          assignedBy: verifiedManagerName,
+          message: `You have been assigned to service ${flight} at ${gate} by ${verifiedManagerName}`
+        });
+        
+        console.log(`👔 GCM: ${verifiedTargetCallsign} assigned to plane ${flight} at ${gate} by ${verifiedManagerName}`);
+        break;
+      }
+    }
+    
+    sendGcmCrewUpdate(airport);
+  });
+
+  socket.on("gcmAssignToGate", (data) => {
+    const { airport, targetUserId, gate } = data;
+    if (!airport) return;
+    
+    // Server-side access control - verify the caller is the owner with authenticated session
+    const callerInfo = connectedUsers.get(socket.id);
+    if (!callerInfo || !callerInfo.userId || callerInfo.userId !== GCM_OWNER_DISCORD_ID) {
+      socket.emit("error", { message: "Access denied. Only certified managers can assign crew." });
+      return;
+    }
+    
+    // Use server-verified manager username
+    const verifiedManagerName = callerInfo.username;
+    
+    for (const [socketId, userData] of connectedUsers) {
+      if (userData.userId === targetUserId && userData.airport === airport) {
+        // Derive target info from server-verified connectedUsers data
+        const verifiedTargetCallsign = getGroundCrewCallsign(airport, userData.userId) || 'Unknown';
+        
+        userData.gcmAssignment = `Gate: ${gate}`;
+        
+        io.to(socketId).emit("gcmAssignmentReceived", {
+          type: 'gate',
+          gate,
+          assignedBy: verifiedManagerName,
+          message: `You have been assigned to gate ${gate} by ${verifiedManagerName}`
+        });
+        
+        console.log(`👔 GCM: ${verifiedTargetCallsign} assigned to gate ${gate} by ${verifiedManagerName}`);
+        break;
+      }
+    }
+    
+    sendGcmCrewUpdate(airport);
+  });
+
+  socket.on("gcmRemoveFromCrew", (data) => {
+    const { airport, targetUserId } = data;
+    if (!airport) return;
+    
+    // Server-side access control - verify the caller is the owner with authenticated session
+    const callerInfo = connectedUsers.get(socket.id);
+    if (!callerInfo || !callerInfo.userId || callerInfo.userId !== GCM_OWNER_DISCORD_ID) {
+      socket.emit("error", { message: "Access denied. Only certified managers can remove crew." });
+      return;
+    }
+    
+    // Use server-verified manager username
+    const verifiedManagerName = callerInfo.username;
+    
+    for (const [socketId, userData] of connectedUsers) {
+      if (userData.userId === targetUserId && userData.airport === airport) {
+        // Derive target info from server-verified connectedUsers data
+        const verifiedTargetCallsign = getGroundCrewCallsign(airport, userData.userId) || 'Unknown';
+        const verifiedTargetUsername = userData.username || 'Unknown';
+        
+        // Notify the user they've been removed - use server-verified manager name
+        io.to(socketId).emit("gcmRemovedFromCrew", {
+          removedBy: verifiedManagerName,
+          message: `You have been removed from ground crew service by ${verifiedManagerName}`
+        });
+        
+        // Release their callsign
+        releaseGroundCrewCallsign(airport, targetUserId);
+        
+        // Update their mode
+        userData.mode = null;
+        userData.gcmAssignment = null;
+        
+        console.log(`👔 GCM: ${verifiedTargetCallsign} removed from ground crew by ${verifiedManagerName}`);
+        
+        // Broadcast chat message - use server-verified data only
+        io.to(airport).emit("chatUpdate", {
+          text: `${verifiedTargetCallsign} (${verifiedTargetUsername}) has been removed from ground crew service by management`,
+          sender: "GCM SYSTEM",
+          airport: airport,
+          timestamp: new Date().toLocaleTimeString(),
+          mode: "system"
+        });
+        
+        break;
+      }
+    }
+    
+    sendGcmCrewUpdate(airport);
+    broadcastUserCounts();
+  });
+
+  // Helper function to send updated crew list to GCM
+  function sendGcmCrewUpdate(airport) {
+    const onlineCrew = [];
+    for (const [socketId, userData] of connectedUsers) {
+      if (userData.airport === airport && userData.mode === 'groundcrew') {
+        let callsign = '';
+        if (airportData[airport] && airportData[airport].groundCrewCallsigns) {
+          for (const [cs, uid] of airportData[airport].groundCrewCallsigns) {
+            if (uid === userData.userId) {
+              callsign = cs;
+              break;
+            }
+          }
+        }
+        onlineCrew.push({
+          socketId,
+          userId: userData.userId,
+          username: userData.username,
+          callsign: callsign || 'Unassigned',
+          assignment: userData.gcmAssignment || null
+        });
+      }
+    }
+    io.to(`gcm-${airport}`).emit("gcmOnlineCrewUpdate", onlineCrew);
+  }
+
   socket.on("disconnect", () => {
     const userInfo = connectedUsers.get(socket.id);
     if (userInfo) {

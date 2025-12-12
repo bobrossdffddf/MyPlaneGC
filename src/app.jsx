@@ -79,6 +79,18 @@ export default function App() {
   const [atcLoadingStep, setAtcLoadingStep] = useState('');
   const [atcActiveTab, setAtcActiveTab] = useState('groundcrew');
 
+  // Ground Crew Manager (GCM) Mode state
+  const [gcmMode, setGcmMode] = useState(false);
+  const [gcmLoading, setGcmLoading] = useState(false);
+  const [gcmLoadingProgress, setGcmLoadingProgress] = useState(0);
+  const [gcmLoadingStep, setGcmLoadingStep] = useState('');
+  const [gcmActiveTab, setGcmActiveTab] = useState('online');
+  const [gcmOnlineCrew, setGcmOnlineCrew] = useState([]);
+  const [gcmAccessDeniedPopup, setGcmAccessDeniedPopup] = useState(false);
+  const [gcmManagerOnlinePopup, setGcmManagerOnlinePopup] = useState(false);
+  const [gcmAssignmentPopup, setGcmAssignmentPopup] = useState(null);
+  const [gcmCurrentAssignment, setGcmCurrentAssignment] = useState(null);
+
   // Mode loading states for Ground Crew and Pilot
   const [modeLoading, setModeLoading] = useState(false);
   const [modeLoadingProgress, setModeLoadingProgress] = useState(0);
@@ -1514,6 +1526,31 @@ export default function App() {
       setAirportUserCounts(counts);
     });
 
+    // GCM Socket Listeners
+    socket.on("gcmManagerOnline", (data) => {
+      // Show popup to ground crew that a manager is online
+      if (userMode === "groundcrew") {
+        setGcmManagerOnlinePopup(true);
+      }
+    });
+
+    socket.on("gcmOnlineCrewUpdate", (crewList) => {
+      setGcmOnlineCrew(crewList);
+    });
+
+    socket.on("gcmAssignmentReceived", (data) => {
+      // Show popup to the ground crew member with their assignment
+      setGcmAssignmentPopup(data);
+      setGcmCurrentAssignment(data);
+    });
+
+    socket.on("gcmRemovedFromCrew", (data) => {
+      // User was removed from ground crew - switch them to pilot mode or show message
+      alert(`You have been removed from ground crew service by ${data.removedBy}. Reason: Manager decision.`);
+      setUserMode(null);
+      setGroundCrewCallsign("");
+    });
+
     return () => {
       isMounted = false;
       socket.off("standUpdate");
@@ -1524,8 +1561,12 @@ export default function App() {
       socket.off("callsignUpdate");
       socket.off("error");
       socket.off("userCountUpdate");
+      socket.off("gcmManagerOnline");
+      socket.off("gcmOnlineCrewUpdate");
+      socket.off("gcmAssignmentReceived");
+      socket.off("gcmRemovedFromCrew");
     };
-  }, [loading]); // Only depend on loading state
+  }, [loading, userMode]); // Added userMode dependency for GCM events
 
   const handleLogin = () => {
     window.location.href = "/auth/discord";
@@ -1671,6 +1712,105 @@ export default function App() {
     setAtcActiveTab('groundcrew');
     setAtcFlightStrips({ waiting: [], cleared: [], taxi: [] });
     setSelectedAirport("");
+  };
+
+  // Ground Crew Manager (GCM) Functions
+  const enterGcmMode = async (airport) => {
+    // Check if user is the owner
+    if (user?.id !== OWNER_DISCORD_ID) {
+      setGcmAccessDeniedPopup(true);
+      return;
+    }
+
+    setSelectedAirport(airport);
+    setGcmLoading(true);
+    setGcmLoadingProgress(0);
+    setGcmLoadingStep('Initializing systems...');
+
+    const loadingSteps = [
+      { progress: 10, step: 'CONNECTING TO MANAGEMENT NETWORK...' },
+      { progress: 25, step: 'LOADING CREW DATABASE...' },
+      { progress: 40, step: 'SYNCING ONLINE CREW...' },
+      { progress: 55, step: 'INITIALIZING ASSIGNMENT SYSTEM...' },
+      { progress: 70, step: 'LOADING GATE MANAGEMENT...' },
+      { progress: 85, step: 'ESTABLISHING COMMUNICATIONS...' },
+      { progress: 95, step: 'SYSTEMS CHECK COMPLETE' },
+      { progress: 100, step: 'READY' }
+    ];
+
+    for (let i = 0; i < loadingSteps.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setGcmLoadingProgress(loadingSteps[i].progress);
+      setGcmLoadingStep(loadingSteps[i].step);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Join GCM mode and notify all ground crew
+    socket.emit("joinGcmMode", { 
+      airport, 
+      userId: user?.id, 
+      username: user?.username 
+    });
+
+    setGcmLoading(false);
+    setGcmMode(true);
+  };
+
+  const exitGcmMode = () => {
+    socket.emit("leaveGcmMode", { 
+      airport: selectedAirport, 
+      username: user?.username 
+    });
+    setGcmMode(false);
+    setGcmActiveTab('online');
+    setGcmOnlineCrew([]);
+    setSelectedAirport("");
+  };
+
+  // GCM Assignment Functions
+  const gcmAssignCrewToCrew = (crewMember, crewTeam) => {
+    socket.emit("gcmAssignToCrew", {
+      airport: selectedAirport,
+      targetUserId: crewMember.userId,
+      targetUsername: crewMember.username,
+      targetCallsign: crewMember.callsign,
+      crewTeam: crewTeam,
+      assignedBy: user?.username
+    });
+  };
+
+  const gcmAssignCrewToPlane = (crewMember, flight, gate) => {
+    socket.emit("gcmAssignToPlane", {
+      airport: selectedAirport,
+      targetUserId: crewMember.userId,
+      targetUsername: crewMember.username,
+      targetCallsign: crewMember.callsign,
+      flight: flight,
+      gate: gate,
+      assignedBy: user?.username
+    });
+  };
+
+  const gcmAssignCrewToGate = (crewMember, gate) => {
+    socket.emit("gcmAssignToGate", {
+      airport: selectedAirport,
+      targetUserId: crewMember.userId,
+      targetUsername: crewMember.username,
+      targetCallsign: crewMember.callsign,
+      gate: gate,
+      assignedBy: user?.username
+    });
+  };
+
+  const gcmRemoveFromGroundCrew = (crewMember) => {
+    socket.emit("gcmRemoveFromCrew", {
+      airport: selectedAirport,
+      targetUserId: crewMember.userId,
+      targetUsername: crewMember.username,
+      targetCallsign: crewMember.callsign,
+      removedBy: user?.username
+    });
   };
 
   const handleDragStart = (strip, column, e) => {
@@ -2489,6 +2629,257 @@ export default function App() {
             </div>
             <div className="boot-airport-badge">{selectedAirport}</div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // GCM Loading Screen
+  if (gcmLoading) {
+    return (
+      <div className="gcm-loading-screen">
+        <div className="gcm-loading-container">
+          <div className="gcm-boot-animation">
+            <div className="boot-logo">👔</div>
+            <div>
+              <div className="boot-title">Ground Crew Manager</div>
+              <div className="boot-subtitle">Management Control System</div>
+            </div>
+            <div className="boot-progress-wrapper">
+              <div className="boot-progress-bar gcm">
+                <div className="boot-progress-fill gcm" style={{ width: `${gcmLoadingProgress}%` }}></div>
+              </div>
+              <div className="boot-status">{gcmLoadingStep}</div>
+            </div>
+            <div className="boot-airport-badge gcm">{selectedAirport}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // GCM Mode UI
+  if (gcmMode) {
+    return (
+      <div className="gcm-mode-container">
+        <div className="gcm-header">
+          <div className="gcm-header-left">
+            <div className="gcm-logo">👔</div>
+            <div className="gcm-title">
+              <h1>GROUND CREW MANAGER</h1>
+              <span className="gcm-airport">{selectedAirport}</span>
+            </div>
+          </div>
+          <div className="gcm-header-center">
+            <div className="gcm-tabs">
+              <button 
+                className={`gcm-tab ${gcmActiveTab === 'online' ? 'active' : ''}`}
+                onClick={() => setGcmActiveTab('online')}
+              >
+                <span className="tab-icon">👥</span>
+                ONLINE CREW
+              </button>
+              <button 
+                className={`gcm-tab ${gcmActiveTab === 'gates' ? 'active' : ''}`}
+                onClick={() => setGcmActiveTab('gates')}
+              >
+                <span className="tab-icon">🚪</span>
+                GATE MANAGER
+              </button>
+              <button 
+                className={`gcm-tab ${gcmActiveTab === 'other' ? 'active' : ''}`}
+                onClick={() => setGcmActiveTab('other')}
+                disabled
+              >
+                <span className="tab-icon">📋</span>
+                N/A
+              </button>
+            </div>
+          </div>
+          <div className="gcm-header-right">
+            <div className="gcm-user">
+              <span className="user-icon">👤</span>
+              {user?.username}
+            </div>
+            <div className="gcm-time">
+              <span className="time-icon">🕐</span>
+              {getZuluTime()}
+            </div>
+            <button className="gcm-exit-btn" onClick={exitGcmMode}>
+              <span className="exit-icon">🚪</span>
+              EXIT GCM MODE
+            </button>
+          </div>
+        </div>
+
+        <div className="gcm-content">
+          {/* Tab 1: Online Crew */}
+          {gcmActiveTab === 'online' && (
+            <div className="gcm-online-tab">
+              <div className="gcm-section">
+                <div className="section-header">
+                  <h2>👥 ONLINE GROUND CREW - {selectedAirport}</h2>
+                  <div className="gcm-stats">
+                    <div className="stat-badge online">
+                      <span className="stat-number">{gcmOnlineCrew.length}</span>
+                      <span className="stat-label">ONLINE</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="gcm-crew-grid">
+                  {gcmOnlineCrew.length === 0 ? (
+                    <div className="no-crew-message">
+                      <span className="no-crew-icon">👷‍♂️</span>
+                      <p>No ground crew currently online at {selectedAirport}</p>
+                    </div>
+                  ) : (
+                    gcmOnlineCrew.map((crew, index) => (
+                      <div key={index} className="gcm-crew-card">
+                        <div className="crew-card-header">
+                          <div className="crew-avatar">👷</div>
+                          <div className="crew-info">
+                            <div className="crew-name">{crew.username}</div>
+                            <div className="crew-callsign">{crew.callsign}</div>
+                          </div>
+                          <div className="crew-status online">ONLINE</div>
+                        </div>
+                        
+                        {crew.assignment && (
+                          <div className="crew-current-assignment">
+                            <span className="assignment-label">Current Assignment:</span>
+                            <span className="assignment-value">{crew.assignment}</span>
+                          </div>
+                        )}
+
+                        <div className="crew-actions">
+                          <div className="action-group">
+                            <label>Assign to Crew:</label>
+                            <select 
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  gcmAssignCrewToCrew(crew, e.target.value);
+                                  e.target.value = "";
+                                }
+                              }}
+                              className="crew-select"
+                            >
+                              <option value="">Select crew...</option>
+                              <option value="Alpha Team">Alpha Team</option>
+                              <option value="Bravo Team">Bravo Team</option>
+                              <option value="Charlie Team">Charlie Team</option>
+                              <option value="Delta Team">Delta Team</option>
+                              <option value="Fuel Team">Fuel Team</option>
+                              <option value="Baggage Team">Baggage Team</option>
+                              <option value="Pushback Team">Pushback Team</option>
+                              <option value="Catering Team">Catering Team</option>
+                            </select>
+                          </div>
+
+                          <div className="action-group">
+                            <label>Assign to Gate:</label>
+                            <select 
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  gcmAssignCrewToGate(crew, e.target.value);
+                                  e.target.value = "";
+                                }
+                              }}
+                              className="crew-select"
+                            >
+                              <option value="">Select gate...</option>
+                              {getAirportConfig(selectedAirport).stands.map((stand) => (
+                                <option key={stand} value={stand}>{stand}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="action-group plane-assign">
+                            <label>Assign to Plane:</label>
+                            <div className="plane-inputs">
+                              <input 
+                                type="text" 
+                                placeholder="Flight #" 
+                                id={`flight-${index}`}
+                                className="flight-input"
+                              />
+                              <select id={`gate-${index}`} className="gate-select">
+                                <option value="">Gate</option>
+                                {getAirportConfig(selectedAirport).stands.map((stand) => (
+                                  <option key={stand} value={stand}>{stand}</option>
+                                ))}
+                              </select>
+                              <button 
+                                onClick={() => {
+                                  const flight = document.getElementById(`flight-${index}`).value;
+                                  const gate = document.getElementById(`gate-${index}`).value;
+                                  if (flight && gate) {
+                                    gcmAssignCrewToPlane(crew, flight, gate);
+                                    document.getElementById(`flight-${index}`).value = "";
+                                    document.getElementById(`gate-${index}`).value = "";
+                                  }
+                                }}
+                                className="assign-btn"
+                              >
+                                ASSIGN
+                              </button>
+                            </div>
+                          </div>
+
+                          <button 
+                            onClick={() => gcmRemoveFromGroundCrew(crew)}
+                            className="remove-crew-btn"
+                          >
+                            REMOVE FROM SERVICE
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Gate Manager */}
+          {gcmActiveTab === 'gates' && (
+            <div className="gcm-gates-tab">
+              <div className="gcm-section">
+                <div className="section-header">
+                  <h2>🚪 GATE MANAGEMENT - {selectedAirport}</h2>
+                </div>
+                <div className="gates-grid">
+                  {getAirportConfig(selectedAirport).stands.map((stand) => (
+                    <div key={stand} className={`gate-card ${stands[stand] ? 'occupied' : 'vacant'}`}>
+                      <div className="gate-header">
+                        <span className="gate-name">{stand}</span>
+                        <span className={`gate-status ${stands[stand] ? 'occupied' : 'vacant'}`}>
+                          {stands[stand] ? 'OCCUPIED' : 'VACANT'}
+                        </span>
+                      </div>
+                      {stands[stand] && (
+                        <div className="gate-flight-info">
+                          <span className="flight-num">{stands[stand].flight || 'N/A'}</span>
+                          <span className="aircraft-type">{stands[stand].aircraft || 'N/A'}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 3: N/A */}
+          {gcmActiveTab === 'other' && (
+            <div className="gcm-other-tab">
+              <div className="coming-soon">
+                <span className="coming-soon-icon">🚧</span>
+                <h2>COMING SOON</h2>
+                <p>This feature is currently under development.</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -3452,8 +3843,34 @@ export default function App() {
                 )}
               </button>
 
+              <button
+                onClick={() => enterGcmMode(selectedAirport)}
+                className="role-card gcm"
+              >
+                <div className="role-icon">👔</div>
+                <div className="role-title">GROUND CREW MANAGER</div>
+                <div className="role-description">Manage ground crew assignments & operations</div>
+                <div className="role-restricted">RESTRICTED ACCESS</div>
+              </button>
+
             </div>
           </div>
+
+          {/* GCM Access Denied Popup */}
+          {gcmAccessDeniedPopup && (
+            <div className="gcm-popup-overlay">
+              <div className="gcm-popup access-denied">
+                <div className="popup-icon">🚫</div>
+                <h2>ACCESS DENIED</h2>
+                <p>You do not have permission to access Ground Crew Manager mode.</p>
+                <p className="popup-subtext">This feature is restricted to certified managers only.</p>
+                <p className="popup-contact">If you believe this is an error, please contact @justawacko_</p>
+                <button onClick={() => setGcmAccessDeniedPopup(false)} className="popup-btn">
+                  UNDERSTOOD
+                </button>
+              </div>
+            </div>
+          )}
 
           <div style={{ textAlign: 'center', marginTop: '30px' }}>
             <button
@@ -4648,6 +5065,60 @@ export default function App() {
       return (
         <div className="groundcrew-main">
 
+          {/* GCM Manager Online Popup */}
+          {gcmManagerOnlinePopup && (
+            <div className="gcm-popup-overlay">
+              <div className="gcm-popup manager-online">
+                <div className="popup-icon">👔</div>
+                <h2>MANAGER ONLINE</h2>
+                <p>A Ground Crew Manager is now online!</p>
+                <p>This user has been certified. Please listen to their orders.</p>
+                <p className="popup-subtext">If you refuse you CAN be removed from service.</p>
+                <p className="popup-contact">Please report any misuse to @justawacko_</p>
+                <button onClick={() => setGcmManagerOnlinePopup(false)} className="popup-btn">
+                  UNDERSTOOD
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* GCM Assignment Popup */}
+          {gcmAssignmentPopup && (
+            <div className="gcm-popup-overlay">
+              <div className="gcm-popup assignment">
+                <div className="popup-icon">📋</div>
+                <h2>NEW ASSIGNMENT</h2>
+                <p>{gcmAssignmentPopup.message}</p>
+                {gcmAssignmentPopup.type === 'crew' && (
+                  <p className="popup-subtext">You are now part of {gcmAssignmentPopup.crewTeam}</p>
+                )}
+                {gcmAssignmentPopup.type === 'plane' && (
+                  <p className="popup-subtext">Service {gcmAssignmentPopup.flight} at gate {gcmAssignmentPopup.gate}</p>
+                )}
+                {gcmAssignmentPopup.type === 'gate' && (
+                  <p className="popup-subtext">Report to gate {gcmAssignmentPopup.gate}</p>
+                )}
+                <button onClick={() => setGcmAssignmentPopup(null)} className="popup-btn">
+                  ACCEPT ASSIGNMENT
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* GCM Current Assignment Bar */}
+          {gcmCurrentAssignment && (
+            <div className="gcm-assignment-bar">
+              <span className="assignment-icon">📋</span>
+              <div className="assignment-info">
+                <div className="assignment-title">CURRENT ASSIGNMENT</div>
+                <div className="assignment-detail">
+                  {gcmCurrentAssignment.type === 'crew' && `Crew: ${gcmCurrentAssignment.crewTeam}`}
+                  {gcmCurrentAssignment.type === 'plane' && `Plane: ${gcmCurrentAssignment.flight} at ${gcmCurrentAssignment.gate}`}
+                  {gcmCurrentAssignment.type === 'gate' && `Gate: ${gcmCurrentAssignment.gate}`}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="service-management-board">
             <div className="service-column critical">
